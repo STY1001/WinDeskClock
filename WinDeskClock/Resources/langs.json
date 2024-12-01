@@ -1,0 +1,128 @@
+{
+  "en-us": {
+    "clock": {
+      "days": {
+        "long": {
+          "sunday": "Sunday",
+          "monday": "Monday",
+          "tuesday": "Tuesday",
+          "wednesday": "Wednesday",
+          "thursday": "Thursday",
+          "friday": "Friday",
+          "saturday": "Saturday"
+        },
+        "short": {
+          "sunday": "Sun",
+          "monday": "Mon",
+          "tuesday": "Tue",
+          "wednesday": "Wed",
+          "thursday": "Thu",
+          "friday": "Fri",
+          "saturday": "Sat"
+        },
+        "abbr": {
+          "sunday": "S",
+          "monday": "M",
+          "tuesday": "T",
+          "wednesday": "W",
+          "thursday": "T",
+          "friday": "F",
+          "saturday": "S"
+        }
+      },
+      "mouths": {
+        "long": {
+          "january": "January",
+          "february": "February",
+          "march": "March",
+          "april": "April",
+          "may": "May",
+          "june": "June",
+          "july": "July",
+          "august": "August",
+          "september": "September",
+          "october": "October",
+          "november": "November",
+          "december": "December"
+        },
+        "short": {
+          "january": "Jan",
+          "february": "Feb",
+          "march": "Mar",
+          "april": "Apr",
+          "may": "May",
+          "june": "Jun",
+          "july": "Jul",
+          "august": "Aug",
+          "september": "Sep",
+          "october": "Oct",
+          "november": "Nov",
+          "december": "Dec"
+        },
+        "abbr": {
+          "january": "J",
+          "february": "F",
+          "march": "M",
+          "april": "A",
+          "may": "M",
+          "june": "J",
+          "july": "J",
+          "august": "A",
+          "september": "S",
+          "october": "O",
+          "november": "N",
+          "december": "D"
+        }
+      }
+    },
+    "weather": {
+      "wmo": {
+        "cleard": "Clear Day",
+        "clearn": "Clear Night",
+        "mostlycleard": "Mostly Clear Day",
+        "mostlyclearn": "Mostly Clear Night",
+        "mostlycloudyd": "Mostly Cloudy Day",
+        "mostlycloudyn": "Mostly Cloudy Night",
+        "cloudy": "Cloudy",
+        "foggy": "Foggy",
+        "rimefog": "Rime Fog",
+        "lightdrizzle": "Light Drizzle",
+        "drizzle": "Drizzle",
+        "heavydrizzle": "Heavy Drizzle",
+        "lightfreezingdrizzle": "Light Freezing Drizzle",
+        "freezingdrizzle": "Freezing Drizzle",
+        "lightraind": "Light Rain",
+        "lightrainn": "Light Rain",
+        "raind": "Rain",
+        "rainn": "Rain",
+        "heavyraind": "Heavy Rain",
+        "heavyrainn": "Heavy Rain",
+        "lightfreezingraind": "Light Freezing Rain",
+        "lightfreezinrainn": "Light Freezing Rain",
+        "lightsnow": "Light Snow",
+        "snow": "Snow",
+        "heavysnow": "Heavy Snow",
+        "snowgrains": "Snow Grains",
+        "lightshowers": "Light Showers",
+        "showers": "Showers",
+        "heavyshowers": "Heavy Showers",
+        "lightsnowshowers": "Light Snow Showers",
+        "snowshowers": "Snow Showers",
+        "thunderstorm": "Thunderstorm",
+        "lightthunderstormswithhail": "Light Thunderstorms with Hail",
+        "thunderstormwithhail": "Thunderstorms with Hail"
+      },
+      "temp": "Temperature",
+      "feelslike": "Feels Like",
+      "humidity": "Humidity",
+      "uvindex": "UV Index",
+      "precipitation": "Precipitation",
+      "pressure": "Pressure",
+      "windspeed": "Wind Speed",
+      "airquality": "Air Quality",
+      "visibility": "Visibility",
+      "sunrise": "Sunrise",
+      "sunset": "Sunset"
+    }
+  }
+}
