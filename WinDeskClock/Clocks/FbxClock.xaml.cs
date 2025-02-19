@@ -312,7 +312,7 @@ namespace WinDeskClock.Clocks
                 {
                     new byte[] { 1, 0, 0, 0, 1 },
                     new byte[] { 1, 0, 0, 0, 1 },
-                    new byte[] { 1, 0, 0, 0, 1 },
+                    new byte[] { 1, 0, 1, 0, 1 },
                     new byte[] { 1, 0, 1, 0, 1 },
                     new byte[] { 1, 1, 1, 1, 1 }
                 }
@@ -476,6 +476,39 @@ namespace WinDeskClock.Clocks
                 H2Img.Source = await FbxStyle.GetFbxNumberBitmapImage(7);
                 M1Img.Source = await FbxStyle.GetFbxNumberBitmapImage(2);
                 M2Img.Source = await FbxStyle.GetFbxNumberBitmapImage(0);
+                DNameStack.Children.Clear();
+                foreach (char c in "MON")
+                {
+                    string letter = c.ToString().ToUpper();
+                    Image img = new Image();
+                    img.Source = await FbxStyle.GetFbxLetterBitmapImage(letter);
+                    img.Margin = new Thickness(5);
+                    img.Height = 30;
+                    img.Width = 30;
+                    DNameStack.Children.Add(img);
+                }
+                DDayStack.Children.Clear();
+                foreach (char c in "7")
+                {
+                    string letter = c.ToString();
+                    Image img = new Image();
+                    img.Source = await FbxStyle.GetFbxNumberBitmapImage(int.Parse(letter));
+                    img.Margin = new Thickness(5);
+                    img.Height = 30;
+                    img.Width = 30;
+                    DDayStack.Children.Add(img);
+                }
+                DMonthStack.Children.Clear();
+                foreach (char c in "AUG")
+                {
+                    string letter = c.ToString().ToUpper();
+                    Image img = new Image();
+                    img.Source = await FbxStyle.GetFbxLetterBitmapImage(letter);
+                    img.Margin = new Thickness(5);
+                    img.Height = 30;
+                    img.Width = 30;
+                    DMonthStack.Children.Add(img);
+                }
 
                 // Create a timer to update the clock every second
                 time = new DispatcherTimer
@@ -717,6 +750,21 @@ namespace WinDeskClock.Clocks
         {
             if (ActualDName != text)
             {
+                ActualDName = text;
+                {
+                    var translateAnimation = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = -55*3,
+                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                    };
+                    Storyboard.SetTarget(translateAnimation, DNameStack);
+                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
+                    var storyboard = new Storyboard();
+                    storyboard.Children.Add(translateAnimation);
+                    storyboard.Begin();
+                }
+                await Task.Delay(txtdelay);
                 DNameStack.Children.Clear();
                 foreach (char c in text)
                 {
@@ -728,6 +776,27 @@ namespace WinDeskClock.Clocks
                     img.Width = 30;
                     DNameStack.Children.Add(img);
                 }
+                {
+                    var translateAnimation = new DoubleAnimation
+                    {
+                        From = 55,
+                        To = 0,
+                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                    };
+                    var resetx = new DoubleAnimation
+                    {
+                        To = 0,
+                        Duration = TimeSpan.FromSeconds(0)
+                    };
+                    Storyboard.SetTarget(translateAnimation, DNameStack);
+                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                    Storyboard.SetTarget(resetx, DNameStack);
+                    Storyboard.SetTargetProperty(resetx, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
+                    var storyboard = new Storyboard();
+                    storyboard.Children.Add(translateAnimation);
+                    storyboard.Children.Add(resetx);
+                    storyboard.Begin();
+                }
             }
         }
 
@@ -735,6 +804,21 @@ namespace WinDeskClock.Clocks
         {
             if (ActualDDay != text)
             {
+                ActualDDay = text;
+                {
+                    var translateAnimation = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = -55,
+                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                    };
+                    Storyboard.SetTarget(translateAnimation, DDayStack);
+                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                    var storyboard = new Storyboard();
+                    storyboard.Children.Add(translateAnimation);
+                    storyboard.Begin();
+                }
+                await Task.Delay(txtdelay);
                 DDayStack.Children.Clear();
                 foreach (char c in text)
                 {
@@ -746,6 +830,19 @@ namespace WinDeskClock.Clocks
                     img.Width = 30;
                     DDayStack.Children.Add(img);
                 }
+                {
+                    var translateAnimation = new DoubleAnimation
+                    {
+                        From = 55,
+                        To = 0,
+                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                    };
+                    Storyboard.SetTarget(translateAnimation, DDayStack);
+                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                    var storyboard = new Storyboard();
+                    storyboard.Children.Add(translateAnimation);
+                    storyboard.Begin();
+                }
             }
         }
 
@@ -753,6 +850,21 @@ namespace WinDeskClock.Clocks
         {
             if (ActualDMonth != text)
             {
+                ActualDMonth = text;
+                {
+                    var translateAnimation = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 55*3,
+                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                    };
+                    Storyboard.SetTarget(translateAnimation, DMonthStack);
+                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
+                    var storyboard = new Storyboard();
+                    storyboard.Children.Add(translateAnimation);
+                    storyboard.Begin();
+                }
+                await Task.Delay(txtdelay);
                 DMonthStack.Children.Clear();
                 foreach (char c in text)
                 {
@@ -764,6 +876,28 @@ namespace WinDeskClock.Clocks
                     img.Width = 30;
                     DMonthStack.Children.Add(img);
                 }
+                {
+                    var translateAnimation = new DoubleAnimation
+                    {
+                        From = 55,
+                        To = 0,
+                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                    };
+                    var resetx = new DoubleAnimation
+                    {
+                        To = 0,
+                        Duration = TimeSpan.FromSeconds(0)
+                    };
+                    Storyboard.SetTarget(translateAnimation, DMonthStack);
+                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                    Storyboard.SetTarget(resetx, DMonthStack);
+                    Storyboard.SetTargetProperty(resetx, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
+                    var storyboard = new Storyboard();
+                    storyboard.Children.Add(translateAnimation);
+                    storyboard.Children.Add(resetx);
+                    storyboard.Begin();
+                }
+
             }
         }
     }

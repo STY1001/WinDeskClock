@@ -93,7 +93,8 @@
                     VerticalAlignment="Top">
                 <Grid x:Name="DateGrid"
                       VerticalAlignment="Top"
-                      HorizontalAlignment="Center">
+                      HorizontalAlignment="Center"
+                      ClipToBounds="True">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="20" />
@@ -102,14 +103,29 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel x:Name="DNameStack"
-                               Grid.Column="0"
-                                Orientation="Horizontal"/>
+                                Grid.Column="0"
+                                Orientation="Horizontal">
+                        <StackPanel.RenderTransform>
+                            <TranslateTransform X="0"
+                                                Y="0" />
+                        </StackPanel.RenderTransform>
+                    </StackPanel>
                     <StackPanel x:Name="DDayStack"
                                 Grid.Column="2"
-                                Orientation="Horizontal" />
+                                Orientation="Horizontal">
+                        <StackPanel.RenderTransform>
+                            <TranslateTransform X="0"
+                                                Y="0" />
+                        </StackPanel.RenderTransform>
+                    </StackPanel>
                     <StackPanel x:Name="DMonthStack"
                                 Grid.Column="4"
-                                Orientation="Horizontal" />
+                                Orientation="Horizontal">
+                        <StackPanel.RenderTransform>
+                            <TranslateTransform X="0"
+                                                Y="0" />
+                        </StackPanel.RenderTransform>
+                    </StackPanel>
                 </Grid>
             </Border>
         </Grid>
