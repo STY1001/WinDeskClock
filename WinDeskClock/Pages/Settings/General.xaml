@@ -1,0 +1,89 @@
+﻿<Page x:Class="WinDeskClock.Pages.Settings.General"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:WinDeskClock.Pages.Settings"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      mc:Ignorable="d"
+      d:DesignHeight="450"
+      d:DesignWidth="800"
+      Title="General">
+
+    <Grid>
+        <StackPanel>
+            <Grid HorizontalAlignment="Stretch"
+                  Margin="20,10,20,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="General"
+                           FontSize="10"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                           Grid.Column="0"
+                           Margin="0,0,10,0"/>
+                <Separator HorizontalAlignment="Stretch"
+                           VerticalAlignment="Center"
+                           Grid.Column="1" />
+            </Grid>
+            <ui:CardControl Margin="15,0,15,10">
+                <ui:CardControl.Header>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="Language"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   FontFamily="Segoe UI SemiBold" />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:CardControl.Content>
+                    <ComboBox x:Name="LangComboBox"/>
+                </ui:CardControl.Content>
+            </ui:CardControl>
+            <Grid HorizontalAlignment="Stretch"
+                  Margin="20,0,20,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Clock"
+                           FontSize="10"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                           Grid.Column="0"
+                           Margin="0,0,10,0" />
+                <Separator HorizontalAlignment="Stretch"
+                           VerticalAlignment="Center"
+                           Grid.Column="1" />
+            </Grid>
+            <ui:CardControl Margin="15,0,15,10">
+                <ui:CardControl.Header>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="Show seconds"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   FontFamily="Segoe UI SemiBold"/>
+                        <TextBlock Text="Show seconds on the clock (also show year)"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   FontSize="12"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:CardControl.Content>
+                    <ui:ToggleSwitch x:Name="ShowSecondsToggleSwitch"/>
+                </ui:CardControl.Content>
+            </ui:CardControl>
+            <ui:CardControl Margin="15,0,15,10">
+                <ui:CardControl.Header>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="Freebox style"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   FontFamily="Segoe UI SemiBold"/>
+                        <TextBlock Text="Apply the Freebox Revolution clock style"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   FontSize="12"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:CardControl.Content>
+                    <ui:ToggleSwitch x:Name="FbxStyleToggleSwitch"/>
+                </ui:CardControl.Content>
+            </ui:CardControl>
+        </StackPanel>
+    </Grid>
+</Page>

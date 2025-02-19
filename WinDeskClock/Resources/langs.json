@@ -1,128 +1,252 @@
 {
   "en-us": {
-    "clock": {
-      "days": {
-        "long": {
-          "sunday": "Sunday",
-          "monday": "Monday",
-          "tuesday": "Tuesday",
-          "wednesday": "Wednesday",
-          "thursday": "Thursday",
-          "friday": "Friday",
-          "saturday": "Saturday"
+    "id": "en-us",
+    "name": "English (United States)",
+    "content": {
+      "mainmenu": {
+        "titlename": "Main menu",
+        "back": "Back",
+        "screenoff": "Turn screen off",
+        "fullscreen": "Fullscreen",
+        "kiosk": "Kiosk mode",
+        "settings": "Settings",
+        "exit": "Exit"
+      },
+      "settings": {
+        "titlename": "Settings",
+        "save": "Save",
+        "cancel": "Cancel",
+        "general": {
+          "titlename": "General",
+          "lang": {
+            "name": "Language",
+            "desc": "Set the language of the interface"
+          },
+          "clock": {
+            "titlename": "Clock",
+            "showsec": {
+              "name": "Show seconds",
+              "desc": "Show seconds on the clock (and also year)"
+            },
+            "fbxstyle": {
+              "name": "Freebox style",
+              "desc": "Use the mythical Freebox Revolution clock style (also hide date and clock second)"
+            }
+          }
         },
-        "short": {
-          "sunday": "Sun",
-          "monday": "Mon",
-          "tuesday": "Tue",
-          "wednesday": "Wed",
-          "thursday": "Thu",
-          "friday": "Fri",
-          "saturday": "Sat"
-        },
-        "abbr": {
-          "sunday": "S",
-          "monday": "M",
-          "tuesday": "T",
-          "wednesday": "W",
-          "thursday": "T",
-          "friday": "F",
-          "saturday": "S"
+        "pluginmanager": {
+          "titlename": "Plugin manager",
+          "enabled": "Enabled",
+          "disabled": "Disabled",
+          "update": "Update",
+          "settings": "Settings",
+          "delete": "Delete",
+          "website": "Website",
+          "Source": "Source"
         }
       },
-      "mouths": {
-        "long": {
-          "january": "January",
-          "february": "February",
-          "march": "March",
-          "april": "April",
-          "may": "May",
-          "june": "June",
-          "july": "July",
-          "august": "August",
-          "september": "September",
-          "october": "October",
-          "november": "November",
-          "december": "December"
+      "clock": {
+        "titlename": "Clock",
+        "days": {
+          "long": {
+            "sunday": "Sunday",
+            "monday": "Monday",
+            "tuesday": "Tuesday",
+            "wednesday": "Wednesday",
+            "thursday": "Thursday",
+            "friday": "Friday",
+            "saturday": "Saturday"
+          },
+          "short": {
+            "sunday": "Sun",
+            "monday": "Mon",
+            "tuesday": "Tue",
+            "wednesday": "Wed",
+            "thursday": "Thu",
+            "friday": "Fri",
+            "saturday": "Sat"
+          },
+          "abbr": {
+            "sunday": "S",
+            "monday": "M",
+            "tuesday": "T",
+            "wednesday": "W",
+            "thursday": "T",
+            "friday": "F",
+            "saturday": "S"
+          }
         },
-        "short": {
-          "january": "Jan",
-          "february": "Feb",
-          "march": "Mar",
-          "april": "Apr",
-          "may": "May",
-          "june": "Jun",
-          "july": "Jul",
-          "august": "Aug",
-          "september": "Sep",
-          "october": "Oct",
-          "november": "Nov",
-          "december": "Dec"
+        "mouths": {
+          "long": {
+            "january": "January",
+            "february": "February",
+            "march": "March",
+            "april": "April",
+            "may": "May",
+            "june": "June",
+            "july": "July",
+            "august": "August",
+            "september": "September",
+            "october": "October",
+            "november": "November",
+            "december": "December"
+          },
+          "short": {
+            "january": "Jan",
+            "february": "Feb",
+            "march": "Mar",
+            "april": "Apr",
+            "may": "May",
+            "june": "Jun",
+            "july": "Jul",
+            "august": "Aug",
+            "september": "Sep",
+            "october": "Oct",
+            "november": "Nov",
+            "december": "Dec"
+          },
+          "abbr": {
+            "january": "J",
+            "february": "F",
+            "march": "M",
+            "april": "A",
+            "may": "M",
+            "june": "J",
+            "july": "J",
+            "august": "A",
+            "september": "S",
+            "october": "O",
+            "november": "N",
+            "december": "D"
+          }
+        }
+      },
+      "alarm": {
+        "titlename": "Alarm",
+        "name": "Name",
+        "defsounds": "Default sounds",
+        "custsounds": "Custom sounds",
+        "add": "Add alarm",
+        "noalarm": "No alarms here",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "save": "Save",
+        "stop": "Stop",
+        "repeat": {
+          "once": "Once",
+          "eveyday": "Everyday",
+          "workdays": "Working days",
+          "weekend": "Weekend"
         },
-        "abbr": {
-          "january": "J",
-          "february": "F",
-          "march": "M",
-          "april": "A",
-          "may": "M",
-          "june": "J",
-          "july": "J",
-          "august": "A",
-          "september": "S",
-          "october": "O",
-          "november": "N",
-          "december": "D"
+        "remaining": {
+          "inhour": "in %h h and %m min",
+          "inmin": "in %m min",
+          "inday": "in %d day"
+        }
+      },
+      "stopwatch": {
+        "titlename": "Stopwatch",
+        "start": "Start",
+        "stop": "Stop",
+        "reset": "Reset",
+        "lap": "Lap"
+      },
+      "timer": {
+        "titlename": "Timer",
+        "start": "Start",
+        "stop": "Stop",
+        "reset": "Reset",
+        "timeup": "Time is up"
+      }
+    }
+  },
+  "fr-fr": {
+    "id": "fr-fr",
+    "name": "Français (France)",
+    "content": {
+      "mainmenu": {
+        "back": "Retour",
+        "screenoff": "Éteindre l'écran",
+        "fullscreen": "Plein écran",
+        "kiosk": "Mode kiosque",
+        "settings": "Paramètres",
+        "exit": "Quitter"
+      },
+      "clock": {
+        "days": {
+          "long": {
+            "sunday": "Dimanche",
+            "monday": "Lundi",
+            "tuesday": "Mardi",
+            "wednesday": "Mercredi",
+            "thursday": "Jeudi",
+            "friday": "Vendredi",
+            "saturday": "Samedi"
+          },
+          "short": {
+            "sunday": "Dim",
+            "monday": "Lun",
+            "tuesday": "Mar",
+            "wednesday": "Mer",
+            "thursday": "Jeu",
+            "friday": "Ven",
+            "saturday": "Sam"
+          },
+          "abbr": {
+            "sunday": "D",
+            "monday": "L",
+            "tuesday": "M",
+            "wednesday": "M",
+            "thursday": "J",
+            "friday": "V",
+            "saturday": "S"
+          }
+        },
+        "mouths": {
+          "long": {
+            "january": "Janvier",
+            "february": "Février",
+            "march": "Mars",
+            "april": "Avril",
+            "may": "Mai",
+            "june": "Juin",
+            "july": "Juillet",
+            "august": "Août",
+            "september": "Septembre",
+            "october": "Octobre",
+            "november": "Novembre",
+            "december": "Décembre"
+          },
+          "short": {
+            "january": "Jan",
+            "february": "Fév",
+            "march": "Mar",
+            "april": "Avr",
+            "may": "Mai",
+            "june": "Juin",
+            "july": "Juil",
+            "august": "Août",
+            "september": "Sep",
+            "october": "Oct",
+            "november": "Nov",
+            "december": "Déc"
+          },
+          "abbr": {
+            "january": "J",
+            "february": "F",
+            "march": "M",
+            "april": "A",
+            "may": "M",
+            "june": "J",
+            "july": "J",
+            "august": "A",
+            "september": "S",
+            "october": "O",
+            "november": "N",
+            "december": "D"
+          }
         }
       }
-    },
-    "weather": {
-      "wmo": {
-        "cleard": "Clear Day",
-        "clearn": "Clear Night",
-        "mostlycleard": "Mostly Clear Day",
-        "mostlyclearn": "Mostly Clear Night",
-        "mostlycloudyd": "Mostly Cloudy Day",
-        "mostlycloudyn": "Mostly Cloudy Night",
-        "cloudy": "Cloudy",
-        "foggy": "Foggy",
-        "rimefog": "Rime Fog",
-        "lightdrizzle": "Light Drizzle",
-        "drizzle": "Drizzle",
-        "heavydrizzle": "Heavy Drizzle",
-        "lightfreezingdrizzle": "Light Freezing Drizzle",
-        "freezingdrizzle": "Freezing Drizzle",
-        "lightraind": "Light Rain",
-        "lightrainn": "Light Rain",
-        "raind": "Rain",
-        "rainn": "Rain",
-        "heavyraind": "Heavy Rain",
-        "heavyrainn": "Heavy Rain",
-        "lightfreezingraind": "Light Freezing Rain",
-        "lightfreezinrainn": "Light Freezing Rain",
-        "lightsnow": "Light Snow",
-        "snow": "Snow",
-        "heavysnow": "Heavy Snow",
-        "snowgrains": "Snow Grains",
-        "lightshowers": "Light Showers",
-        "showers": "Showers",
-        "heavyshowers": "Heavy Showers",
-        "lightsnowshowers": "Light Snow Showers",
-        "snowshowers": "Snow Showers",
-        "thunderstorm": "Thunderstorm",
-        "lightthunderstormswithhail": "Light Thunderstorms with Hail",
-        "thunderstormwithhail": "Thunderstorms with Hail"
-      },
-      "temp": "Temperature",
-      "feelslike": "Feels Like",
-      "humidity": "Humidity",
-      "uvindex": "UV Index",
-      "precipitation": "Precipitation",
-      "pressure": "Pressure",
-      "windspeed": "Wind Speed",
-      "airquality": "Air Quality",
-      "visibility": "Visibility",
-      "sunrise": "Sunrise",
-      "sunset": "Sunset"
     }
   }
 }

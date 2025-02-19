@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35309.182
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinDeskClock", "WinDeskClock\WinDeskClock.csproj", "{C92CB787-870B-4DCA-B118-1829DBDF6F30}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinDeskClockPlugin", "WinDeskClockPlugin\WinDeskClockPlugin.csproj", "{5154A0FE-9E68-44B7-A4F0-D00C540D3A9A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{C92CB787-870B-4DCA-B118-1829DBDF6F30}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C92CB787-870B-4DCA-B118-1829DBDF6F30}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C92CB787-870B-4DCA-B118-1829DBDF6F30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5154A0FE-9E68-44B7-A4F0-D00C540D3A9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5154A0FE-9E68-44B7-A4F0-D00C540D3A9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5154A0FE-9E68-44B7-A4F0-D00C540D3A9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5154A0FE-9E68-44B7-A4F0-D00C540D3A9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

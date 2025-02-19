@@ -1,18 +1,19 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 using System.IO;
 using System.Media;
-using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using WinDeskClock.Utils;
 using Wpf.Ui.Controls;
-using Newtonsoft.Json;
-using System.Windows.Controls.Primitives;
-using Microsoft.Win32;
-using Newtonsoft.Json.Linq;
 
 namespace WinDeskClock
 {
@@ -20,145 +21,119 @@ namespace WinDeskClock
     /// Interaction logic for MainWindow.xaml
     /// </summary>
 
-    public class Configs
+    public class User32
     {
-        public string ConfigPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "config.json");
-        public string AlarmPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "alarms.json");
+        private const uint WM_SYSCOMMAND = 0x0112;
+        private const uint SC_MONITORPOWER = 0xF170;
+        private const int MONITOR_OFF = 2;
+        private const int MONITOR_ON = -1;
+        public uint User32WM_SYSCOMMAND { get { return WM_SYSCOMMAND; } }
+        public uint User32SC_MONITORPOWER { get { return SC_MONITORPOWER; } }
+        public int User32MONITOR_OFF { get { return MONITOR_OFF; } }
+        public int User32MONITOR_ON { get { return MONITOR_ON; } }
 
-        public string DefaultTimeUpSound = "C:\\Windows\\Media\\Ring01.wav";
-        public string DefaultAlarmSound = "C:\\Windows\\Media\\Alarm03.wav";
-        public string SnoozeDelay = "1";
-
-        public async Task SetConfig(string key, string value)
+        [DllImport("user32.dll")]
+        private static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);
+        [DllImport("user32.dll")]
+        private static extern int GetMessage(out MSG lpMsg, int hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
+        [DllImport("user32.dll")]
+        private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
+        [DllImport("user32.dll")]
+        private static extern IntPtr CallWindowProc(IntPtr lpPrevWndProc, IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+        [DllImport("user32.dll")]
+        private static extern IntPtr DefWindowProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+        public int User32SendMessage(int hWnd, int hMsg, int wParam, int lParam)
         {
-            string json = await File.ReadAllTextAsync(ConfigPath);
-            JObject data = JObject.Parse(json);
-
-            SetNestedValue(data, key.Split('.'), value);
-
-            string newJson = data.ToString();
-            await File.WriteAllTextAsync(ConfigPath, newJson);
+            return SendMessage(hWnd, hMsg, wParam, lParam);
         }
-
-        public async Task<string> GetAlarm(string key)
+        public int User32GetMessage(out MSG lpMsg, int hWnd, uint wMsgFilterMin, uint wMsgFilterMax)
         {
-            string json = await File.ReadAllTextAsync(AlarmPath);
-            JObject data = JObject.Parse(json);
-
-            return GetNestedValue(data, key.Split('.'));
+            return GetMessage(out lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax);
         }
-
-        public async Task SetAlarm(string key, string value)
+        public IntPtr User32SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
         {
-            string json = await File.ReadAllTextAsync(AlarmPath);
-            JObject data = JObject.Parse(json);
-
-            SetNestedValue(data, key.Split('.'), value);
-
-            string newJson = data.ToString();
-            await File.WriteAllTextAsync(AlarmPath, newJson);
+            return SetWindowLongPtr(hWnd, nIndex, dwNewLong);
         }
-
-        public async Task DelAlarm(string key)
+        public IntPtr User32GetWindowLongPtr(IntPtr hWnd, int nIndex)
         {
-            string json = await File.ReadAllTextAsync(AlarmPath);
-            JObject data = JObject.Parse(json);
-
-            DeleteNestedValue(data, key.Split('.'));
-
-            string newJson = data.ToString();
-            await File.WriteAllTextAsync(AlarmPath, newJson);
+            return GetWindowLongPtr(hWnd, nIndex);
         }
-
-        private void SetNestedValue(JObject obj, string[] keys, string value)
+        public IntPtr User32CallWindowProc(IntPtr lpPrevWndProc, IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
         {
-            JObject current = obj;
-            for (int i = 0; i < keys.Length - 1; i++)
-            {
-                if (current[keys[i]] == null || current[keys[i]].Type != JTokenType.Object)
-                {
-                    current[keys[i]] = new JObject();
-                }
-                current = (JObject)current[keys[i]];
-            }
-            current[keys[^1]] = value;
+            return CallWindowProc(lpPrevWndProc, hWnd, msg, wParam, lParam);
         }
-
-        private string GetNestedValue(JObject obj, string[] keys)
+        public IntPtr User32DefWindowProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
         {
-            JObject current = obj;
-            for (int i = 0; i < keys.Length - 1; i++)
-            {
-                if (current[keys[i]] == null)
-                {
-                    throw new KeyNotFoundException($"Key '{keys[i]}' not found.");
-                }
-                current = (JObject)current[keys[i]];
-            }
-            return current[keys[^1]]?.ToString();
-        }
-
-        private void DeleteNestedValue(JObject obj, string[] keys)
-        {
-            JObject current = obj;
-            for (int i = 0; i < keys.Length - 1; i++)
-            {
-                if (current[keys[i]] == null)
-                {
-                    throw new KeyNotFoundException($"Key '{keys[i]}' not found.");
-                }
-                current = (JObject)current[keys[i]];
-            }
-            current.Remove(keys[^1]);
+            return DefWindowProc(hWnd, msg, wParam, lParam);
         }
     }
 
     public partial class MainWindow : FluentWindow
     {
-        public Configs configs = new Configs();
+        public User32 user32dll = new User32();
+
+        private Page ClockPage;
 
         private List<Grid> MenuClockGrids = new List<Grid>();
+        private DispatcherTimer time;
         private Stopwatch stopwatch;
         private DispatcherTimer stopwatchTimer;
         private DispatcherTimer timerTimer;
+        private DispatcherTimer alarm;
         private TimeSpan timer;
+
+        private Dictionary<string, Page> SettingsTabs = new Dictionary<string, Page>();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            //Create config files if they don't exist
-            if (!File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "config.json")))
+            // Prevent the window from being resized, minimized or windowed when FullScreenBtn mode is enabled
+            this.StateChanged += async (sender, e) =>
             {
-                File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "config.json"), "{}");
-            }
-            if (!File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "alarms.json")))
-            {
-                File.WriteAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "alarms.json"), "{}");
-            }
+                await Task.Delay(100);
+                if (FullScreenBtn.IsChecked == true && this.WindowState != WindowState.Maximized)
+                {
+                    WindowState = WindowState.Normal;
+                    WindowStyle = WindowStyle.None;
+                    WindowState = WindowState.Maximized;
+                }
+            };
 
-            // Add the grids to the list
-            MenuClockGrids.Add(AlarmGrid);
-            MenuClockGrids.Add(StopwatchGrid);
-            MenuClockGrids.Add(TimerGrid);
-
-            // Load the alarms
-            AlarmCardRestore();
+            // Hide cursor after 3 seconds of inactivity
+            this.MouseMove += MouseMoved;
 
             Loaded += MainWindow_Loaded;
         }
 
-        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        // Change UI elements depending on the settings
+        private async Task UIUpdate()
+        {
+            if (ConfigManager.Variable.ClockFbxStyle)
+            {
+                ClockPage = new Clocks.FbxClock();
+            }
+            else
+            {
+                ClockPage = new Clocks.FluentClock();
+            }
+            ClockFrame.Navigate(ClockPage);
+        }
+
+        // Create all timer of the app
+        private async Task CreateTimers()
         {
             // Create a timer to update the clock every second
-            DispatcherTimer time = new DispatcherTimer
+            time = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(1)
             };
             time.Tick += Time_Tick;
             time.Start();
 
-            // Create the stopwatch for... the stopwatch of the app (lol)
+            // Create the stopwatch for... the stopwatch (lol)
             stopwatch = new Stopwatch();
             stopwatchTimer = new DispatcherTimer
             {
@@ -166,7 +141,7 @@ namespace WinDeskClock
             };
             stopwatchTimer.Tick += Stopwatch_Tick;
 
-            // Create the timer for the... timer of the app (lol... Ok I'll stop)
+            // Create the timer for the... timer (lol... Ok I'll stop)
             timerTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(1)
@@ -174,79 +149,512 @@ namespace WinDeskClock
             timerTimer.Tick += Timer_Tick;
 
             // Create the timer for the alarm
-            DispatcherTimer alarm = new DispatcherTimer
+            alarm = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMinutes(1)
+                Interval = TimeSpan.FromSeconds(1)
             };
             alarm.Tick += Alarm_Tick;
             alarm.Start();
         }
 
-        private async Task<FrameworkElement> FindFrameworkElementwithTag(DependencyObject parent, object tag)
+        private int TotalSplashStep = 10 + 1;
+        private int CurrentSplashStep = 0;
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            int count = VisualTreeHelper.GetChildrenCount(parent);
-            for (int i = 0; i < count; i++)
+            // Splash start
+            RootTitleBar.Visibility = Visibility.Hidden;
+            MainGrid.Visibility = Visibility.Hidden;
+            SplashLoadingText.Text = "Hi !";
+            SplashPercentageText.Text = "0%";
+            SplashProgressBar.Value = 0;
+            SplashVersionText.Text = "Version " + App.AppVersion;
+            CurrentSplashStep = 0;
+
+            await Task.Delay(300);
+            SplashGrid.Visibility = Visibility.Visible;
+
             {
-                var child = VisualTreeHelper.GetChild(parent, i);
-
-                if (child is FrameworkElement element && element.Tag?.Equals(tag) == true)
+                var fadeAnimation = new DoubleAnimation
                 {
-                    return element;
-                }
-
-                var result = await FindFrameworkElementwithTag(child, tag);
-                if (result != null)
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.2),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var zoomAnimation1 = new DoubleAnimation
                 {
-                    return result;
-                }
+                    From = 0.9,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.5),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var zoomAnimation2 = new DoubleAnimation
+                {
+                    From = 0.9,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.5),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeAnimation, SplashGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
+                Storyboard.SetTarget(zoomAnimation1, SplashGrid);
+                Storyboard.SetTarget(zoomAnimation2, SplashGrid);
+                Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Children.Add(zoomAnimation1);
+                storyboard.Children.Add(zoomAnimation2);
+                storyboard.Begin();
             }
-            return null;
+
+            await Task.Delay(700);
+
+            CurrentSplashStep++;
+            SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
+            SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
+            SplashLoadingText.Text = "Applying arguments...";
+            // Specific startup options
+            if (App.StartupOptions.FullScreen)
+            {
+                FullScreenBtn.IsChecked = true;
+                WindowState = WindowState.Normal;
+                WindowStyle = WindowStyle.None;
+                WindowState = WindowState.Maximized;
+                RootTitleBar.ShowMaximize = false;
+                RootTitleBar.ShowMinimize = false;
+            }
+            if (App.StartupOptions.KioskMode)
+            {
+                KioskModeBtn.IsChecked = true;
+                FullScreenBtn.IsChecked = true;
+                FullScreenBtn.IsEnabled = false;
+                WindowState = WindowState.Normal;
+                WindowStyle = WindowStyle.None;
+                WindowState = WindowState.Maximized;
+                RootTitleBar.ShowMaximize = false;
+                RootTitleBar.ShowMinimize = false;
+                RootTitleBar.ShowClose = false;
+                Process.Start("taskkill", "/f /im explorer.exe");
+            }
+
+            CurrentSplashStep++;
+            SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
+            SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
+            SplashLoadingText.Text = "Checking files...";
+            // Check and create the config files
+            await ConfigManager.CheckAndCreateConfigs();
+
+
+            CurrentSplashStep++;
+            SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
+            SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
+            SplashLoadingText.Text = "Loading settings...";
+            // Load settings
+            await ConfigManager.LoadSettings();
+
+            CurrentSplashStep++;
+            SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
+            SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
+            SplashLoadingText.Text = "Loading language...";
+            // Init language
+            await LangSystem.InitLang();
+
+            CurrentSplashStep++;
+            SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
+            SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
+            SplashLoadingText.Text = "Loading UI (ClockMenu)...";
+            // Add the grids to the list
+            MenuClockGrids.Add(AlarmGrid);
+            MenuClockGrids.Add(StopwatchGrid);
+            MenuClockGrids.Add(TimerGrid);
+
+            CurrentSplashStep++;
+            SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
+            SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
+            SplashLoadingText.Text = "Loading UI (Settings)...";
+            // Load the settings tabs
+            SettingsTabs.Add("General", new Pages.Settings.General());
+            SettingsTabs.Add("PluginManager", new Pages.Settings.PluginManager());
+            SettingsTabs.Add("About", new Pages.Settings.About());
+
+            CurrentSplashStep++;
+            SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
+            SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
+            SplashLoadingText.Text = "Loading alarms...";
+            // Load the alarms
+            await AlarmCardRestore();
+
+            CurrentSplashStep++;
+            SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
+            SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
+            SplashLoadingText.Text = "Loading plugins...";
+            // Load plugins
+            await PluginLoader.LoadPlugins();
+
+            CurrentSplashStep++;
+            SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
+            SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
+            SplashLoadingText.Text = "Loading UI...";
+            // Change UI depending on the settings
+            await UIUpdate();
+
+            CurrentSplashStep++;
+            SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
+            SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
+            SplashLoadingText.Text = "Creating timers...";
+            // Create every timers of the app
+            await CreateTimers();
+
+            // Splash end
+            CurrentSplashStep++;
+            SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
+            SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
+            SplashLoadingText.Text = "Ready !";
+
+            await Task.Delay(700);
+
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(0.2),
+                    BeginTime = TimeSpan.FromSeconds(0.1),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var zoomAnimation1 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 1.1,
+                    Duration = TimeSpan.FromSeconds(0.3),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var zoomAnimation2 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 1.1,
+                    Duration = TimeSpan.FromSeconds(0.3),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(fadeAnimation, SplashGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
+                Storyboard.SetTarget(zoomAnimation1, SplashGrid);
+                Storyboard.SetTarget(zoomAnimation2, SplashGrid);
+                Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Children.Add(zoomAnimation1);
+                storyboard.Children.Add(zoomAnimation2);
+                storyboard.Begin();
+            }
+
+            await Task.Delay(300);
+
+            SplashGrid.Visibility = Visibility.Hidden;
+            RootTitleBar.Visibility = Visibility.Visible;
+            MainGrid.Visibility = Visibility.Visible;
+
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.2),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var zoomAnimation1 = new DoubleAnimation
+                {
+                    From = 0.9,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.5),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var zoomAnimation2 = new DoubleAnimation
+                {
+                    From = 0.9,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.5),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeAnimation, MainGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
+                Storyboard.SetTarget(zoomAnimation1, MainGrid);
+                Storyboard.SetTarget(zoomAnimation2, MainGrid);
+                Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Children.Add(zoomAnimation1);
+                storyboard.Children.Add(zoomAnimation2);
+                storyboard.Begin();
+            }
+            {
+                var translateAnimation = new DoubleAnimation
+                {
+                    From = -100,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(0.5),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(translateAnimation, RootTitleBar);
+                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(translateAnimation);
+                storyboard.Begin();
+            }
         }
 
-        private async Task<FrameworkElement> FindItemwithTag(ItemCollection items, object tag)
+        #region Screen Off/On
+        private bool MouseMovedExecuted = false;
+        private async void MouseMoved(object sender, MouseEventArgs e)
         {
-            foreach (FrameworkElement item in items)
+            if (!MouseMovedExecuted && FullScreenBtn.IsChecked == true)
             {
-                if (item.Tag?.Equals(tag) == true)
-                {
-                    return item;
-                }
+                MouseMovedExecuted = true;
+                this.Cursor = Cursors.Arrow;
+                await Task.Delay(3000);
+                this.Cursor = Cursors.None;
+                MouseMovedExecuted = false;
             }
-            return null;
         }
 
+        /*private const int GWL_WNDPROC = -4;
+        private IntPtr oldWndProc;
+        private delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+        private IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
+        {
+            Debug.WriteLine("WndProc: " + msg);
+            if (msg == (int)user32dll.User32WM_SYSCOMMAND)
+            {
+                if (wParam.ToInt32() == (int)user32dll.User32SC_MONITORPOWER)
+                {
+                    if (lParam.ToInt32() == user32dll.User32MONITOR_OFF)
+                    {
+                        Console.WriteLine("L'écran est éteint.");
+                    }
+                    else if (lParam.ToInt32() == user32dll.User32MONITOR_ON)
+                    {
+                        Console.WriteLine("L'écran est allumé.");
+                    }
+                }
+            }
+            return user32dll.User32CallWindowProc(oldWndProc, hWnd, msg, wParam, lParam);
+        }*/
+
+        //private DispatcherTimer ScreenPolling;
+        private bool TurnOnSignal = false;
+        private async Task TurnScreenOff()
+        {
+            await ScreenOffAnimation("crt");
+            await Task.Delay(200);
+            user32dll.User32SendMessage(0xFFFF, (int)user32dll.User32WM_SYSCOMMAND, (int)user32dll.User32SC_MONITORPOWER, user32dll.User32MONITOR_OFF);
+            TurnOnSignal = false;
+
+            this.MouseMove += async (sender, e) =>
+            {
+                TurnOnSignal = true;
+            };
+            this.KeyDown += async (sender, e) =>
+            {
+                TurnOnSignal = true;
+            };
+            this.MouseDown += async (sender, e) =>
+            {
+                TurnOnSignal = true;
+            };
+
+            while (!TurnOnSignal)
+            {
+                await Task.Delay(100);
+            }
+
+            this.MouseDown -= async (sender, e) =>
+            {
+                TurnOnSignal = true;
+            };
+            this.KeyDown -= async (sender, e) =>
+            {
+                TurnOnSignal = true;
+            };
+            this.MouseMove -= async (sender, e) =>
+            {
+                TurnOnSignal = true;
+            };
+
+            await Task.Delay(1000);
+
+            await ScreenOnAnimation("crt");
+
+            //nint thisHandle = new WindowInteropHelper(this).Handle;
+            //oldWndProc = user32dll.User32SetWindowLongPtr(thisHandle, GWL_WNDPROC, Marshal.GetFunctionPointerForDelegate(new WndProcDelegate(WndProc)));
+
+            //await Task.Delay(200);
+            //await ScreenOnAnimation("crt");
+        }
+
+        private async Task ScreenOffAnimation(string animtype)
+        {
+            switch (animtype)
+            {
+                case "crt":
+                    CRTRectUp.Visibility = Visibility.Visible;
+                    CRTRectDown.Visibility = Visibility.Visible;
+                    {
+                        var rectangleupsize = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(0.2),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        var rectangledownsize = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(0.2),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        var appgridsize = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(0.2),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        Storyboard.SetTarget(rectangleupsize, CRTRectUp);
+                        Storyboard.SetTarget(rectangledownsize, CRTRectDown);
+                        Storyboard.SetTarget(appgridsize, AppGrid);
+                        Storyboard.SetTargetProperty(rectangleupsize, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                        Storyboard.SetTargetProperty(rectangledownsize, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                        Storyboard.SetTargetProperty(appgridsize, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(rectangleupsize);
+                        storyboard.Children.Add(rectangledownsize);
+                        storyboard.Children.Add(appgridsize);
+                        storyboard.Begin();
+                    }
+                    await Task.Delay(150);
+                    CRTRectMiddle.Visibility = Visibility.Visible;
+                    await Task.Delay(50);
+                    {
+                        var rectanglemiddlesize = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(0.2),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        Storyboard.SetTarget(rectanglemiddlesize, CRTRectMiddle);
+                        Storyboard.SetTargetProperty(rectanglemiddlesize, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(rectanglemiddlesize);
+                        storyboard.Begin();
+                    }
+                    await Task.Delay(200);
+                    break;
+
+            }
+        }
+
+        private async Task ScreenOnAnimation(string animtype)
+        {
+            switch (animtype)
+            {
+                case "crt":
+                    {
+                        var rectanglemiddlesize = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(0.2),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        Storyboard.SetTarget(rectanglemiddlesize, CRTRectMiddle);
+                        Storyboard.SetTargetProperty(rectanglemiddlesize, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(rectanglemiddlesize);
+                        storyboard.Begin();
+                    }
+                    await Task.Delay(200);
+                    CRTRectMiddle.Visibility = Visibility.Hidden;
+                    {
+                        var rectangleupsize = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(0.2),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        var rectangledownsize = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(0.2),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        var appgridsize = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(0.2),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        Storyboard.SetTarget(rectangleupsize, CRTRectUp);
+                        Storyboard.SetTarget(rectangledownsize, CRTRectDown);
+                        Storyboard.SetTarget(appgridsize, AppGrid);
+                        Storyboard.SetTargetProperty(rectangleupsize, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                        Storyboard.SetTargetProperty(rectangledownsize, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                        Storyboard.SetTargetProperty(appgridsize, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(rectangleupsize);
+                        storyboard.Children.Add(rectangledownsize);
+                        storyboard.Children.Add(appgridsize);
+                        storyboard.Begin();
+                    }
+                    CRTRectUp.Visibility = Visibility.Hidden;
+                    CRTRectDown.Visibility = Visibility.Hidden;
+                    await Task.Delay(200);
+                    break;
+            }
+        }
+#endregion
+
+        #region Clock Menu
+        // Animation variables
+        // - Fade speed
+        private double fadespeed = 0.30;
+        // - Zoom speed
+        private double zoomspeed = 0.35;
+
+        // Current ClockMenu page index
+        private int MenuClockIndex = 0;
+
+        // Update the MiniClock
         private async void Time_Tick(object sender, EventArgs e)
         {
-            // Update the clock
             DateTime now = DateTime.Now;
-            UpdateH1(now.Hour.ToString("00")[0].ToString()); // First digit of the hour
-            UpdateH2(now.Hour.ToString("00")[1].ToString()); // Second digit of the hour
-            UpdateM1(now.Minute.ToString("00")[0].ToString()); // First digit of the minute
-            UpdateM2(now.Minute.ToString("00")[1].ToString()); // Second digit of the minute
-            UpdateS1(now.Second.ToString("00")[0].ToString()); // First digit of the second
-            UpdateS2(now.Second.ToString("00")[1].ToString()); // Second digit of the second
-            MiniClockHour.Text = now.Hour.ToString("00");  // Hour of MiniClock
-            MiniClockMinute.Text = now.Minute.ToString("00");  // Minute of MiniClock
-            DNameText.Text = now.DayOfWeek.ToString().Substring(0, 3).ToUpper();  // Day of the week
-            DDayText.Text = now.Day.ToString();  // Day of the month
-            DMonthText.Text = now.ToString("MMM").ToUpper();  // Month
-            DYearText.Text = now.Year.ToString("0000");  // Year
+            await UpdateMiniClockHour(now.Hour.ToString());  // Update the MiniClock Hour
+            await UpdateMiniClockMinute(now.Minute.ToString());  // Update the MiniClock Minute
         }
 
-        private string ActualH1 = "1";
-        private string ActualH2 = "7";
-        private string ActualM1 = "2";
-        private string ActualM2 = "0";
-        private string ActualS1 = "0";
-        private string ActualS2 = "0";
+        // MiniClock Update
+        // - Slide speed
         private double txtslidespeed = 0.15;
+        // - Delay between slides
         private int txtdelay = 150;
-        private async Task UpdateH1(string text)
+        // - Actual MiniClock Hour
+        private string ActualMCHour = "17";
+        // - Actual MiniClock Minute
+        private string ActualMCMinute = "20";
+        // - Update MiniClock Hour
+        private async Task UpdateMiniClockHour(string text)
         {
-            if (ActualH1 != text)
+            if (ActualMCHour != text)
             {
-                H1Text.Text = ActualH1;
-                ActualH1 = text;
+                MiniClockHour.Text = ActualMCHour;
+                ActualMCHour = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
@@ -255,14 +663,14 @@ namespace WinDeskClock
                         Duration = TimeSpan.FromSeconds(txtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
-                    Storyboard.SetTarget(translateAnimation, H1Text);
+                    Storyboard.SetTarget(translateAnimation, MiniClockHour);
                     Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
                     var storyboard = new Storyboard();
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
                 await Task.Delay(txtdelay);
-                H1Text.Text = text;
+                MiniClockHour.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
@@ -271,7 +679,7 @@ namespace WinDeskClock
                         Duration = TimeSpan.FromSeconds(txtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    Storyboard.SetTarget(translateAnimation, H1Text);
+                    Storyboard.SetTarget(translateAnimation, MiniClockHour);
                     Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
                     var storyboard = new Storyboard();
                     storyboard.Children.Add(translateAnimation);
@@ -279,12 +687,13 @@ namespace WinDeskClock
                 }
             }
         }
-        private async Task UpdateH2(string text)
+        // - Update MiniClock Minute
+        private async Task UpdateMiniClockMinute(string text)
         {
-            if (ActualH2 != text)
+            if (ActualMCMinute != text)
             {
-                H2Text.Text = ActualH2;
-                ActualH2 = text;
+                MiniClockMinute.Text = ActualMCMinute;
+                ActualMCMinute = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
@@ -293,14 +702,14 @@ namespace WinDeskClock
                         Duration = TimeSpan.FromSeconds(txtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
-                    Storyboard.SetTarget(translateAnimation, H2Text);
+                    Storyboard.SetTarget(translateAnimation, MiniClockMinute);
                     Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
                     var storyboard = new Storyboard();
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
                 await Task.Delay(txtdelay);
-                H2Text.Text = text;
+                MiniClockMinute.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
@@ -309,160 +718,8 @@ namespace WinDeskClock
                         Duration = TimeSpan.FromSeconds(txtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    Storyboard.SetTarget(translateAnimation, H2Text);
+                    Storyboard.SetTarget(translateAnimation, MiniClockMinute);
                     Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-            }
-        }
-        private async Task UpdateM1(string text)
-        {
-            if (ActualM1 != text)
-            {
-                M1Text.Text = ActualM1;
-                ActualM1 = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 180,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    Storyboard.SetTarget(translateAnimation, M1Text);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-                await Task.Delay(txtdelay);
-                M1Text.Text = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = -180,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, M1Text);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-            }
-        }
-        private async Task UpdateM2(string text)
-        {
-            if (ActualM2 != text)
-            {
-                M2Text.Text = ActualM2;
-                ActualM2 = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 180,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    Storyboard.SetTarget(translateAnimation, M2Text);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-                await Task.Delay(txtdelay);
-                M2Text.Text = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = -180,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, M2Text);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-            }
-        }
-        private async Task UpdateS1(string text)
-        {
-            if (ActualS1 != text)
-            {
-                S1Text.Text = ActualS1;
-                ActualS1 = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 110,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    Storyboard.SetTarget(translateAnimation, S1Text);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-                await Task.Delay(txtdelay);
-                S1Text.Text = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = -110,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, S1Text);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-            }
-        }
-        private async Task UpdateS2(string text)
-        {
-            if (ActualS2 != text)
-            {
-                S2Text.Text = ActualS2;
-                ActualS2 = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 110,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    Storyboard.SetTarget(translateAnimation, S2Text);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-                await Task.Delay(txtdelay);
-                S2Text.Text = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = -110,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, S2Text);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
                     var storyboard = new Storyboard();
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
@@ -470,9 +727,8 @@ namespace WinDeskClock
             }
         }
 
-        private double fadespeed = 0.30;
-        private double zoomspeed = 0.35;
-        private int MenuClockIndex = 0;
+        // Navigation functions
+        // - Open Clock Menu
         private async void EnterDownMenuClockBtn_Click(object sender, RoutedEventArgs e)
         {
             {
@@ -588,6 +844,7 @@ namespace WinDeskClock
                 storyboard.Begin();
             }
         }
+        // - Close Clock Menu
         private async void ExitDownMenuClockBtn_Click(object sender, RoutedEventArgs e)
         {
             {
@@ -702,6 +959,7 @@ namespace WinDeskClock
                 storyboard.Begin();
             }
         }
+        // - Go to the left page (in Clock Menu)
         private async void LeftMenuClockBtn_Click(object sender, RoutedEventArgs e)
         {
             int ActualIndex = MenuClockIndex;
@@ -768,6 +1026,7 @@ namespace WinDeskClock
                 storyboard.Begin();
             }
         }
+        // - Go to the right page (in Clock Menu)
         private async void RightMenuClockBtn_Click(object sender, RoutedEventArgs e)
         {
             int ActualIndex = MenuClockIndex;
@@ -834,12 +1093,44 @@ namespace WinDeskClock
                 storyboard.Begin();
             }
         }
+        #endregion
 
+        #region Stopwatch
+
+        /*
+         * Time Digit Legend:
+         * H1 = [0]0:00:00.00
+         * H2 = 0[0]:00:00.00
+         * M1 = 00:[0]0:00.00
+         * M2 = 00:0[0]:00.00
+         * S1 = 00:00:[0]0.00
+         * S2 = 00:00:0[0].00
+         * MS1 = 00:00:00.[0]0
+         * MS2 = 00:00:00.0[0]
+         */
+
+        // Stopwatch state
+        // - Is the stopwatch running?
         private bool StopwatchIsRunning = false;
+        // - Is the lap list deployed? (for the animation)
         private bool StopwatchLapDeployed = false;
-        private double swfadespeed = 0.15;
-        private double swzoomspeed = 0.30;
+        // - Is the progress bar flipped (reversed)? (for the animation)
         private bool StopwatchProgressFlipped = false;
+
+        // Animation variables
+        // - Fade speed
+        private double swfadespeed = 0.15;
+        // - Zoom speed
+        private double swzoomspeed = 0.30;
+        // - Slide speed
+        private double swtxtslidespeed = 0.15;
+        // - Delay between slides
+        private int swtxtdelay = 150;
+
+        // Current lap number
+        private int LapIndex = 0;
+
+        // Current char of the stopwatch
         private string ActualStopwatchH1 = "0";
         private string ActualStopwatchH2 = "0";
         private string ActualStopwatchM1 = "0";
@@ -848,9 +1139,11 @@ namespace WinDeskClock
         private string ActualStopwatchS2 = "0";
         private string ActualStopwatchMS1 = "0";
         private string ActualStopwatchMS2 = "0";
-        private double swtxtslidespeed = 0.15;
-        private int swtxtdelay = 150;
+
+        // Last Lap Time for interval calculation
         private TimeSpan LastLapTime;
+
+        // Tick event
         private async void Stopwatch_Tick(object sender, EventArgs e)
         {
             UpdateStopwatchTextH1(stopwatch.Elapsed.Hours.ToString("00")[0].ToString());
@@ -883,6 +1176,9 @@ namespace WinDeskClock
                 StopwatchProgressBar.Value = stopwatch.Elapsed.Milliseconds;
             }
         }
+
+        // Stopwatch functions
+        // - Start
         private async void StartStopwatchBtn_Click(object sender, RoutedEventArgs e)
         {
             stopwatch.Start();
@@ -1022,6 +1318,7 @@ namespace WinDeskClock
 
             StopwatchIsRunning = true;
         }
+        // - Pause
         private async void PauseStopwatchBtn_Click(object sender, RoutedEventArgs e)
         {
             stopwatch.Stop();
@@ -1084,7 +1381,7 @@ namespace WinDeskClock
                 storyboard.Begin();
             }
         }
-        private int LapIndex = 0;
+        // - Reset
         private async void ResetStopwatchBtn_Click(object sender, RoutedEventArgs e)
         {
             stopwatch.Reset();
@@ -1245,6 +1542,7 @@ namespace WinDeskClock
 
             StopwatchIsRunning = false;
         }
+        // - New lap
         private async void LapStopwatchBtn_Click(object sender, RoutedEventArgs e)
         {
             LapIndex++;
@@ -1352,6 +1650,8 @@ namespace WinDeskClock
                 storyboard.Begin();
             }
         }
+
+        // Stopwatch text update with animation
         private async Task UpdateStopwatchTextH1(string text)
         {
             if (ActualStopwatchH1 != text)
@@ -1580,6 +1880,8 @@ namespace WinDeskClock
                 }
             }
         }
+
+        // Stopwatch text update without animation
         private async Task UpdateStopwatchTextMS1(string text, bool reset)
         {
             if (ActualStopwatchMS1 != text)
@@ -1664,21 +1966,55 @@ namespace WinDeskClock
                 ActualStopwatchMS2 = text;
             }
         }
+        #endregion
 
+        #region Timer
 
+        /*
+         * Time Digit Legend:
+         * H1 = [0]0:00:00
+         * H2 = 0[0]:00:00
+         * M1 = 00:[0]0:00
+         * M2 = 00:0[0]:00
+         * S1 = 00:00:[0]0
+         * S2 = 00:00:0[0]
+         */
+
+        // Current char of the timer
         private string ActualTimerH1 = "0";
         private string ActualTimerH2 = "0";
         private string ActualTimerM1 = "0";
         private string ActualTimerM2 = "0";
         private string ActualTimerS1 = "0";
         private string ActualTimerS2 = "0";
+
+        // Current progress ring value
         private int ActualTimeProgress = 100;
+
+        // Timer values when timer starts
         private TimeSpan timerSet = TimeSpan.Zero;
+
+        // Timer status
+        // - Is the timer running?
         private bool TimerIsRunning = false;
-        private double tfadespeed = 0.30;
-        private double tzoomspeed = 0.30;
+        // - Is time up?
         private bool TimeUp = false;
+
+        // Animation variables
+        // - Fade speed
+        private double tfadespeed = 0.30;
+        // - Zoom speed
+        private double tzoomspeed = 0.30;
+        // - Text slide speed
+        private double ttxtslidespeed = 0.15;
+        // - Text slide delay
+        private int ttxtdelay = 150;
+
+        // Sound player instance for time up sound
         private SoundPlayer TimeUpSoundPlayer;
+
+        // Timer functions
+        // - Start
         private async void StartTimerBtn_Click(object sender, RoutedEventArgs e)
         {
             if (!TimerIsRunning)
@@ -1872,6 +2208,7 @@ namespace WinDeskClock
                 TimerIsRunning = true;
             }
         }
+        // - Pause
         private async void PauseTimerBtn_Click(object sender, RoutedEventArgs e)
         {
             timerTimer.Stop();
@@ -1938,6 +2275,7 @@ namespace WinDeskClock
                 storyboard.Begin();
             }
         }
+        // - Reset
         private async void ResetTimerBtn_Click(object sender, RoutedEventArgs e)
         {
             timerTimer.Stop();
@@ -2062,6 +2400,8 @@ namespace WinDeskClock
                 }
             }
         }
+
+        // Tick event
         private async void Timer_Tick(object sender, EventArgs e)
         {
             if (timer > TimeSpan.Zero)
@@ -2082,9 +2422,11 @@ namespace WinDeskClock
                 TimeUpShow();
             }
         }
+
+        // Time up function
         private async Task TimeUpShow()
         {
-            TimeUpSoundPlayer = new SoundPlayer(configs.DefaultTimeUpSound);
+            TimeUpSoundPlayer = new SoundPlayer(ConfigManager.Variable.DefaultTimeUpSound);
             TimeUpSoundPlayer.Load();
             TimeUpSoundPlayer.PlayLooping();
             TimeUpGrid.Visibility = Visibility.Visible;
@@ -2284,6 +2626,8 @@ namespace WinDeskClock
             }
             TimeUpGrid.Visibility = Visibility.Hidden;
         }
+
+        // Timer set buttons
         private async void TimeUpStopBtn_Click(object sender, EventArgs e)
         {
             TimeUp = false;
@@ -2390,6 +2734,8 @@ namespace WinDeskClock
                 UpdateTimerTextS2((int.Parse(ActualTimerS2) - 1).ToString(), false);
             }
         }
+
+        // Timer text update with animation
         private async Task UpdateTimerTextH1(string text, bool reset)
         {
             string direction = "none";
@@ -2425,7 +2771,7 @@ namespace WinDeskClock
                     {
                         From = 0,
                         To = -50,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerH1Text);
@@ -2434,14 +2780,14 @@ namespace WinDeskClock
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
-                await Task.Delay(150);
+                await Task.Delay(ttxtdelay);
                 TimerH1Text.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = 50,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerH1Text);
@@ -2458,7 +2804,7 @@ namespace WinDeskClock
                     {
                         From = 0,
                         To = 50,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerH1Text);
@@ -2467,14 +2813,14 @@ namespace WinDeskClock
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
-                await Task.Delay(150);
+                await Task.Delay(ttxtdelay);
                 TimerH1Text.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = -50,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerH1Text);
@@ -2529,7 +2875,7 @@ namespace WinDeskClock
                     {
                         From = 0,
                         To = -50,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerH2Text);
@@ -2538,14 +2884,14 @@ namespace WinDeskClock
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
-                await Task.Delay(150);
+                await Task.Delay(ttxtdelay);
                 TimerH2Text.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = 50,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerH2Text);
@@ -2562,7 +2908,7 @@ namespace WinDeskClock
                     {
                         From = 0,
                         To = 50,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerH2Text);
@@ -2571,14 +2917,14 @@ namespace WinDeskClock
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
-                await Task.Delay(150);
+                await Task.Delay(ttxtdelay);
                 TimerH2Text.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = -50,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerH2Text);
@@ -2625,7 +2971,7 @@ namespace WinDeskClock
                     {
                         From = 0,
                         To = -50,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerM1Text);
@@ -2634,14 +2980,14 @@ namespace WinDeskClock
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
-                await Task.Delay(150);
+                await Task.Delay(ttxtdelay);
                 TimerM1Text.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = 50,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerM1Text);
@@ -2658,7 +3004,7 @@ namespace WinDeskClock
                     {
                         From = 0,
                         To = 50,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerM1Text);
@@ -2667,14 +3013,14 @@ namespace WinDeskClock
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
-                await Task.Delay(150);
+                await Task.Delay(ttxtdelay);
                 TimerM1Text.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = -50,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerM1Text);
@@ -2721,7 +3067,7 @@ namespace WinDeskClock
                     {
                         From = 0,
                         To = -50,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerM2Text);
@@ -2730,14 +3076,14 @@ namespace WinDeskClock
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
-                await Task.Delay(150);
+                await Task.Delay(ttxtdelay);
                 TimerM2Text.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = 50,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerM2Text);
@@ -2754,7 +3100,7 @@ namespace WinDeskClock
                     {
                         From = 0,
                         To = 50,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerM2Text);
@@ -2763,14 +3109,14 @@ namespace WinDeskClock
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
-                await Task.Delay(150);
+                await Task.Delay(ttxtdelay);
                 TimerM2Text.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = -50,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerM2Text);
@@ -2817,7 +3163,7 @@ namespace WinDeskClock
                     {
                         From = 0,
                         To = -50,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerS1Text);
@@ -2826,14 +3172,14 @@ namespace WinDeskClock
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
-                await Task.Delay(150);
+                await Task.Delay(ttxtdelay);
                 TimerS1Text.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = 50,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerS1Text);
@@ -2850,7 +3196,7 @@ namespace WinDeskClock
                     {
                         From = 0,
                         To = 50,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerS1Text);
@@ -2859,14 +3205,14 @@ namespace WinDeskClock
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
-                await Task.Delay(150);
+                await Task.Delay(ttxtdelay);
                 TimerS1Text.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = -50,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerS1Text);
@@ -2913,7 +3259,7 @@ namespace WinDeskClock
                     {
                         From = 0,
                         To = -50,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerS2Text);
@@ -2922,14 +3268,14 @@ namespace WinDeskClock
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
-                await Task.Delay(150);
+                await Task.Delay(ttxtdelay);
                 TimerS2Text.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = 50,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerS2Text);
@@ -2946,7 +3292,7 @@ namespace WinDeskClock
                     {
                         From = 0,
                         To = 50,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerS2Text);
@@ -2955,14 +3301,14 @@ namespace WinDeskClock
                     storyboard.Children.Add(translateAnimation);
                     storyboard.Begin();
                 }
-                await Task.Delay(150);
+                await Task.Delay(ttxtdelay);
                 TimerS2Text.Text = text;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = -50,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.15),
+                        Duration = TimeSpan.FromSeconds(ttxtslidespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, TimerS2Text);
@@ -2974,6 +3320,8 @@ namespace WinDeskClock
             }
             ActualTimerS2 = text;
         }
+
+        // Timer progress ring update with animation
         private async Task UpdateTimerProgressRing(int value)
         {
             var transtion = new DoubleAnimation
@@ -2989,72 +3337,88 @@ namespace WinDeskClock
             storyboard.Children.Add(transtion);
             storyboard.Begin();
         }
+        #endregion
 
+        #region Alarm
+
+        // Alarm status
+        // - Is the alarm alerting?
+        private bool AlarmAlert = false;
+        // - Alerting alarm UID
+        private string AlarmAlertUID = "";
+        // - Alarm sound player instance
+        private SoundPlayer AlarmSoundPlayer;
+        // - Is Alarm ActionCard deployed ?
+        private bool CardDeployed = false;
+        // - Temp value for Alarm_Tick synchronization
+        private int AlarmTickTempMinute = 0;
+        // Tick event
         private async void Alarm_Tick(object sender, EventArgs e)
-        { 
-            Debug.WriteLine("Alarm_Tick");
-
-            AlarmCardETAUpdate();
-
-            string nowdaynumber = "0";
+        {
             DateTime now = DateTime.Now;
-            string nowday = now.DayOfWeek.ToString();
-
-            switch (nowday) 
+            if (now.Minute != AlarmTickTempMinute)
             {
-                case "Monday":
-                    nowdaynumber = "1";
-                    break;
-                case "Tuesday":
-                    nowdaynumber = "2";
-                    break;
-                case "Wednesday":
-                    nowdaynumber = "3";
-                    break;
-                case "Thursday":
-                    nowdaynumber = "4";
-                    break;
-                case "Friday":
-                    nowdaynumber = "5";
-                    break;
-                case "Saturday":
-                    nowdaynumber = "6";
-                    break;
-                case "Sunday":
-                    nowdaynumber = "7";
-                    break;
-            }
+                AlarmTickTempMinute = now.Minute;
+                AlarmCardETAUpdate();
 
-            foreach (CardAction card in AlarmStack.Children)
-            {
-                string uid = card.Tag.ToString().Replace("_AlarmCard", "");
-                string time = await configs.GetAlarm($"{uid}.time");
-                string days = await configs.GetAlarm($"{uid}.days");
-                string enabled = await configs.GetAlarm($"{uid}.enabled");
-                if (time == now.ToString("HH:mm") && (days.Contains(nowdaynumber) || days == "0") && enabled.Contains("true"))
+                string nowdaynumber = "0";
+                string nowday = now.DayOfWeek.ToString();
+
+                switch (nowday)
                 {
-                    AlarmAlertShow(uid);
+                    case "Monday":
+                        nowdaynumber = "1";
+                        break;
+                    case "Tuesday":
+                        nowdaynumber = "2";
+                        break;
+                    case "Wednesday":
+                        nowdaynumber = "3";
+                        break;
+                    case "Thursday":
+                        nowdaynumber = "4";
+                        break;
+                    case "Friday":
+                        nowdaynumber = "5";
+                        break;
+                    case "Saturday":
+                        nowdaynumber = "6";
+                        break;
+                    case "Sunday":
+                        nowdaynumber = "7";
+                        break;
+                }
+
+                foreach (CardAction card in AlarmStack.Children)
+                {
+                    string uid = card.Tag.ToString().Replace("_AlarmCard", "");
+                    string time = await ConfigManager.GetAlarm($"{uid}.time");
+                    string days = await ConfigManager.GetAlarm($"{uid}.days");
+                    string enabled = await ConfigManager.GetAlarm($"{uid}.enabled");
+                    if (time == now.ToString("HH:mm") && (days.Contains(nowdaynumber) || days == "0") && enabled.Contains("true"))
+                    {
+                        AlarmAlertShow(uid);
+                    }
                 }
             }
         }
-        private bool AlarmAlert = false;
-        private string AlarmAlertUID = "";
-        private SoundPlayer AlarmSoundPlayer;
+
+        // Alarm alert show
         private async Task AlarmAlertShow(string uid)
         {
             if (!AlarmAlert)
             {
                 AlarmAlert = true;
                 AlarmAlertUID = uid;
-                string name = await configs.GetAlarm($"{uid}.name");
+                string name = await ConfigManager.GetAlarm($"{uid}.name");
                 if (name == "") name = "Alarm";
                 AlarmAlertText.Text = name;
-                string time = await configs.GetAlarm($"{uid}.time");
+                string time = await ConfigManager.GetAlarm($"{uid}.time");
                 AlarmAlertTime.Text = time;
-                string sound = await configs.GetAlarm($"{uid}.sound");
+                string sound = await ConfigManager.GetAlarm($"{uid}.sound");
                 if (!sound.Contains("none"))
                 {
-                    if (sound.Contains("default")) sound = configs.DefaultAlarmSound;
+                    if (sound.Contains("default")) sound = ConfigManager.Variable.DefaultAlarmSound;
                     AlarmSoundPlayer = new SoundPlayer(sound);
                     AlarmSoundPlayer.Load();
                     AlarmSoundPlayer.PlayLooping();
@@ -3095,7 +3459,7 @@ namespace WinDeskClock
                     storyboard.Begin();
                 }
 
-                double snooze = double.Parse(configs.SnoozeDelay);
+                double snooze = double.Parse(ConfigManager.Variable.AlarmSnoozeDelay);
                 TimeSpan alerttime = new TimeSpan(0, 0, 0, 0, 0);
 
                 while (AlarmAlert)
@@ -3148,16 +3512,16 @@ namespace WinDeskClock
                     AlarmSoundPlayer.Dispose();
                 }
 
-                string days = await configs.GetAlarm($"{uid}.days");
+                string days = await ConfigManager.GetAlarm($"{uid}.days");
                 if (days == "0")
                 {
-                    FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-                    FrameworkElement AlarmCardToggleSmall = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleSmall");
-                    FrameworkElement AlarmCardToggleBig = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleBig");
+                    FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+                    FrameworkElement AlarmCardToggleSmall = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleSmall");
+                    FrameworkElement AlarmCardToggleBig = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleBig");
                     ((ToggleSwitch)AlarmCardToggleBig).IsChecked = false;
                     ((ToggleSwitch)AlarmCardToggleSmall).IsChecked = false;
 
-                    await configs.SetAlarm($"{uid}.enabled", "false");
+                    await ConfigManager.SetAlarm($"{uid}.enabled", "false");
                 }
 
                 AlarmAlert = false;
@@ -3168,14 +3532,16 @@ namespace WinDeskClock
                 AlarmAlertGrid.Visibility = Visibility.Hidden;
             }
         }
+
+        // Update alarm card ETA
         private async Task AlarmCardETAUpdate()
         {
             foreach (CardAction card in AlarmStack.Children)
             {
                 string uid = card.Tag.ToString().Replace("_AlarmCard", "");
-                FrameworkElement AlarmCardDescText = await FindFrameworkElementwithTag(card, $"{uid}_AlarmCardDescText");
+                FrameworkElement AlarmCardDescText = await TagSearch.FindFrameworkElementwithTag(card, $"{uid}_AlarmCardDescText");
                 string days = "";
-                string daysArray = await configs.GetAlarm($"{uid}.days");
+                string daysArray = await ConfigManager.GetAlarm($"{uid}.days");
                 if (daysArray == "0")
                 {
                     days = "Once";
@@ -3230,9 +3596,11 @@ namespace WinDeskClock
                 ((System.Windows.Controls.TextBlock)AlarmCardDescText).Text = days + " • " + remaningtime;
             }
         }
+
+        // Recreate saved alarm cards from config file
         private async Task AlarmCardRestore()
         {
-            string alarmsJSON = await File.ReadAllTextAsync(configs.AlarmPath);
+            string alarmsJSON = await File.ReadAllTextAsync(ConfigManager.AlarmPath);
             JObject alarms = JObject.Parse(alarmsJSON);
             List<string> alarmsUID = new List<string>();
             foreach (var alarm in alarms)
@@ -3245,16 +3613,20 @@ namespace WinDeskClock
             }
             await SortAlarmCards();
         }
+
+        // Get DateTime of Time  with a UID
         private async Task<DateTime> GetAlarmTime(string uid)
         {
-            string time = await configs.GetAlarm($"{uid}.time");
+            string time = await ConfigManager.GetAlarm($"{uid}.time");
             string[] timeArray = time.Split(':');
             return new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, int.Parse(timeArray[0]), int.Parse(timeArray[1]), 0);
         }
+
+        // Get TimeSpan of ETA with a UID
         private async Task<TimeSpan> GetETAAlarm(string uid)
         {
-            string time = await configs.GetAlarm($"{uid}.time");
-            string days = await configs.GetAlarm($"{uid}.days");
+            string time = await ConfigManager.GetAlarm($"{uid}.time");
+            string days = await ConfigManager.GetAlarm($"{uid}.days");
 
             string[] timeArray = time.Split(":");
             int hours = int.Parse(timeArray[0]);
@@ -3288,7 +3660,9 @@ namespace WinDeskClock
 
             return alarm - now;
         }
-        public async Task SortAlarmCards()
+
+        // Sort alarm cards by time and ETA/Days
+        private async Task SortAlarmCards()
         {
             StackPanel stackPanel = AlarmStack;
 
@@ -3368,6 +3742,8 @@ namespace WinDeskClock
                 card.Height = double.NaN;
             }
         }
+
+        // Create alarm card with a UID
         private async Task CreateAlarmCard(string uid)
         {
             CardAction AlarmCard = new CardAction();
@@ -3393,7 +3769,7 @@ namespace WinDeskClock
 
             System.Windows.Controls.TextBlock AlarmCardTimeText = new System.Windows.Controls.TextBlock();
             AlarmCardTimeText.Tag = $"{uid}_AlarmCardTimeText";
-            AlarmCardTimeText.Text = await configs.GetAlarm($"{uid}.time");
+            AlarmCardTimeText.Text = await ConfigManager.GetAlarm($"{uid}.time");
             AlarmCardTimeText.FontSize = 32;
             AlarmCardTimeText.FontFamily = new FontFamily("Segoe UI Variable Display SemiBold");
             AlarmCardTimeText.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
@@ -3403,7 +3779,7 @@ namespace WinDeskClock
 
             System.Windows.Controls.TextBlock AlarmCardNameText = new System.Windows.Controls.TextBlock();
             AlarmCardNameText.Tag = $"{uid}_AlarmCardNameText";
-            AlarmCardNameText.Text = await configs.GetAlarm($"{uid}.name");
+            AlarmCardNameText.Text = await ConfigManager.GetAlarm($"{uid}.name");
             AlarmCardNameText.FontSize = 18;
             AlarmCardNameText.FontFamily = new FontFamily("Segoe UI SemiBold");
             AlarmCardNameText.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
@@ -3412,7 +3788,7 @@ namespace WinDeskClock
             AlarmCardNameText.VerticalAlignment = VerticalAlignment.Center;
 
             string days = "";
-            string daysArray = await configs.GetAlarm($"{uid}.days");
+            string daysArray = await ConfigManager.GetAlarm($"{uid}.days");
             if (daysArray == "0")
             {
                 days = "Once";
@@ -3466,7 +3842,7 @@ namespace WinDeskClock
             AlarmCardToggleSmall.VerticalAlignment = VerticalAlignment.Center;
             AlarmCardToggleSmall.Margin = new Thickness(0, 0, 10, 0);
             AlarmCardToggleSmall.SetValue(Grid.ColumnProperty, 3);
-            if ((await configs.GetAlarm($"{uid}.enabled")).Contains("true"))
+            if ((await ConfigManager.GetAlarm($"{uid}.enabled")).Contains("true"))
             {
                 AlarmCardToggleSmall.IsChecked = true;
             }
@@ -3494,7 +3870,7 @@ namespace WinDeskClock
 
             Wpf.Ui.Controls.TextBox AlarmCardNameTextBox = new Wpf.Ui.Controls.TextBox();
             AlarmCardNameTextBox.Tag = $"{uid}_AlarmCardNameTextBox";
-            AlarmCardNameTextBox.Text = await configs.GetAlarm($"{uid}.name");
+            AlarmCardNameTextBox.Text = await ConfigManager.GetAlarm($"{uid}.name");
             AlarmCardNameTextBox.SetValue(Grid.ColumnProperty, 0);
             AlarmCardNameTextBox.PlaceholderEnabled = true;
             AlarmCardNameTextBox.PlaceholderText = "Name";
@@ -3506,7 +3882,7 @@ namespace WinDeskClock
             AlarmCardToggleBig.HorizontalAlignment = HorizontalAlignment.Right;
             AlarmCardToggleBig.Margin = new Thickness(0, 0, 10, 0);
             AlarmCardToggleBig.SetValue(Grid.ColumnProperty, 1);
-            if ((await configs.GetAlarm($"{uid}.enabled")).Contains("true"))
+            if ((await ConfigManager.GetAlarm($"{uid}.enabled")).Contains("true"))
             {
                 AlarmCardToggleBig.IsChecked = true;
             }
@@ -3527,7 +3903,7 @@ namespace WinDeskClock
 
             Border AlarmCardEditBorder = new Border();
             AlarmCardEditBorder.Tag = $"{uid}_AlarmCardEditBorder";
-            AlarmCardEditBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0aFFFFFF"));
+            AlarmCardEditBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0affffff"));
             AlarmCardEditBorder.CornerRadius = new CornerRadius(8);
             AlarmCardEditBorder.Padding = new Thickness(10);
             AlarmCardEditBorder.VerticalAlignment = VerticalAlignment.Center;
@@ -3606,7 +3982,7 @@ namespace WinDeskClock
 
             System.Windows.Controls.TextBlock AlarmCardEditHourText = new System.Windows.Controls.TextBlock();
             AlarmCardEditHourText.Tag = $"{uid}_AlarmCardEditHourText";
-            AlarmCardEditHourText.Text = (await configs.GetAlarm($"{uid}.time")).Split(":")[0];
+            AlarmCardEditHourText.Text = (await ConfigManager.GetAlarm($"{uid}.time")).Split(":")[0];
             AlarmCardEditHourText.FontSize = 48;
             AlarmCardEditHourText.LineHeight = 50;
             AlarmCardEditHourText.LineStackingStrategy = LineStackingStrategy.BlockLineHeight;
@@ -3629,7 +4005,7 @@ namespace WinDeskClock
 
             System.Windows.Controls.TextBlock AlarmCardEditMinuteText = new System.Windows.Controls.TextBlock();
             AlarmCardEditMinuteText.Tag = $"{uid}_AlarmCardEditMinuteText";
-            AlarmCardEditMinuteText.Text = (await configs.GetAlarm($"{uid}.time")).Split(":")[1];
+            AlarmCardEditMinuteText.Text = (await ConfigManager.GetAlarm($"{uid}.time")).Split(":")[1];
             AlarmCardEditMinuteText.FontSize = 48;
             AlarmCardEditMinuteText.LineHeight = 50;
             AlarmCardEditMinuteText.LineStackingStrategy = LineStackingStrategy.BlockLineHeight;
@@ -3670,7 +4046,7 @@ namespace WinDeskClock
             AlarmCardDaysStack.Margin = new Thickness(0, 0, 0, 10);
             AlarmCardDaysStack.Orientation = Orientation.Horizontal;
 
-            string daysstr = await configs.GetAlarm($"{uid}.days");
+            string daysstr = await ConfigManager.GetAlarm($"{uid}.days");
             ToggleButton AlarmCardDayOnce = new ToggleButton();
             AlarmCardDayOnce.Tag = $"{uid}_AlarmCardDayOnce";
             AlarmCardDayOnce.Content = "1";
@@ -3803,7 +4179,7 @@ namespace WinDeskClock
             AlarmCardSoundToggle.VerticalAlignment = VerticalAlignment.Center;
             AlarmCardSoundToggle.Margin = new Thickness(0, 0, 10, 0);
             AlarmCardSoundToggle.SetValue(Grid.ColumnProperty, 0);
-            if ((await configs.GetAlarm($"{uid}.sound")).Contains("none"))
+            if ((await ConfigManager.GetAlarm($"{uid}.sound")).Contains("none"))
             {
                 AlarmCardSoundToggle.IsChecked = false;
             }
@@ -3840,7 +4216,7 @@ namespace WinDeskClock
             ComboBoxItem AlarmCardSoundComboBoxItemDefault = new ComboBoxItem();
             AlarmCardSoundComboBoxItemDefault.Tag = $"{uid}_AlarmCardSoundComboBoxItemDefault";
             AlarmCardSoundComboBoxItemDefault.Content = "Default sound";
-            if (!(await configs.GetAlarm($"{uid}.sound")).Contains("default"))
+            if (!(await ConfigManager.GetAlarm($"{uid}.sound")).Contains("default"))
             {
                 AlarmCardSoundComboBoxItemDefault.IsSelected = false;
             }
@@ -3855,7 +4231,7 @@ namespace WinDeskClock
             if (AlarmCardSoundComboBox.IsEnabled && !AlarmCardSoundComboBoxItemDefault.IsSelected)
             {
                 AlarmCardSoundComboBoxItemCustom.IsSelected = true;
-                AlarmCardSoundComboBoxItemCustom.Content = await configs.GetAlarm($"{uid}.sound");
+                AlarmCardSoundComboBoxItemCustom.Content = await ConfigManager.GetAlarm($"{uid}.sound");
             }
             else
             {
@@ -3972,10 +4348,12 @@ namespace WinDeskClock
 
             NoAlarmText.Visibility = Visibility.Collapsed;
         }
+
+        // Get alarme ETA with UID
         private async Task<string> GetETAAlarmString(string uid)
         {
-            string time = await configs.GetAlarm($"{uid}.time");
-            string days = await configs.GetAlarm($"{uid}.days");
+            string time = await ConfigManager.GetAlarm($"{uid}.time");
+            string days = await ConfigManager.GetAlarm($"{uid}.days");
 
             string[] timeArray = time.Split(":");
             int hours = int.Parse(timeArray[0]);
@@ -4018,13 +4396,15 @@ namespace WinDeskClock
                 return $"in {diff.Days} day{(diff.Days > 1 ? "s" : "")}";
             }
         }
+
+        // Components in alarm card update
         private async Task AlarmCardSoundToggleClick(string uid)
         {
-            FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-            FrameworkElement AlarmCardSoundToggle = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundToggle");
-            FrameworkElement AlarmCardSoundComboBox = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundComboBox");
-            FrameworkElement AlarmCardSoundComboBoxItemDefault = await FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemDefault");
-            FrameworkElement AlarmCardSoundComboBoxItemCustom = await FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemCustom");
+            FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+            FrameworkElement AlarmCardSoundToggle = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundToggle");
+            FrameworkElement AlarmCardSoundComboBox = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundComboBox");
+            FrameworkElement AlarmCardSoundComboBoxItemDefault = await TagSearch.FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemDefault");
+            FrameworkElement AlarmCardSoundComboBoxItemCustom = await TagSearch.FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemCustom");
             if (((ToggleButton)AlarmCardSoundToggle).IsChecked == true)
             {
                 ((ComboBox)AlarmCardSoundComboBox).IsEnabled = true;
@@ -4041,15 +4421,15 @@ namespace WinDeskClock
         }
         private async Task AlarmCardDaysToggleButton(string uid, string source)
         {
-            FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-            FrameworkElement AlarmCardDayOnce = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayOnce");
-            FrameworkElement AlarmCardDayMonday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayMonday");
-            FrameworkElement AlarmCardDayTuesday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayTuesday");
-            FrameworkElement AlarmCardDayWednesday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayWednesday");
-            FrameworkElement AlarmCardDayThursday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayThursday");
-            FrameworkElement AlarmCardDayFriday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayFriday");
-            FrameworkElement AlarmCardDaySaturday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDaySaturday");
-            FrameworkElement AlarmCardDaySunday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDaySunday");
+            FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+            FrameworkElement AlarmCardDayOnce = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayOnce");
+            FrameworkElement AlarmCardDayMonday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayMonday");
+            FrameworkElement AlarmCardDayTuesday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayTuesday");
+            FrameworkElement AlarmCardDayWednesday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayWednesday");
+            FrameworkElement AlarmCardDayThursday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayThursday");
+            FrameworkElement AlarmCardDayFriday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayFriday");
+            FrameworkElement AlarmCardDaySaturday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDaySaturday");
+            FrameworkElement AlarmCardDaySunday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDaySunday");
 
             if (((ToggleButton)AlarmCardDayOnce).IsChecked == true && source == "once")
             {
@@ -4084,10 +4464,10 @@ namespace WinDeskClock
         }
         private async Task AlarmCardSoundComboBoxClose(string uid)
         {
-            FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-            FrameworkElement AlarmCardSoundComboBox = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundComboBox");
-            FrameworkElement AlarmCardSoundComboBoxItemDefault = await FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemDefault");
-            FrameworkElement AlarmCardSoundComboBoxItemCustom = await FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemCustom");
+            FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+            FrameworkElement AlarmCardSoundComboBox = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundComboBox");
+            FrameworkElement AlarmCardSoundComboBoxItemDefault = await TagSearch.FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemDefault");
+            FrameworkElement AlarmCardSoundComboBoxItemCustom = await TagSearch.FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemCustom");
 
             if (((ComboBoxItem)AlarmCardSoundComboBoxItemCustom).IsSelected)
             {
@@ -4111,55 +4491,60 @@ namespace WinDeskClock
         }
         private async Task AlarmCardSoundComboBoxOpen(string uid)
         {
-            FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-            FrameworkElement AlarmCardSoundComboBox = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundComboBox");
-            FrameworkElement AlarmCardSoundComboBoxItemDefault = await FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemDefault");
-            FrameworkElement AlarmCardSoundComboBoxItemCustom = await FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemCustom");
+            FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+            FrameworkElement AlarmCardSoundComboBox = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundComboBox");
+            FrameworkElement AlarmCardSoundComboBoxItemDefault = await TagSearch.FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemDefault");
+            FrameworkElement AlarmCardSoundComboBoxItemCustom = await TagSearch.FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemCustom");
 
             ((ComboBoxItem)AlarmCardSoundComboBoxItemCustom).Content = "Custom";
         }
+
+        // Alarm enable/disable
         private async Task AlarmCardToggle(string uid)
         {
-            FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-            FrameworkElement AlarmCardToggleSmall = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleSmall");
-            FrameworkElement AlarmCardToggleBig = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleBig");
+            FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+            FrameworkElement AlarmCardToggleSmall = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleSmall");
+            FrameworkElement AlarmCardToggleBig = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleBig");
 
             if (((ToggleSwitch)AlarmCardToggleSmall).IsChecked == true)
             {
                 ((ToggleSwitch)AlarmCardToggleBig).IsChecked = true;
-                await configs.SetAlarm($"{uid}.enabled", "true");
+                await ConfigManager.SetAlarm($"{uid}.enabled", "true");
             }
             else
             {
                 ((ToggleSwitch)AlarmCardToggleBig).IsChecked = false;
-                await configs.SetAlarm($"{uid}.enabled", "false");
+                await ConfigManager.SetAlarm($"{uid}.enabled", "false");
             }
         }
+
+        // Alarm card buttons
+        // - Save
         private async Task AlarmCardSave(string uid)
         {
-            FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-            FrameworkElement AlarmCardEditHourText = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditHourText");
-            FrameworkElement AlarmCardEditMinuteText = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditMinuteText");
-            FrameworkElement AlarmCardNameTextBox = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardNameTextBox");
-            FrameworkElement AlarmCardDayOnce = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayOnce");
-            FrameworkElement AlarmCardDayMonday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayMonday");
-            FrameworkElement AlarmCardDayTuesday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayTuesday");
-            FrameworkElement AlarmCardDayWednesday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayWednesday");
-            FrameworkElement AlarmCardDayThursday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayThursday");
-            FrameworkElement AlarmCardDayFriday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayFriday");
-            FrameworkElement AlarmCardDaySaturday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDaySaturday");
-            FrameworkElement AlarmCardDaySunday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDaySunday");
-            FrameworkElement AlarmCardSoundToggle = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundToggle");
-            FrameworkElement AlarmCardSoundComboBox = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundComboBox");
-            FrameworkElement AlarmCardSoundComboBoxItemDefault = await FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemDefault");
-            FrameworkElement AlarmCardSoundComboBoxItemCustom = await FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemCustom");
+            FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+            FrameworkElement AlarmCardEditHourText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditHourText");
+            FrameworkElement AlarmCardEditMinuteText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditMinuteText");
+            FrameworkElement AlarmCardNameTextBox = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardNameTextBox");
+            FrameworkElement AlarmCardDayOnce = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayOnce");
+            FrameworkElement AlarmCardDayMonday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayMonday");
+            FrameworkElement AlarmCardDayTuesday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayTuesday");
+            FrameworkElement AlarmCardDayWednesday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayWednesday");
+            FrameworkElement AlarmCardDayThursday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayThursday");
+            FrameworkElement AlarmCardDayFriday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayFriday");
+            FrameworkElement AlarmCardDaySaturday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDaySaturday");
+            FrameworkElement AlarmCardDaySunday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDaySunday");
+            FrameworkElement AlarmCardSoundToggle = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundToggle");
+            FrameworkElement AlarmCardSoundComboBox = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundComboBox");
+            FrameworkElement AlarmCardSoundComboBoxItemDefault = await TagSearch.FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemDefault");
+            FrameworkElement AlarmCardSoundComboBoxItemCustom = await TagSearch.FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemCustom");
 
-            FrameworkElement AlarmCardToggleBig = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleBig");
-            FrameworkElement AlarmCardToggleSmall = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleSmall");
+            FrameworkElement AlarmCardToggleBig = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleBig");
+            FrameworkElement AlarmCardToggleSmall = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleSmall");
 
-            FrameworkElement AlarmCardTimeText = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardTimeText");
-            FrameworkElement AlarmCardNameText = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardNameText");
-            FrameworkElement AlarmCardDescText = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDescText");
+            FrameworkElement AlarmCardTimeText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardTimeText");
+            FrameworkElement AlarmCardNameText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardNameText");
+            FrameworkElement AlarmCardDescText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDescText");
 
             string time = $"{((System.Windows.Controls.TextBlock)AlarmCardEditHourText).Text}:{((System.Windows.Controls.TextBlock)AlarmCardEditMinuteText).Text}";
             ((System.Windows.Controls.TextBlock)AlarmCardTimeText).Text = time;
@@ -4233,43 +4618,44 @@ namespace WinDeskClock
                 enabled = "false";
             }
 
-            await configs.SetAlarm($"{uid}.time", time);
-            await configs.SetAlarm($"{uid}.name", name);
-            await configs.SetAlarm($"{uid}.days", daysstr);
-            await configs.SetAlarm($"{uid}.sound", sound);
-            await configs.SetAlarm($"{uid}.enabled", enabled);
+            await ConfigManager.SetAlarm($"{uid}.time", time);
+            await ConfigManager.SetAlarm($"{uid}.name", name);
+            await ConfigManager.SetAlarm($"{uid}.days", daysstr);
+            await ConfigManager.SetAlarm($"{uid}.sound", sound);
+            await ConfigManager.SetAlarm($"{uid}.enabled", enabled);
         }
+        // - Cancel
         private async Task AlarmCardCancel(string uid)
         {
-            FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-            FrameworkElement AlarmCardEditHourText = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditHourText");
-            FrameworkElement AlarmCardEditMinuteText = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditMinuteText");
-            FrameworkElement AlarmCardNameTextBox = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardNameTextBox");
-            FrameworkElement AlarmCardDayOnce = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayOnce");
-            FrameworkElement AlarmCardDayMonday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayMonday");
-            FrameworkElement AlarmCardDayTuesday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayTuesday");
-            FrameworkElement AlarmCardDayWednesday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayWednesday");
-            FrameworkElement AlarmCardDayThursday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayThursday");
-            FrameworkElement AlarmCardDayFriday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayFriday");
-            FrameworkElement AlarmCardDaySaturday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDaySaturday");
-            FrameworkElement AlarmCardDaySunday = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDaySunday");
-            FrameworkElement AlarmCardSoundToggle = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundToggle");
-            FrameworkElement AlarmCardSoundComboBox = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundComboBox");
-            FrameworkElement AlarmCardSoundComboBoxItemDefault = await FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemDefault");
-            FrameworkElement AlarmCardSoundComboBoxItemCustom = await FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemCustom");
+            FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+            FrameworkElement AlarmCardEditHourText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditHourText");
+            FrameworkElement AlarmCardEditMinuteText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditMinuteText");
+            FrameworkElement AlarmCardNameTextBox = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardNameTextBox");
+            FrameworkElement AlarmCardDayOnce = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayOnce");
+            FrameworkElement AlarmCardDayMonday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayMonday");
+            FrameworkElement AlarmCardDayTuesday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayTuesday");
+            FrameworkElement AlarmCardDayWednesday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayWednesday");
+            FrameworkElement AlarmCardDayThursday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayThursday");
+            FrameworkElement AlarmCardDayFriday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDayFriday");
+            FrameworkElement AlarmCardDaySaturday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDaySaturday");
+            FrameworkElement AlarmCardDaySunday = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardDaySunday");
+            FrameworkElement AlarmCardSoundToggle = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundToggle");
+            FrameworkElement AlarmCardSoundComboBox = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSoundComboBox");
+            FrameworkElement AlarmCardSoundComboBoxItemDefault = await TagSearch.FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemDefault");
+            FrameworkElement AlarmCardSoundComboBoxItemCustom = await TagSearch.FindItemwithTag(((ComboBox)AlarmCardSoundComboBox).Items, $"{uid}_AlarmCardSoundComboBoxItemCustom");
 
-            FrameworkElement AlarmCardToggleBig = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleBig");
+            FrameworkElement AlarmCardToggleBig = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleBig");
 
-            string name = await configs.GetAlarm($"{uid}.name");
+            string name = await ConfigManager.GetAlarm($"{uid}.name");
             ((Wpf.Ui.Controls.TextBox)AlarmCardNameTextBox).Text = name;
 
-            string time = await configs.GetAlarm($"{uid}.time");
+            string time = await ConfigManager.GetAlarm($"{uid}.time");
             string[] timeArray = time.Split(":");
             ((System.Windows.Controls.TextBlock)AlarmCardEditHourText).Text = timeArray[0];
             ((System.Windows.Controls.TextBlock)AlarmCardEditMinuteText).Text = timeArray[1];
-            ((Wpf.Ui.Controls.TextBox)AlarmCardNameTextBox).Text = await configs.GetAlarm($"{uid}.name");
+            ((Wpf.Ui.Controls.TextBox)AlarmCardNameTextBox).Text = await ConfigManager.GetAlarm($"{uid}.name");
 
-            string daysstr = await configs.GetAlarm($"{uid}.days");
+            string daysstr = await ConfigManager.GetAlarm($"{uid}.days");
             if (daysstr.Contains("0"))
             {
                 ((ToggleButton)AlarmCardDayOnce).IsChecked = true;
@@ -4307,7 +4693,7 @@ namespace WinDeskClock
                 }
             }
 
-            string sound = await configs.GetAlarm($"{uid}.sound");
+            string sound = await ConfigManager.GetAlarm($"{uid}.sound");
             if (sound.Contains("none"))
             {
                 ((ToggleSwitch)AlarmCardSoundToggle).IsChecked = false;
@@ -4326,7 +4712,7 @@ namespace WinDeskClock
                 }
             }
 
-            string enabled = await configs.GetAlarm($"{uid}.enabled");
+            string enabled = await ConfigManager.GetAlarm($"{uid}.enabled");
             if (enabled.Contains("true"))
             {
                 ((ToggleSwitch)AlarmCardToggleBig).IsChecked = true;
@@ -4336,10 +4722,11 @@ namespace WinDeskClock
                 ((ToggleSwitch)AlarmCardToggleBig).IsChecked = false;
             }
         }
+        // - Delete
         private async Task AlarmCardDelete(string uid)
         {
-            await configs.DelAlarm(uid);
-            FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+            await ConfigManager.DelAlarm(uid);
+            FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
             {
                 var sizeAnimation = new DoubleAnimation
                 {
@@ -4361,10 +4748,11 @@ namespace WinDeskClock
                 NoAlarmText.Visibility = Visibility.Visible;
             }
         }
+        // - Hour Up/Down
         private async Task AlarmCardEditHour(string uid, string direction)
         {
-            FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-            FrameworkElement AlarmCardEditHourText = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditHourText");
+            FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+            FrameworkElement AlarmCardEditHourText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditHourText");
             int hour = int.Parse(((System.Windows.Controls.TextBlock)AlarmCardEditHourText).Text);
             if (direction == "up")
             {
@@ -4454,10 +4842,11 @@ namespace WinDeskClock
             }
             ((System.Windows.Controls.TextBlock)AlarmCardEditHourText).Text = hour.ToString("00");
         }
+        // - Minute Up/Down
         private async Task AlarmCardEditMinute(string uid, string direction)
         {
-            FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-            FrameworkElement AlarmCardEditMinuteText = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditMinuteText");
+            FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+            FrameworkElement AlarmCardEditMinuteText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditMinuteText");
             int minute = int.Parse(((System.Windows.Controls.TextBlock)AlarmCardEditMinuteText).Text);
             if (direction == "up")
             {
@@ -4547,7 +4936,84 @@ namespace WinDeskClock
             }
             ((System.Windows.Controls.TextBlock)AlarmCardEditMinuteText).Text = minute.ToString("00");
         }
-        private bool CardDeployed = false;
+
+        // Alarm card open
+        private async Task AlarmCardOpen(object sender, MouseButtonEventArgs e, string uid)
+        {
+            if ((e.Source is CardAction || e.Source is System.Windows.Controls.TextBlock) && !CardDeployed)
+            {
+                CardDeployed = true;
+
+                foreach (CardAction card in AlarmStack.Children)
+                {
+                    if (card.Tag.ToString() != $"{uid}_AlarmCard")
+                    {
+                        var sizeAnimation = new DoubleAnimation
+                        {
+                            From = card.ActualHeight,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(0.3),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        Storyboard.SetTarget(sizeAnimation, card);
+                        Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(sizeAnimation);
+                        storyboard.Begin();
+                    }
+                }
+
+                FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+                FrameworkElement AlarmCardMainGrid = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardMainGrid");
+                FrameworkElement AlarmCardBigGrid = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardBigGrid");
+                FrameworkElement AlarmCardSmallGrid = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSmallGrid");
+
+                AlarmCardSmallGrid.Visibility = Visibility.Collapsed;
+                AlarmCardBigGrid.Visibility = Visibility.Visible;
+
+                {
+                    var sizeAnimation = new DoubleAnimation
+                    {
+                        From = AlarmCard.ActualHeight,
+                        To = AlarmScroll.ActualHeight - 23,
+                        Duration = TimeSpan.FromSeconds(0.3),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    Storyboard.SetTarget(sizeAnimation, AlarmCardMainGrid);
+                    Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
+                    var storyboard = new Storyboard();
+                    storyboard.Children.Add(sizeAnimation);
+                    storyboard.Begin();
+
+                    var fadeAnimation = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(0.5),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    };
+                    Storyboard.SetTarget(fadeAnimation, AlarmCardBigGrid);
+                    Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                    var storyboard2 = new Storyboard();
+                    storyboard2.Children.Add(fadeAnimation);
+                    storyboard2.Begin();
+                }
+
+                await Task.Delay(150);
+
+                foreach (CardAction card in AlarmStack.Children)
+                {
+                    if (card.Tag.ToString() != $"{uid}_AlarmCard")
+                    {
+                        card.Visibility = Visibility.Collapsed;
+                    }
+                }
+
+                await Task.Delay(150);
+            }
+        }
+
+        // Alarm card close
         private async Task AlarmCardClose(string uid)
         {
 
@@ -4558,10 +5024,10 @@ namespace WinDeskClock
 
             await Task.Delay(150);
 
-            FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-            FrameworkElement AlarmCardMainGrid = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardMainGrid");
-            FrameworkElement AlarmCardBigGrid = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardBigGrid");
-            FrameworkElement AlarmCardSmallGrid = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSmallGrid");
+            FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+            FrameworkElement AlarmCardMainGrid = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardMainGrid");
+            FrameworkElement AlarmCardBigGrid = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardBigGrid");
+            FrameworkElement AlarmCardSmallGrid = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSmallGrid");
 
             AlarmCardBigGrid.Visibility = Visibility.Collapsed;
             AlarmCardSmallGrid.Visibility = Visibility.Visible;
@@ -4629,80 +5095,8 @@ namespace WinDeskClock
             await SortAlarmCards();
             await AlarmCardETAUpdate();
         }
-        private async Task AlarmCardOpen(object sender, MouseButtonEventArgs e, string uid)
-        {
-            if ((e.Source is CardAction || e.Source is System.Windows.Controls.TextBlock) && !CardDeployed)
-            {
-                CardDeployed = true;
 
-                foreach (CardAction card in AlarmStack.Children)
-                {
-                    if (card.Tag.ToString() != $"{uid}_AlarmCard")
-                    {
-                        var sizeAnimation = new DoubleAnimation
-                        {
-                            From = card.ActualHeight,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(0.3),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        Storyboard.SetTarget(sizeAnimation, card);
-                        Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(sizeAnimation);
-                        storyboard.Begin();
-                    }
-                }
-
-                FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-                FrameworkElement AlarmCardMainGrid = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardMainGrid");
-                FrameworkElement AlarmCardBigGrid = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardBigGrid");
-                FrameworkElement AlarmCardSmallGrid = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSmallGrid");
-
-                AlarmCardSmallGrid.Visibility = Visibility.Collapsed;
-                AlarmCardBigGrid.Visibility = Visibility.Visible;
-
-                {
-                    var sizeAnimation = new DoubleAnimation
-                    {
-                        From = AlarmCard.ActualHeight,
-                        To = AlarmScroll.ActualHeight - 23,
-                        Duration = TimeSpan.FromSeconds(0.3),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(sizeAnimation, AlarmCardMainGrid);
-                    Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(sizeAnimation);
-                    storyboard.Begin();
-
-                    var fadeAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(0.5),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    Storyboard.SetTarget(fadeAnimation, AlarmCardBigGrid);
-                    Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                    var storyboard2 = new Storyboard();
-                    storyboard2.Children.Add(fadeAnimation);
-                    storyboard2.Begin();
-                }
-
-                await Task.Delay(150);
-
-                foreach (CardAction card in AlarmStack.Children)
-                {
-                    if (card.Tag.ToString() != $"{uid}_AlarmCard")
-                    {
-                        card.Visibility = Visibility.Collapsed;
-                    }
-                }
-
-                await Task.Delay(150);
-            }
-        }
+        // Add alarm
         private async void AddAlarmBtn_Click(object sender, RoutedEventArgs e)
         {
             if (!CardDeployed)
@@ -4717,15 +5111,15 @@ namespace WinDeskClock
                 string days = "0";
                 string sound = "default";
                 string enabled = "true";
-                await configs.SetAlarm($"{uid}.time", time);
-                await configs.SetAlarm($"{uid}.name", name);
-                await configs.SetAlarm($"{uid}.days", days);
-                await configs.SetAlarm($"{uid}.sound", sound);
-                await configs.SetAlarm($"{uid}.enabled", enabled);
+                await ConfigManager.SetAlarm($"{uid}.time", time);
+                await ConfigManager.SetAlarm($"{uid}.name", name);
+                await ConfigManager.SetAlarm($"{uid}.days", days);
+                await ConfigManager.SetAlarm($"{uid}.sound", sound);
+                await ConfigManager.SetAlarm($"{uid}.enabled", enabled);
 
                 await CreateAlarmCard(uid);
 
-                FrameworkElement AlarmCard = await FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
+                FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
 
                 {
                     var sizeAnimation = new DoubleAnimation
@@ -4766,9 +5160,9 @@ namespace WinDeskClock
                     }
                 }
 
-                FrameworkElement AlarmCardMainGrid = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardMainGrid");
-                FrameworkElement AlarmCardBigGrid = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardBigGrid");
-                FrameworkElement AlarmCardSmallGrid = await FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSmallGrid");
+                FrameworkElement AlarmCardMainGrid = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardMainGrid");
+                FrameworkElement AlarmCardBigGrid = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardBigGrid");
+                FrameworkElement AlarmCardSmallGrid = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardSmallGrid");
 
                 AlarmCardSmallGrid.Visibility = Visibility.Collapsed;
                 AlarmCardBigGrid.Visibility = Visibility.Visible;
@@ -4812,9 +5206,623 @@ namespace WinDeskClock
                 await Task.Delay(150);
             }
         }
+
+        // Stop alarm alert
         private void AlarmAlertStopBtn_Click(object sender, RoutedEventArgs e)
         {
             AlarmAlert = false;
+        }
+        #endregion
+
+        private double animspeedzoomgm = 0.2;
+        private async void GlobalMenuBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 2,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 2,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            await Task.Delay(150);
+            GlobalMenuGrid.Visibility = Visibility.Visible;
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(fadeAnimation, GlobalMenuGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBorder);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBorder);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+        }
+        private async void BackBtn_Click(object sender, RoutedEventArgs e)
+        {
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeAnimation, GlobalMenuGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBorder);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBorder);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+            await Task.Delay(150);
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 2,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 2,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+            await Task.Delay(300);
+            GlobalMenuGrid.Visibility = Visibility.Hidden;
+        }
+        private async void ScreenOffBtn_Click(object sender, RoutedEventArgs e)
+        {
+            GlobalMenuGrid.Visibility = Visibility.Hidden;
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.3),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 2,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.3),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 2,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.3),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+            await TurnScreenOff();
+        }
+        private async void FullScreenBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (FullScreenBtn.IsChecked == true)
+            {
+                WindowState = WindowState.Normal;
+                WindowStyle = WindowStyle.None;
+                WindowState = WindowState.Maximized;
+                RootTitleBar.ShowMaximize = false;
+                RootTitleBar.ShowMinimize = false;
+            }
+            else
+            {
+                WindowState = WindowState.Normal;
+                WindowStyle = WindowStyle.SingleBorderWindow;
+                WindowState = WindowState.Maximized;
+                RootTitleBar.ShowMaximize = true;
+                RootTitleBar.ShowMinimize = true;
+            }
+        }
+        private async void KioskModeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (KioskModeBtn.IsChecked == true)
+            {
+                FullScreenBtn.IsChecked = true;
+                FullScreenBtn.IsEnabled = false;
+                WindowState = WindowState.Normal;
+                WindowStyle = WindowStyle.None;
+                WindowState = WindowState.Maximized;
+                RootTitleBar.ShowMaximize = false;
+                RootTitleBar.ShowMinimize = false;
+                RootTitleBar.ShowClose = false;
+                Process.Start("taskkill", "/f /im explorer.exe");
+            }
+            else
+            {
+                FullScreenBtn.IsChecked = false;
+                FullScreenBtn.IsEnabled = true;
+                WindowState = WindowState.Normal;
+                WindowStyle = WindowStyle.SingleBorderWindow;
+                WindowState = WindowState.Maximized;
+                RootTitleBar.ShowMaximize = true;
+                RootTitleBar.ShowMinimize = true;
+                RootTitleBar.ShowClose = true;
+                Process.Start("explorer.exe");
+            }
+        }
+
+        private double animzoomspeeds = 0.3;
+        private async void SettingsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeAnimation, GlobalMenuGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBorder);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBorder);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+            await Task.Delay(150);
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 2,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 2,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+            await Task.Delay(300);
+            GlobalMenuGrid.Visibility = Visibility.Hidden;
+            SettingsGrid.Visibility = Visibility.Visible;
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(fadeAnimation, SettingsGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 1.1,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 1.1,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(sizeAnimation1, SettingsBorder);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, SettingsBorder);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+            SettingsTabControl.SelectedIndex = 0;
+            GeneralFrame.Navigate(SettingsTabs["General"]);
+            {
+                var opacityAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(stabcontrolpage / 2),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 0.9,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(stabcontrolpage),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 0.9,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(stabcontrolpage),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(opacityAnimation, GeneralFrame);
+                Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(OpacityProperty));
+                Storyboard.SetTarget(sizeAnimation1, GeneralFrame);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, GeneralFrame);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(opacityAnimation);
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+        }
+        private async void ExitAppBtn_Click(object sender, RoutedEventArgs e)
+        {
+            ExitAppBtn.Content = "Exiting...";
+            if (Process.GetProcessesByName("explorer").Length == 0)
+            {
+                Process.Start("explorer.exe");
+            }
+            await Task.Delay(1000);
+            Application.Current.Shutdown();
+        }
+
+        private async void RootTitleBar_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private async void SettingsBackBtn_Click(object sender, RoutedEventArgs e)
+        {
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeAnimation, SettingsGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 1.1,
+                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 1.1,
+                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(sizeAnimation1, SettingsBorder);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, SettingsBorder);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+            await Task.Delay(300);
+            SettingsGrid.Visibility = Visibility.Hidden;
+        }
+
+        private double stabcontrolpage = 0.3;
+        private async void AboutFrame_Loaded(object sender, EventArgs e)
+        {
+            if (SettingsGrid.Visibility == Visibility.Visible)
+            {
+                AboutFrame.Navigate(SettingsTabs["About"]);
+                {
+                    var opacityAnimation = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(stabcontrolpage / 2),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    };
+                    var sizeAnimation1 = new DoubleAnimation
+                    {
+                        From = 0.9,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(stabcontrolpage),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    var sizeAnimation2 = new DoubleAnimation
+                    {
+                        From = 0.9,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(stabcontrolpage),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    Storyboard.SetTarget(opacityAnimation, AboutFrame);
+                    Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(OpacityProperty));
+                    Storyboard.SetTarget(sizeAnimation1, AboutFrame);
+                    Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                    Storyboard.SetTarget(sizeAnimation2, AboutFrame);
+                    Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                    var storyboard = new Storyboard();
+                    storyboard.Children.Add(opacityAnimation);
+                    storyboard.Children.Add(sizeAnimation1);
+                    storyboard.Children.Add(sizeAnimation2);
+                    storyboard.Begin();
+                }
+            }
+
+        }
+
+        private void GeneralFrame_Loaded(object sender, EventArgs e)
+        {
+            if (SettingsGrid.Visibility == Visibility.Visible)
+            {
+                GeneralFrame.Navigate(SettingsTabs["General"]);
+                {
+                    var opacityAnimation = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(stabcontrolpage / 2),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    };
+                    var sizeAnimation1 = new DoubleAnimation
+                    {
+                        From = 0.9,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(stabcontrolpage),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    var sizeAnimation2 = new DoubleAnimation
+                    {
+                        From = 0.9,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(stabcontrolpage),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    Storyboard.SetTarget(opacityAnimation, GeneralFrame);
+                    Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(OpacityProperty));
+                    Storyboard.SetTarget(sizeAnimation1, GeneralFrame);
+                    Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                    Storyboard.SetTarget(sizeAnimation2, GeneralFrame);
+                    Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                    var storyboard = new Storyboard();
+                    storyboard.Children.Add(opacityAnimation);
+                    storyboard.Children.Add(sizeAnimation1);
+                    storyboard.Children.Add(sizeAnimation2);
+                    storyboard.Begin();
+                }
+            }
+        }
+
+        private void PluginManagerFrame_Loaded(object sender, EventArgs e)
+        {
+            if (SettingsGrid.Visibility == Visibility.Visible)
+            {
+                PluginManagerFrame.Navigate(SettingsTabs["PluginManager"]);
+                {
+                    var opacityAnimation = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(stabcontrolpage / 2),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    };
+                    var sizeAnimation1 = new DoubleAnimation
+                    {
+                        From = 0.9,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(stabcontrolpage),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    var sizeAnimation2 = new DoubleAnimation
+                    {
+                        From = 0.9,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(stabcontrolpage),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    Storyboard.SetTarget(opacityAnimation, PluginManagerFrame);
+                    Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(OpacityProperty));
+                    Storyboard.SetTarget(sizeAnimation1, PluginManagerFrame);
+                    Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                    Storyboard.SetTarget(sizeAnimation2, PluginManagerFrame);
+                    Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                    var storyboard = new Storyboard();
+                    storyboard.Children.Add(opacityAnimation);
+                    storyboard.Children.Add(sizeAnimation1);
+                    storyboard.Children.Add(sizeAnimation2);
+                    storyboard.Begin();
+                }
+            }
+        }
+
+        private async void SettingsSaveBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await ConfigManager.SaveNewSettings();
+
+            if (ConfigManager.NewVariable.RestartNeeded)
+            {
+                await App.RestartApp();
+            }
         }
     }
 }

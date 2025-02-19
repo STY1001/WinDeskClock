@@ -1,24 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>true</UseWPF>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+		<AssemblyName>WinDeskClock</AssemblyName>
+		<Company>STY Inc. (STY1001)</Company>
+		<Product>WinDeskClock</Product>
+		<Description>Transform your Windows Tablet (or PC) into a Smart Clock</Description>
+		<PackageProjectUrl>https://github.com/STY1001/WinDeskClock</PackageProjectUrl>
+		<Copyright>STY1001</Copyright>
+		<ApplicationIcon>WinDeskClock.ico</ApplicationIcon>
+		<UseWindowsForms>False</UseWindowsForms>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Resources\**\*" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Resources\**\*" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="WPF-UI" Version="3.0.5" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="WPF-UI" Version="3.0.5" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Resources\**\*" />
-  </ItemGroup>
+	<ItemGroup>
+		<Resource Include="Resources\**\*" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="WinDeskClock.ico" />
+	</ItemGroup>
 
 </Project>

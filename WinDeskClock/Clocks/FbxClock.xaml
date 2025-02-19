@@ -1,0 +1,117 @@
+﻿<Page x:Class="WinDeskClock.Clocks.FbxClock"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WinDeskClock.Clocks"
+      mc:Ignorable="d" 
+      d:DesignHeight="619" d:DesignWidth="614"
+      Title="FbxClock">
+
+    <Grid>
+        <Grid VerticalAlignment="Center"
+              HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Border x:Name="TimeBorder"
+                    Padding="20"
+                    CornerRadius="8,8,0,0"
+                    Background="#000000"
+                    Grid.Row="0"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                <Grid x:Name="TimeGrid"
+                      Grid.Row="0"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Center"
+                      ClipToBounds="True">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="180" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="180" />
+                        <RowDefinition Height="180" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Column="0"
+                          Grid.Row="0"
+                          ClipToBounds="True">
+                        <Image x:Name="H1Img"
+                               Margin="5"
+                                   RenderTransformOrigin="0.5,0.5">
+                            <Image.RenderTransform>
+                                <TranslateTransform Y="0"
+                                                    X="0"/>
+                            </Image.RenderTransform>
+                        </Image>
+                    </Grid>
+                    <Grid Grid.Column="1"
+                          Grid.Row="0"
+                          ClipToBounds="True">
+                        <Image x:Name="H2Img"
+                               Margin="5"
+                                   RenderTransformOrigin="0.5,0.5">
+                            <Image.RenderTransform>
+                                <TranslateTransform Y="0"
+                                                    X="0" />
+                            </Image.RenderTransform>
+                        </Image>
+                    </Grid>
+                    <Grid Grid.Column="0"
+                          Grid.Row="1"
+                          ClipToBounds="True">
+                        <Image x:Name="M1Img"
+                               Margin="5"
+                                   RenderTransformOrigin="0.5,0.5">
+                            <Image.RenderTransform>
+                                <TranslateTransform Y="0"
+                                                    X="0" />
+                            </Image.RenderTransform>
+                        </Image>
+                    </Grid>
+                    <Grid Grid.Column="1"
+                          Grid.Row="1"
+                          ClipToBounds="True">
+                        <Image x:Name="M2Img"
+                               Margin="5"
+                               RenderTransformOrigin="0.5,0.5">
+                            <Image.RenderTransform>
+                                <TranslateTransform Y="0"
+                                                    X="0" />
+                            </Image.RenderTransform>
+                        </Image>
+                    </Grid>
+                </Grid>
+            </Border>
+            <Border x:Name="DateBorder"
+                    Padding="10"
+                    CornerRadius="0,0,8,8"
+                    Background="#000000"
+                    Grid.Row="1"
+                    VerticalAlignment="Top">
+                <Grid x:Name="DateGrid"
+                      VerticalAlignment="Top"
+                      HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel x:Name="DNameStack"
+                               Grid.Column="0"
+                                Orientation="Horizontal"/>
+                    <StackPanel x:Name="DDayStack"
+                                Grid.Column="2"
+                                Orientation="Horizontal" />
+                    <StackPanel x:Name="DMonthStack"
+                                Grid.Column="4"
+                                Orientation="Horizontal" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

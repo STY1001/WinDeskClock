@@ -1,0 +1,62 @@
+﻿<Page x:Class="WinDeskClock.Pages.Settings.PluginManager"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:WinDeskClock.Pages.Settings"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      mc:Ignorable="d"
+      d:DesignHeight="485"
+      d:DesignWidth="1180"
+      Title="PluginManager">
+
+    <Grid>
+        <ScrollViewer Padding="5">
+            <StackPanel x:Name="PluginCardStack">
+            </StackPanel>
+        </ScrollViewer>
+        <Grid Visibility="Hidden"
+              x:Name="PluginSettingsGrid">
+            <Border Background="#282828"
+                    CornerRadius="8"
+                    ClipToBounds="True"
+                    x:Name="PluginSettingsBorder"
+                    RenderTransformOrigin="0.9,0.5">
+                <Border.RenderTransform>
+                    <ScaleTransform ScaleX="1"
+                                    ScaleY="1" />
+                </Border.RenderTransform>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Frame x:Name="PluginSettingsFrame" />
+                    <Border Background="#a0000000"
+                            CornerRadius="0,0,8,8"
+                            Padding="10"
+                            Grid.Row="1">
+                        <Grid Grid.Row="1"
+                              HorizontalAlignment="Right">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:Button Content="Cancel"
+                                       Grid.Column="0"
+                                       Margin="5,10,5,10"
+                                       x:Name="PluginSettingsCancelBtn"
+                                       Click="PluginSettingsCancelBtn_Click" />
+                            <ui:Button Content="Save"
+                                       Grid.Column="1"
+                                       Margin="5,10,10,10"
+                                       Appearance="Primary"
+                                       x:Name="PluginSettingsSaveBtn"
+                                       Click="PluginSettingsSaveBtn_Click" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>
