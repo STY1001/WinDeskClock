@@ -90,6 +90,9 @@ namespace WinDeskClock
         {
             InitializeComponent();
 
+            OverlayGrid.Visibility = Visibility.Visible;
+            DownMenuClockGrid.Visibility = Visibility.Visible;
+
             // Prevent the window from being resized, minimized or windowed when FullScreenBtn mode is enabled
             this.StateChanged += async (sender, e) =>
             {
@@ -3459,7 +3462,7 @@ namespace WinDeskClock
                     storyboard.Begin();
                 }
 
-                double snooze = double.Parse(ConfigManager.Variable.AlarmSnoozeDelay);
+                double timeout = double.Parse(ConfigManager.Variable.AlarmTimeoutDelay);
                 TimeSpan alerttime = new TimeSpan(0, 0, 0, 0, 0);
 
                 while (AlarmAlert)
@@ -3467,7 +3470,7 @@ namespace WinDeskClock
                     await Task.Delay(100);
                     alerttime = alerttime.Add(TimeSpan.FromMilliseconds(100));
 
-                    if (alerttime.TotalMinutes >= snooze)
+                    if (alerttime.TotalMinutes >= timeout)
                     {
                         break;
                     }
@@ -4475,7 +4478,7 @@ namespace WinDeskClock
                 ofd.DefaultExt = "wav";
                 ofd.Filter = "WAV Audio File (*.wav)|*.wav";
                 ofd.FilterIndex = 1;
-                ofd.Title = "WinDeskClock Custom Alarm Sound Select";
+                ofd.Title = "WinDeskClock Custom Alarm Sound";
                 var result = ofd.ShowDialog();
                 if (result == true)
                 {
