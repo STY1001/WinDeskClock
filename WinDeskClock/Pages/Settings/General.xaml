@@ -6,84 +6,234 @@
       xmlns:local="clr-namespace:WinDeskClock.Pages.Settings"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d"
-      d:DesignHeight="450"
+      d:DesignHeight="900"
       d:DesignWidth="800"
       Title="General">
 
     <Grid>
-        <StackPanel>
-            <Grid HorizontalAlignment="Stretch"
-                  Margin="20,10,20,5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="General"
-                           FontSize="10"
-                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                           Grid.Column="0"
-                           Margin="0,0,10,0"/>
-                <Separator HorizontalAlignment="Stretch"
-                           VerticalAlignment="Center"
-                           Grid.Column="1" />
-            </Grid>
-            <ui:CardControl Margin="15,0,15,10">
-                <ui:CardControl.Header>
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Language"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   FontFamily="Segoe UI SemiBold" />
-                    </StackPanel>
-                </ui:CardControl.Header>
-                <ui:CardControl.Content>
-                    <ComboBox x:Name="LangComboBox"/>
-                </ui:CardControl.Content>
-            </ui:CardControl>
-            <Grid HorizontalAlignment="Stretch"
-                  Margin="20,0,20,5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Clock"
-                           FontSize="10"
-                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                           Grid.Column="0"
-                           Margin="0,0,10,0" />
-                <Separator HorizontalAlignment="Stretch"
-                           VerticalAlignment="Center"
-                           Grid.Column="1" />
-            </Grid>
-            <ui:CardControl Margin="15,0,15,10">
-                <ui:CardControl.Header>
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Show seconds"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   FontFamily="Segoe UI SemiBold"/>
-                        <TextBlock Text="Show seconds on the clock (also show year)"
+        <ScrollViewer>
+            <StackPanel>
+                <Grid HorizontalAlignment="Stretch"
+                      Margin="20,10,20,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="General"
+                               FontSize="10"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Grid.Column="0"
+                               Margin="0,0,10,0" />
+                    <Separator HorizontalAlignment="Stretch"
+                               VerticalAlignment="Center"
+                               Grid.Column="1" />
+                </Grid>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Language"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       FontFamily="Segoe UI SemiBold" />
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <ComboBox x:Name="LangComboBox" />
+                </ui:CardControl>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Volume"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       FontFamily="Segoe UI SemiBold" />
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="x %"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                   FontSize="12"/>
+                                   FontSize="12"
+                                   HorizontalAlignment="Right"
+                                   Margin="0,0,10,0"
+                                   x:Name="VolumeText"/>
+                        <Slider x:Name="VolumeSlider"
+                                Minimum="0"
+                                Maximum="100" />
                     </StackPanel>
-                </ui:CardControl.Header>
-                <ui:CardControl.Content>
-                    <ui:ToggleSwitch x:Name="ShowSecondsToggleSwitch"/>
-                </ui:CardControl.Content>
-            </ui:CardControl>
-            <ui:CardControl Margin="15,0,15,10">
-                <ui:CardControl.Header>
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="Freebox style"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   FontFamily="Segoe UI SemiBold"/>
-                        <TextBlock Text="Apply the Freebox Revolution clock style"
+                </ui:CardControl>
+                <Grid HorizontalAlignment="Stretch"
+                      Margin="20,0,20,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Clock"
+                               FontSize="10"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Grid.Column="0"
+                               Margin="0,0,10,0" />
+                    <Separator HorizontalAlignment="Stretch"
+                               VerticalAlignment="Center"
+                               Grid.Column="1" />
+                </Grid>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Show seconds"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       FontFamily="Segoe UI SemiBold" />
+                            <TextBlock Text="Show seconds on the clock (also show year)"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <ui:ToggleSwitch x:Name="ShowSecondsToggleSwitch" />
+                </ui:CardControl>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Freebox style"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       FontFamily="Segoe UI SemiBold" />
+                            <TextBlock Text="Apply the Freebox Revolution clock style"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <ui:ToggleSwitch x:Name="FbxStyleToggleSwitch" />
+                </ui:CardControl>
+                <Grid HorizontalAlignment="Stretch"
+                      Margin="20,0,20,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Alarm"
+                               FontSize="10"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Grid.Column="0"
+                               Margin="0,0,10,0" />
+                    <Separator HorizontalAlignment="Stretch"
+                               VerticalAlignment="Center"
+                               Grid.Column="1" />
+                </Grid>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Default alarm sound"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       FontFamily="Segoe UI SemiBold" />
+                            <TextBlock Text="Select the default sound of the alarm (Current: audio.wav)"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <Button Content="Choose a file"
+                            x:Name="DefaultAlarmSoundBtn"/>
+                </ui:CardControl>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Alarm timeout delay"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       FontFamily="Segoe UI SemiBold" />
+                            <TextBlock Text="Delay before the alarm stops ringing"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="x minutes"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                   FontSize="12"/>
+                                   FontSize="12"
+                                   HorizontalAlignment="Right"
+                                   Margin="0,0,10,0"
+                                   x:Name="AlarmTimeoutText"/>
+                        <Slider x:Name="AlarmTimeoutSlider"
+                                Minimum="0"
+                                Maximum="60" />
                     </StackPanel>
-                </ui:CardControl.Header>
-                <ui:CardControl.Content>
-                    <ui:ToggleSwitch x:Name="FbxStyleToggleSwitch"/>
-                </ui:CardControl.Content>
-            </ui:CardControl>
-        </StackPanel>
+                </ui:CardControl>
+                <Grid HorizontalAlignment="Stretch"
+                      Margin="20,0,20,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Timer"
+                               FontSize="10"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Grid.Column="0"
+                               Margin="0,0,10,0" />
+                    <Separator HorizontalAlignment="Stretch"
+                               VerticalAlignment="Center"
+                               Grid.Column="1" />
+                </Grid>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Timer sound"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       FontFamily="Segoe UI SemiBold" />
+                            <TextBlock Text="Select the sound of the timer (Current: audio.wav)"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <Button Content="Choose a file"
+                            x:Name="TimerSoundBtn"/>
+                </ui:CardControl>
+                <Grid HorizontalAlignment="Stretch"
+                      Margin="20,0,20,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Plugin"
+                               FontSize="10"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               Grid.Column="0"
+                               Margin="0,0,10,0" />
+                    <Separator HorizontalAlignment="Stretch"
+                               VerticalAlignment="Center"
+                               Grid.Column="1" />
+                </Grid>
+                <Expander Margin="15,0,15,10">
+                    <Expander.Header>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Carousel"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       FontFamily="Segoe UI SemiBold" />
+                            <TextBlock Text="Select what plugins you want to see in the main screen carousel"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </Expander.Header>
+                    <StackPanel>
+                    </StackPanel>
+                </Expander>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Carousel delay"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       FontFamily="Segoe UI SemiBold" />
+                            <TextBlock Text="Delay between changes"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="x seconds"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   FontSize="12"
+                                   HorizontalAlignment="Right"
+                                   Margin="0,0,10,0"/>
+                        <Slider x:Name="CarouselDelaySlider"
+                                Minimum="5"
+                                Maximum="60"
+                                TickFrequency="5"
+                                IsSnapToTickEnabled="True" />
+                    </StackPanel>
+                </ui:CardControl>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>
