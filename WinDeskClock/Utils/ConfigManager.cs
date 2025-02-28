@@ -16,7 +16,7 @@ namespace WinDeskClock.Utils
             { "Language", "en-us" },
             { "DefaultTimeUpSound", "C:\\Windows\\Media\\Alarm08.wav" },
             { "DefaultAlarmSound", "C:\\Windows\\Media\\Alarm05.wav" },
-            { "AlarmSnoozeDelay", "5" },
+            { "AlarmTimeoutDelay", "1" },
             { "ClockShowSecond", "true" },
             { "ClockFbxStyle", "false" },
             { "PinnedPlugin", "" },
@@ -53,7 +53,7 @@ namespace WinDeskClock.Utils
             Variable.Language = await GetConfig("Language");
             Variable.DefaultTimeUpSound = await GetConfig("DefaultTimeUpSound");
             Variable.DefaultAlarmSound = await GetConfig("DefaultAlarmSound");
-            Variable.AlarmSnoozeDelay = await GetConfig("AlarmSnoozeDelay");
+            Variable.AlarmTimeoutDelay = await GetConfig("AlarmTimeoutDelay");
             Variable.ClockShowSecond = bool.Parse(await GetConfig("ClockShowSecond"));
             Variable.ClockFbxStyle = bool.Parse(await GetConfig("ClockFbxStyle"));
 
@@ -87,7 +87,7 @@ namespace WinDeskClock.Utils
             NewVariable.Language = Variable.Language;
             NewVariable.DefaultTimeUpSound = Variable.DefaultTimeUpSound;
             NewVariable.DefaultAlarmSound = Variable.DefaultAlarmSound;
-            NewVariable.AlarmSnoozeDelay = Variable.AlarmSnoozeDelay;
+            NewVariable.AlarmTimeoutDelay = Variable.AlarmTimeoutDelay;
             NewVariable.ClockShowSecond = Variable.ClockShowSecond;
             NewVariable.PinnedPlugin = Variable.PinnedPlugin;
             NewVariable.PluginOrder = Variable.PluginOrder;
@@ -99,7 +99,7 @@ namespace WinDeskClock.Utils
             await SetConfig("Language", NewVariable.Language);
             await SetConfig("DefaultTimeUpSound", NewVariable.DefaultTimeUpSound);
             await SetConfig("DefaultAlarmSound", NewVariable.DefaultAlarmSound);
-            await SetConfig("AlarmSnoozeDelay", NewVariable.AlarmSnoozeDelay);
+            await SetConfig("AlarmTimeoutDelay", NewVariable.AlarmTimeoutDelay);
             await SetConfig("ClockShowSecond", NewVariable.ClockShowSecond.ToString());
             await SetConfig("ClockFbxStyle", NewVariable.ClockFbxStyle.ToString());
             await SetConfig("PinnedPlugin", string.Join(',', NewVariable.PinnedPlugin));
@@ -203,7 +203,7 @@ namespace WinDeskClock.Utils
         {
             public static string DefaultTimeUpSound;
             public static string DefaultAlarmSound;
-            public static string AlarmSnoozeDelay;
+            public static string AlarmTimeoutDelay;
             public static string Language;
             public static bool ClockShowSecond;
             public static bool ClockFbxStyle;
@@ -217,7 +217,7 @@ namespace WinDeskClock.Utils
             public static bool RestartNeeded = false;
             public static string DefaultTimeUpSound;
             public static string DefaultAlarmSound;
-            public static string AlarmSnoozeDelay;
+            public static string AlarmTimeoutDelay;
             public static string Language;
             public static bool ClockShowSecond;
             public static bool ClockFbxStyle;
