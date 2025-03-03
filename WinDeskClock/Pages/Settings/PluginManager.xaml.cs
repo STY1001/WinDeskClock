@@ -35,7 +35,7 @@ namespace WinDeskClock.Pages.Settings
         private async Task Load()
         {
             PluginCardStack.Children.Clear();
-            foreach (var id in PluginLoader.Plugins.Keys)
+            foreach (var id in PluginLoader.PluginInfos.Keys)
             {
                 Debug.WriteLine(id);
                 await CreatePluginCard(id);
@@ -86,7 +86,7 @@ namespace WinDeskClock.Pages.Settings
                 storyboard.Begin();
             }
             SettingsPluginID = id;
-            PluginSettingsFrame.Content = PluginLoader.Plugins[id].GetSettings();
+            PluginSettingsFrame.Content = PluginLoader.PluginModules[id].GetSettings();
         }
 
         private async Task HidePluginSettings()
@@ -153,7 +153,7 @@ namespace WinDeskClock.Pages.Settings
             PluginCardMainGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Auto) });
 
             System.Windows.Controls.Image PluginIcon = new System.Windows.Controls.Image();
-            PluginIcon.Source = PluginLoader.Plugins[id].Icon;
+            PluginIcon.Source = PluginLoader.PluginInfos[id].Icon;
             PluginIcon.Width = 150;
             PluginIcon.Height = 150;
             PluginIcon.Margin = new Thickness(5, 0, 0, 0);
@@ -182,7 +182,7 @@ namespace WinDeskClock.Pages.Settings
             PluginTitleGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Auto) });
 
             System.Windows.Controls.TextBlock PluginNameTextBlock = new System.Windows.Controls.TextBlock();
-            PluginNameTextBlock.Text = PluginLoader.Plugins[id].Name;
+            PluginNameTextBlock.Text = PluginLoader.PluginInfos[id].Name;
             PluginNameTextBlock.FontSize = 18;
             PluginNameTextBlock.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
             PluginNameTextBlock.FontFamily = new FontFamily("Segoe UI SemiBold");
@@ -201,7 +201,7 @@ namespace WinDeskClock.Pages.Settings
             PluginSepTextBlock1.Tag = $"{id}_PluginSepTextBlock1";
 
             System.Windows.Controls.TextBlock PluginIDTextBlock = new System.Windows.Controls.TextBlock();
-            PluginIDTextBlock.Text = PluginLoader.Plugins[id].ID;
+            PluginIDTextBlock.Text = PluginLoader.PluginInfos[id].ID;
             PluginIDTextBlock.FontSize = 18;
             PluginIDTextBlock.Foreground = (Brush)FindResource("TextFillColorSecondaryBrush");
             PluginIDTextBlock.FontFamily = new FontFamily("Segoe UI");
@@ -220,7 +220,7 @@ namespace WinDeskClock.Pages.Settings
             PluginSepTextBlock2.Tag = $"{id}_PluginSepTextBlock2";
 
             System.Windows.Controls.TextBlock PluginAuthorTextBlock = new System.Windows.Controls.TextBlock();
-            PluginAuthorTextBlock.Text = PluginLoader.Plugins[id].Author;
+            PluginAuthorTextBlock.Text = PluginLoader.PluginInfos[id].Author;
             PluginAuthorTextBlock.FontSize = 18;
             PluginAuthorTextBlock.Foreground = (Brush)FindResource("TextFillColorSecondaryBrush");
             PluginAuthorTextBlock.FontFamily = new FontFamily("Segoe UI");
@@ -239,7 +239,7 @@ namespace WinDeskClock.Pages.Settings
             PluginSepTextBlock3.Tag = $"{id}_PluginSepTextBlock3";
 
             System.Windows.Controls.TextBlock PluginVersionTextBlock = new System.Windows.Controls.TextBlock();
-            PluginVersionTextBlock.Text = PluginLoader.Plugins[id].Version;
+            PluginVersionTextBlock.Text = PluginLoader.PluginInfos[id].Version;
             PluginVersionTextBlock.FontSize = 18;
             PluginVersionTextBlock.Foreground = (Brush)FindResource("TextFillColorSecondaryBrush");
             PluginVersionTextBlock.FontFamily = new FontFamily("Segoe UI");
@@ -248,7 +248,7 @@ namespace WinDeskClock.Pages.Settings
             PluginVersionTextBlock.Tag = $"{id}_PluginVersionTextBlock";
 
             System.Windows.Controls.TextBlock PluginDescTextBlock = new System.Windows.Controls.TextBlock();
-            PluginDescTextBlock.Text = PluginLoader.Plugins[id].Description;
+            PluginDescTextBlock.Text = PluginLoader.PluginInfos[id].Description;
             PluginDescTextBlock.FontSize = 12;
             PluginDescTextBlock.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
             PluginDescTextBlock.FontFamily = new FontFamily("Segoe UI");
@@ -270,7 +270,7 @@ namespace WinDeskClock.Pages.Settings
             PluginInfoWebsiteButton.Tag = $"{id}_PluginInfoWebsiteButton";
             PluginInfoWebsiteButton.Click += async (s, e) =>
             {
-                Process.Start(new ProcessStartInfo(PluginLoader.Plugins[id].ProjectWebsiteURL) { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo(PluginLoader.PluginInfos[id].ProjectWebsiteURL) { UseShellExecute = true });
             };
 
             Wpf.Ui.Controls.Button PluginInfoSourceButton = new Wpf.Ui.Controls.Button();
@@ -279,7 +279,7 @@ namespace WinDeskClock.Pages.Settings
             PluginInfoSourceButton.Tag = $"{id}_PluginInfoSourceButton";
             PluginInfoSourceButton.Click += async (s, e) =>
             {
-                Process.Start(new ProcessStartInfo(PluginLoader.Plugins[id].ProjectSourceURL) { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo(PluginLoader.PluginInfos[id].ProjectSourceURL) { UseShellExecute = true });
             };
 
             Grid PluginActionButtonGrid = new Grid();
@@ -292,9 +292,9 @@ namespace WinDeskClock.Pages.Settings
             PluginActionButtonGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
 
             ToggleButton PluginEnableToggleButton = new ToggleButton();
-            PluginEnableToggleButton.Content = "Enabled";
+            PluginEnableToggleButton.Content = await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) ? "Disabled" : "Enabled";
             PluginEnableToggleButton.SetValue(Grid.RowProperty, 0);
-            PluginEnableToggleButton.IsChecked = true;
+            PluginEnableToggleButton.IsChecked = !await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID);
             PluginEnableToggleButton.HorizontalAlignment = HorizontalAlignment.Stretch;
             PluginEnableToggleButton.Tag = $"{id}_PluginEnableToggleButton";
             PluginEnableToggleButton.Click += async (s, e) =>
@@ -304,12 +304,12 @@ namespace WinDeskClock.Pages.Settings
                 if (PluginEnableToggleButton.IsChecked == true)
                 {
                     PluginEnableToggleButton.Content = "Enabled";
-                    PluginLoader.DelDisabledPlugin(PluginLoader.Plugins[id].ID);
+                    PluginLoader.DelDisabledPlugin(PluginLoader.PluginInfos[id].ID);
                 }
                 else
                 {
                     PluginEnableToggleButton.Content = "Disabled";
-                    PluginLoader.AddDisabledPlugin(PluginLoader.Plugins[id].ID);
+                    PluginLoader.AddDisabledPlugin(PluginLoader.PluginInfos[id].ID);
                 }
             };
 
@@ -327,7 +327,7 @@ namespace WinDeskClock.Pages.Settings
             PluginSettingsButton.Tag = $"{id}_PluginSettingsButton";
             PluginSettingsButton.Click += async (s, e) =>
             {
-                await ShowPluginSettings(PluginLoader.Plugins[id].ID);
+                await ShowPluginSettings(PluginLoader.PluginInfos[id].ID);
             };
 
             Wpf.Ui.Controls.Button PluginDeleteButton = new Wpf.Ui.Controls.Button();
@@ -380,7 +380,7 @@ namespace WinDeskClock.Pages.Settings
         private async void PluginSettingsSaveBtn_Click(object sender, RoutedEventArgs e)
         {
             ConfigManager.NewVariable.RestartNeeded = true;
-            await PluginLoader.Plugins[SettingsPluginID].SaveConfig();
+            await PluginLoader.PluginModules[SettingsPluginID].SaveConfig();
             await HidePluginSettings();
         }
     }

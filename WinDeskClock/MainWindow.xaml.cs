@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Media;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -92,6 +93,7 @@ namespace WinDeskClock
 
             OverlayGrid.Visibility = Visibility.Visible;
             DownMenuClockGrid.Visibility = Visibility.Visible;
+            DownMenuPluginGrid.Visibility = Visibility.Visible;
 
             // Prevent the window from being resized, minimized or windowed when FullScreenBtn mode is enabled
             this.StateChanged += async (sender, e) =>
@@ -622,7 +624,7 @@ namespace WinDeskClock
                     break;
             }
         }
-#endregion
+        #endregion
 
         #region Clock Menu
         // Animation variables
@@ -638,8 +640,8 @@ namespace WinDeskClock
         private async void Time_Tick(object sender, EventArgs e)
         {
             DateTime now = DateTime.Now;
-            await UpdateMiniClockHour(now.Hour.ToString());  // Update the MiniClock Hour
-            await UpdateMiniClockMinute(now.Minute.ToString());  // Update the MiniClock Minute
+            await UpdateMiniClockHour(now.Hour.ToString("0"));  // Update the MiniClock Hour
+            await UpdateMiniClockMinute(now.Minute.ToString("00"));  // Update the MiniClock Minute
         }
 
         // MiniClock Update
@@ -5217,6 +5219,7 @@ namespace WinDeskClock
         }
         #endregion
 
+        #region Global Menu
         private double animspeedzoomgm = 0.2;
         private async void GlobalMenuBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -5640,12 +5643,9 @@ namespace WinDeskClock
             await Task.Delay(1000);
             Application.Current.Shutdown();
         }
+        #endregion
 
-        private async void RootTitleBar_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
+        #region Settings
         private async void SettingsBackBtn_Click(object sender, RoutedEventArgs e)
         {
             {
@@ -5826,6 +5826,134 @@ namespace WinDeskClock
             {
                 await App.RestartApp();
             }
+        }
+        #endregion
+
+
+        private async void EnterDownMenuPluginBtn_Click(object sender, RoutedEventArgs e)
+        {
+            {
+                var translateAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = -100,
+                    Duration = TimeSpan.FromSeconds(zoomspeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(translateAnimation, PluginGrid);
+                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                Storyboard.SetTarget(fadeAnimation, PluginGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(translateAnimation);
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+
+            await Task.Delay(400);
+
+            PluginGrid.Visibility = Visibility.Hidden;
+            MenuPluginGrid.Visibility = Visibility.Visible;
+
+            {
+                var translateAnimation = new DoubleAnimation
+                {
+                    From = 100,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(zoomspeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(translateAnimation, MenuPluginGrid);
+                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                Storyboard.SetTarget(fadeAnimation, MenuPluginGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(translateAnimation);
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+        }
+
+        private async void ExitDownMenuPluginBtn_Click(object sender, RoutedEventArgs e)
+        {
+            {
+                var translateAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 100,
+                    Duration = TimeSpan.FromSeconds(zoomspeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(translateAnimation, MenuPluginGrid);
+                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                Storyboard.SetTarget(fadeAnimation, MenuPluginGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(translateAnimation);
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+
+            await Task.Delay(400);
+
+            MenuPluginGrid.Visibility = Visibility.Hidden;
+            PluginGrid.Visibility = Visibility.Visible;
+
+            {
+                var translateAnimation = new DoubleAnimation
+                {
+                    From = -100,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(zoomspeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(translateAnimation, PluginGrid);
+                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                Storyboard.SetTarget(fadeAnimation, PluginGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(translateAnimation);
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+        }
+
+        private void LeftMenuPluginBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RightMenuPluginBtn_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

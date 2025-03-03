@@ -14,7 +14,8 @@ namespace WinDeskClock.Utils
         public static string PluginPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "plugins");
         public static string PluginDataPath = Path.Combine(PluginPath, "plugins_data");
 
-        public static Dictionary<string, IPlugin> Plugins = new Dictionary<string, IPlugin>();
+        public static Dictionary<string, IPluginInfo> PluginInfos = new Dictionary<string, IPluginInfo>();
+        public static Dictionary<string, IPluginModule> PluginModules = new Dictionary<string, IPluginModule>();
 
         public static async Task<bool> CheckDisabledPlugin(string id)
         {
@@ -72,7 +73,7 @@ namespace WinDeskClock.Utils
                 var assembly = context.LoadFromStream(stream);
 
                 var productAttribute = assembly.GetCustomAttribute<AssemblyProductAttribute>();
-                if (productAttribute == null || productAttribute.Product != "WinDeskClock")
+                if (productAttribute?.Product != "WinDeskClock" || !assembly.GetName().Name.StartsWith("WDC."))
                 {
                     context.Unload();
                     GC.Collect();
@@ -80,36 +81,34 @@ namespace WinDeskClock.Utils
                     continue;
                 }
 
-                if (!assembly.GetName().Name.StartsWith("WDC."))
-                {
-                    context.Unload();
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                    continue;
-                }
+                var pluginInfos = assembly.GetTypes()
+                    .Where(t => typeof(IPluginInfo).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
 
-                var types = assembly.GetTypes()
-                    .Where(t => typeof(IPlugin).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
-
-                foreach (var type in types)
+                foreach (var infoType in pluginInfos)
                 {
-                    if (Activator.CreateInstance(type) is IPlugin plugin)
+                    if (Activator.CreateInstance(infoType) is IPluginInfo pluginInfo)
                     {
-                        if (!plugin.ID.StartsWith("WDC."))
+                        if (!pluginInfo.ID.StartsWith("WDC.") || Path.GetFileNameWithoutExtension(file) != pluginInfo.ID)
                         {
                             continue;
                         }
 
-                        if (Path.GetFileNameWithoutExtension(file) != plugin.ID)
+                        PluginInfos.Add(pluginInfo.ID, pluginInfo);
+
+                        var moduleType = assembly.GetTypes()
+                            .FirstOrDefault(t => typeof(IPluginModule).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+
+                        if (moduleType == null || Activator.CreateInstance(moduleType) is not IPluginModule pluginModule || typeof(IPluginModule).AssemblyQualifiedName != moduleType.GetInterface(nameof(IPluginModule))?.AssemblyQualifiedName)
                         {
                             continue;
                         }
 
-                        Plugins.Add(plugin.ID, plugin);
+                        PluginModules.Add(pluginInfo.ID, pluginModule);
 
-                        if (!Directory.Exists(Path.Combine(PluginDataPath, plugin.ID)))
+                        var pluginDataDir = Path.Combine(PluginDataPath, pluginInfo.ID);
+                        if (!Directory.Exists(pluginDataDir))
                         {
-                            Directory.CreateDirectory(Path.Combine(PluginDataPath, plugin.ID));
+                            Directory.CreateDirectory(pluginDataDir);
                         }
                     }
                 }

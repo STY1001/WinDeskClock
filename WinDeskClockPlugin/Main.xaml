@@ -6,8 +6,8 @@
       xmlns:local="clr-namespace:WinDeskClockPlugin"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d"
-      d:DesignHeight="650"
-      d:DesignWidth="600"
+      d:DesignHeight="600"
+      d:DesignWidth="585"
       Title="Main">
     <!-- Don't touch here (BEGIN) -->
     <Page.Resources>

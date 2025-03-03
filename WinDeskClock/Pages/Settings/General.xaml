@@ -206,8 +206,8 @@
                                        FontSize="12" />
                         </StackPanel>
                     </Expander.Header>
-                    <StackPanel>
-                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"
+                                x:Name="CarouselSelectStack" />
                 </Expander>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
