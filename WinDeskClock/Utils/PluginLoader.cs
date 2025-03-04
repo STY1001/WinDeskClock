@@ -26,6 +26,15 @@ namespace WinDeskClock.Utils
             return false;
         }
 
+        public static async Task<bool> CheckCompatiblePlugin(string id)
+        {
+            foreach (string plugin in PluginModules.Keys)
+            {
+                if (plugin == id) { return true; }
+            }
+            return false;
+        }
+
         public static async Task AddDisabledPlugin(string id)
         {
             foreach (string plugin in ConfigManager.NewVariable.DisabledPlugin)
@@ -81,36 +90,64 @@ namespace WinDeskClock.Utils
                     continue;
                 }
 
-                var pluginInfos = assembly.GetTypes()
-                    .Where(t => typeof(IPluginInfo).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
-
-                foreach (var infoType in pluginInfos)
+                Type[] types;
+                try
                 {
-                    if (Activator.CreateInstance(infoType) is IPluginInfo pluginInfo)
+                    types = assembly.GetTypes();
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    types = ex.Types.Where(t => t != null).ToArray();
+                }
+
+                var pluginInfoType = types
+                    .FirstOrDefault(t => typeof(IPluginInfo).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+
+                IPluginInfo pluginInfo = null;
+                try
+                {
+                    if (pluginInfoType != null)
                     {
-                        if (!pluginInfo.ID.StartsWith("WDC.") || Path.GetFileNameWithoutExtension(file) != pluginInfo.ID)
+                        pluginInfo = Activator.CreateInstance(pluginInfoType) as IPluginInfo;
+                    }
+                }
+                catch 
+                {
+
+                }
+
+                if (pluginInfo == null || !pluginInfo.ID.StartsWith("WDC.") || Path.GetFileNameWithoutExtension(file) != pluginInfo.ID)
+                {
+                    context.Unload();
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    continue;
+                }
+
+                PluginInfos.Add(pluginInfo.ID, pluginInfo);
+
+                var pluginDataDir = Path.Combine(PluginDataPath, pluginInfo.ID);
+                if (!Directory.Exists(pluginDataDir))
+                {
+                    Directory.CreateDirectory(pluginDataDir);
+                }
+
+                try
+                {
+                    var moduleType = types
+                        .FirstOrDefault(t => typeof(IPluginModule).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+
+                    if (moduleType != null)
+                    {
+                        if (Activator.CreateInstance(moduleType) is IPluginModule pluginModule)
                         {
-                            continue;
-                        }
-
-                        PluginInfos.Add(pluginInfo.ID, pluginInfo);
-
-                        var moduleType = assembly.GetTypes()
-                            .FirstOrDefault(t => typeof(IPluginModule).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
-
-                        if (moduleType == null || Activator.CreateInstance(moduleType) is not IPluginModule pluginModule || typeof(IPluginModule).AssemblyQualifiedName != moduleType.GetInterface(nameof(IPluginModule))?.AssemblyQualifiedName)
-                        {
-                            continue;
-                        }
-
-                        PluginModules.Add(pluginInfo.ID, pluginModule);
-
-                        var pluginDataDir = Path.Combine(PluginDataPath, pluginInfo.ID);
-                        if (!Directory.Exists(pluginDataDir))
-                        {
-                            Directory.CreateDirectory(pluginDataDir);
+                            PluginModules.Add(pluginInfo.ID, pluginModule);
                         }
                     }
+                }
+                catch
+                {
+
                 }
 
                 context.Unload();

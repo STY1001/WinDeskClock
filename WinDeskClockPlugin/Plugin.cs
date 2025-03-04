@@ -7,13 +7,28 @@ using WinDeskClock.Utils;
 
 namespace WinDeskClockPlugin
 {
-    public class Plugin : IPluginInfo, IPluginModule
+    public class Plugin
     {
-        // Information about updates: In the future, IPluginModule can be updated to add, update or delete features, but IPluginInfo will not change (normally)
-        // So, if you need to update your plugin, you can simply backup the Plugin Info part of this file (Plugin.cs) and restore it in the new Plugin.cs file
-        // (you can download the new Plugin.cs from the Github of the Plugin template)
-        // and don't forget to change the namespace of the new Plugin.cs file
+        // Plugin variables
+        // - You must use PluginDataPath (folder) to store the plugin data, you need to manage only the folder content, the folder is created automatically by the main program
+        public readonly string PluginDataPath;
+        // - You need to use Language for your plugin language system, this variable is the same as the main program language. If your plugin don't have the language that set in the main program, you need to use the default language (en-us)
+        public readonly string Language;
 
+        // Don't touch this, this is for the Plugin variables
+        public Plugin()
+        {
+            var pluginInfo = new PluginInfo();
+
+            // Plugin data path
+            PluginDataPath = Path.Combine((string)AppDomain.CurrentDomain.GetData("PluginFolderPath"), "plugins_data", pluginInfo.ID);
+            // Plugin language
+            Language = ConfigManager.Variable.Language;
+        }
+    }
+
+    public class PluginInfo : IPluginInfo
+    {
         // Information of your plugin (IPuginInfo)
         // - For the ID, don't use spaces or special characters and start with "WDC." (The main program will use this ID to identify the plugin)
         // - For the Icon, you need to use a square image (recommended 1024x1024 pixels) and with transparent background (recommended PNG format)
@@ -41,31 +56,13 @@ namespace WinDeskClockPlugin
         public BitmapImage Icon => new BitmapImage(new Uri($"pack://application:,,,/{GetType().Assembly.GetName().Name};component/Resources/icon.png", UriKind.Absolute));
         public string ProjectWebsiteURL => "none";
         public string ProjectSourceURL => "https://github.com/STY1001/WinDeskClock";
+    }
 
-
-
-        // Plugin variables
-        // - You must use PluginDataPath (folder) to store the plugin data, you need to manage only the folder content, the folder is created automatically by the main program
-        public readonly string PluginDataPath;
-        // - You need to use Language for your plugin language system, this variable is the same as the main program language. If your plugin don't have the language that set in the main program, you need to use the default language (en-us)
-        public readonly string Language;
-
-        // Don't touch this, this is for the Plugin variables
-        public Plugin()
-        {
-            // Plugin pages (Don't touch this)
-            _main = new Main();
-            _settings = new Settings();
-
-            // Plugin data path
-            PluginDataPath = Path.Combine((string)AppDomain.CurrentDomain.GetData("PluginFolderPath"), "plugins_data", ID);
-            // Plugin language
-            Language = ConfigManager.Variable.Language;
-        }
-
+    public class PluginModule : IPluginModule
+    {
         // Don't touch this, this is for the Plugin Interface (IPluginModule)
-        Main _main;
-        Settings _settings;
+        Main _main = new Main();
+        Settings _settings = new Settings();
         public Page GetMain()
         {
             return _main;
