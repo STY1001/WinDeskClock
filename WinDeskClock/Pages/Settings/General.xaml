@@ -198,7 +198,7 @@
                 <Expander Margin="15,0,15,10">
                     <Expander.Header>
                         <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Carousel"
+                            <TextBlock Text="Pinned plugins"
                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                        FontFamily="Segoe UI SemiBold" />
                             <TextBlock Text="Select what plugins you want to see in the main screen carousel"
@@ -206,7 +206,7 @@
                                        FontSize="12" />
                         </StackPanel>
                     </Expander.Header>
-                    <StackPanel Orientation="Horizontal"
+                    <StackPanel Orientation="Vertical"
                                 x:Name="CarouselSelectStack" />
                 </Expander>
                 <ui:CardControl Margin="15,0,15,10">
@@ -225,7 +225,8 @@
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    FontSize="12"
                                    HorizontalAlignment="Right"
-                                   Margin="0,0,10,0"/>
+                                   Margin="0,0,10,0"
+                                   x:Name="CarouselDelayText"/>
                         <Slider x:Name="CarouselDelaySlider"
                                 Minimum="5"
                                 Maximum="60"

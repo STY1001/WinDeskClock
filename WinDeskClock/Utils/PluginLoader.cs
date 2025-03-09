@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Windows;
+using System.Windows.Controls;
 using WinDeskClock.Interfaces;
 using WinDeskClock.Utils;
 
@@ -16,6 +17,7 @@ namespace WinDeskClock.Utils
 
         public static Dictionary<string, IPluginInfo> PluginInfos = new Dictionary<string, IPluginInfo>();
         public static Dictionary<string, IPluginModule> PluginModules = new Dictionary<string, IPluginModule>();
+        public static List<string> IncompatiblePlugin = new List<string>();
 
         public static async Task<bool> CheckDisabledPlugin(string id)
         {
@@ -28,11 +30,11 @@ namespace WinDeskClock.Utils
 
         public static async Task<bool> CheckCompatiblePlugin(string id)
         {
-            foreach (string plugin in PluginModules.Keys)
+            foreach (string plugin in IncompatiblePlugin)
             {
-                if (plugin == id) { return true; }
+                if (plugin == id) { return false; }
             }
-            return false;
+            return true;
         }
 
         public static async Task AddDisabledPlugin(string id)
@@ -141,13 +143,16 @@ namespace WinDeskClock.Utils
                     {
                         if (Activator.CreateInstance(moduleType) is IPluginModule pluginModule)
                         {
-                            PluginModules.Add(pluginInfo.ID, pluginModule);
+                            if (!await CheckDisabledPlugin(pluginInfo.ID))
+                            {
+                                PluginModules.Add(pluginInfo.ID, pluginModule);
+                            }
                         }
                     }
                 }
                 catch
                 {
-
+                    IncompatiblePlugin.Add(pluginInfo.ID);
                 }
 
                 context.Unload();

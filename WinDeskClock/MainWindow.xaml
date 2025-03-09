@@ -784,7 +784,21 @@
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"
                                Background="Transparent"
-                               Margin="10" />
+                               Margin="10"
+                               RenderTransformOrigin="0.5,0.5">
+                            <Frame.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform ScaleX="1"
+                                                    ScaleY="1" />
+                                    <TranslateTransform X="0" />
+                                </TransformGroup>
+                            </Frame.RenderTransform>
+                        </Frame>
+                        <Grid x:Name="CarouselFrameClickGrid"
+                              PreviewMouseUp="CarouselFrameClickGrid_PreviewMouseUp"
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"
+                              Background="#00000000"/>
                         <Button Grid.Row="1"
                                 x:Name="EnterDownMenuPluginBtn"
                                 Click="EnterDownMenuPluginBtn_Click"
@@ -813,7 +827,12 @@
                                    HorizontalAlignment="Stretch"
                                    VerticalAlignment="Stretch"
                                    Background="Transparent"
-                                   Margin="10" />
+                                   Margin="10"
+                                   RenderTransformOrigin="0.5,0.5">
+                                <Frame.LayoutTransform>
+                                    <TranslateTransform X="0" />
+                                </Frame.LayoutTransform>
+                            </Frame>
                             <Grid Grid.Row="1">
                                 <Button x:Name="LeftMenuPluginBtn"
                                         Click="LeftMenuPluginBtn_Click"

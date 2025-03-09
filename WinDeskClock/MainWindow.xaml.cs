@@ -15,6 +15,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using WinDeskClock.Utils;
 using Wpf.Ui.Controls;
+using Wpf.Ui.Extensions;
 
 namespace WinDeskClock
 {
@@ -83,9 +84,12 @@ namespace WinDeskClock
         private DispatcherTimer stopwatchTimer;
         private DispatcherTimer timerTimer;
         private DispatcherTimer alarm;
+        private DispatcherTimer carousel;
         private TimeSpan timer;
 
         private Dictionary<string, Page> SettingsTabs = new Dictionary<string, Page>();
+        private List<string> CarouselPluginList = new List<string>();
+        private List<string> PluginList = new List<string>();
 
         public MainWindow()
         {
@@ -125,6 +129,56 @@ namespace WinDeskClock
                 ClockPage = new Clocks.FluentClock();
             }
             ClockFrame.Navigate(ClockPage);
+
+            if (PluginLoader.PluginModules.Count != 0)
+            {
+                foreach (string id in PluginLoader.PluginModules.Keys)
+                {
+                    PluginList.Add(id);
+                }
+            }
+
+            if (ConfigManager.Variable.PinnedPlugin.Count != 0)
+            {
+                foreach (string id in ConfigManager.Variable.PinnedPlugin)
+                {
+                    if (PluginList.Contains(id))
+                    {
+                        CarouselPluginList.Add(id);
+                    }
+                }
+            }
+
+            if (PluginList.Count == 0)
+            {
+                Wpf.Ui.Controls.TextBlock tb = new Wpf.Ui.Controls.TextBlock
+                {
+                    Text = "No plugin loaded",
+                    FontSize = 20,
+                    Foreground = Brushes.White,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                CarouselPluginFrame.Navigate(tb);
+                EnterDownMenuPluginBtn.IsEnabled = false;
+            }
+            else if (CarouselPluginList.Count == 0)
+            {
+                Wpf.Ui.Controls.TextBlock tb = new Wpf.Ui.Controls.TextBlock
+                {
+                    Text = "No pinned plugin",
+                    FontSize = 20,
+                    Foreground = Brushes.White,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                CarouselPluginFrame.Navigate(tb);
+            }
+
+            if(CarouselPluginList.Count != 0)
+            {
+                CarouselPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[0]].GetMain());
+            }
         }
 
         // Create all timer of the app
@@ -160,6 +214,14 @@ namespace WinDeskClock
             };
             alarm.Tick += Alarm_Tick;
             alarm.Start();
+
+            // Create the timer for the carousel
+            carousel = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(ConfigManager.Variable.CarouselDelay)
+            };
+            carousel.Tick += Carousel_Tick;
+            carousel.Start();
         }
 
         private int TotalSplashStep = 10 + 1;
@@ -3464,7 +3526,7 @@ namespace WinDeskClock
                     storyboard.Begin();
                 }
 
-                double timeout = double.Parse(ConfigManager.Variable.AlarmTimeoutDelay);
+                double timeout = ConfigManager.Variable.AlarmTimeoutDelay;
                 TimeSpan alerttime = new TimeSpan(0, 0, 0, 0, 0);
 
                 while (AlarmAlert)
@@ -5829,7 +5891,6 @@ namespace WinDeskClock
         }
         #endregion
 
-
         private async void EnterDownMenuPluginBtn_Click(object sender, RoutedEventArgs e)
         {
             {
@@ -5861,6 +5922,17 @@ namespace WinDeskClock
 
             PluginGrid.Visibility = Visibility.Hidden;
             MenuPluginGrid.Visibility = Visibility.Visible;
+
+            LeftMenuPluginBtn.IsEnabled = false;
+            if (PluginList.Count == 1)
+            {
+                RightMenuPluginBtn.IsEnabled = false;
+            }
+            if (CarouselPluginList.Count != 0)
+            {
+                CarouselPluginFrame.Navigate(null);
+                MenuPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[0]].GetMain());
+            }
 
             {
                 var translateAnimation = new DoubleAnimation
@@ -5920,6 +5992,12 @@ namespace WinDeskClock
             MenuPluginGrid.Visibility = Visibility.Hidden;
             PluginGrid.Visibility = Visibility.Visible;
 
+            if (CarouselPluginList.Count != 0)
+            {   
+                MenuPluginFrame.Navigate(null);
+                CarouselPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[0]].GetMain());
+            }
+
             {
                 var translateAnimation = new DoubleAnimation
                 {
@@ -5946,14 +6024,332 @@ namespace WinDeskClock
             }
         }
 
-        private void LeftMenuPluginBtn_Click(object sender, RoutedEventArgs e)
+        private int PluginIndex = 0;
+        private async void LeftMenuPluginBtn_Click(object sender, RoutedEventArgs e)
         {
+            PluginIndex--;
+            if (PluginList.Count != 1)
+            {
+                RightMenuPluginBtn.IsEnabled = true;
+            }
+            if (PluginIndex == 0)
+            {
+                LeftMenuPluginBtn.IsEnabled = false;
+            }
 
+            {
+                var fadeanimation = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var translateanimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 100,
+                    Duration = TimeSpan.FromSeconds(zoomspeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(fadeanimation, MenuPluginFrame);
+                Storyboard.SetTargetProperty(fadeanimation, new PropertyPath(OpacityProperty));
+                Storyboard.SetTarget(translateanimation, MenuPluginFrame);
+                Storyboard.SetTargetProperty(translateanimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeanimation);
+                storyboard.Children.Add(translateanimation);
+                storyboard.Begin();
+            }
+
+            await Task.Delay(400);
+            CarouselPluginFrame.Navigate(null);
+            MenuPluginFrame.Navigate(PluginLoader.PluginModules[PluginList[PluginIndex]].GetMain());
+
+            {
+                var fadeanimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var translateanimation = new DoubleAnimation
+                {
+                    From = -100,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(zoomspeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeanimation, MenuPluginFrame);
+                Storyboard.SetTargetProperty(fadeanimation, new PropertyPath(OpacityProperty));
+                Storyboard.SetTarget(translateanimation, MenuPluginFrame);
+                Storyboard.SetTargetProperty(translateanimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeanimation);
+                storyboard.Children.Add(translateanimation);
+                storyboard.Begin();
+            }
         }
 
-        private void RightMenuPluginBtn_Click(object sender, RoutedEventArgs e)
+        private async void RightMenuPluginBtn_Click(object sender, RoutedEventArgs e)
         {
+            PluginIndex++;
+            if (PluginList.Count != 1)
+            {
+                LeftMenuPluginBtn.IsEnabled = true;
+            }
+            if (PluginIndex == PluginList.Count - 1)
+            {
+                RightMenuPluginBtn.IsEnabled = false;
+            }
+            {
+                var fadeanimation = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var translateanimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = -100,
+                    Duration = TimeSpan.FromSeconds(zoomspeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(fadeanimation, MenuPluginFrame);
+                Storyboard.SetTargetProperty(fadeanimation, new PropertyPath(OpacityProperty));
+                Storyboard.SetTarget(translateanimation, MenuPluginFrame);
+                Storyboard.SetTargetProperty(translateanimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeanimation);
+                storyboard.Children.Add(translateanimation);
+                storyboard.Begin();
+            }
 
+            await Task.Delay(400);
+            CarouselPluginFrame.Navigate(null);
+            MenuPluginFrame.Navigate(PluginLoader.PluginModules[PluginList[PluginIndex]].GetMain());
+
+            {
+                var fadeanimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var translateanimation = new DoubleAnimation
+                {
+                    From = 100,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(zoomspeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeanimation, MenuPluginFrame);
+                Storyboard.SetTargetProperty(fadeanimation, new PropertyPath(OpacityProperty));
+                Storyboard.SetTarget(translateanimation, MenuPluginFrame);
+                Storyboard.SetTargetProperty(translateanimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeanimation);
+                storyboard.Children.Add(translateanimation);
+                storyboard.Begin();
+            }
+        }
+
+        private int CarouselIndex = 0;
+        private async void Carousel_Tick(object sender, EventArgs e)
+        {
+            if (CarouselPluginList.Count != 0 && PluginLoader.PluginModules.Count != 0)
+            {
+                if (CarouselPluginList.Count > 1)
+                {
+                    if (CarouselIndex == CarouselPluginList.Count - 1)
+                    {
+                        CarouselIndex = 0;
+                    }
+                    else
+                    {
+                        CarouselIndex++;
+                    }
+
+                    {
+                        var fadeanimation = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        var zoomanimation1 = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 1.1,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        var zoomanimation2 = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 1.1,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        var translateanimation = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 10,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        Storyboard.SetTarget(fadeanimation, CarouselPluginFrame);
+                        Storyboard.SetTargetProperty(fadeanimation, new PropertyPath(OpacityProperty));
+                        Storyboard.SetTarget(zoomanimation1, CarouselPluginFrame);
+                        Storyboard.SetTargetProperty(zoomanimation1, new PropertyPath("(UIElement.RenderTransform).Children[0].(ScaleTransform.ScaleX)"));
+                        Storyboard.SetTarget(zoomanimation2, CarouselPluginFrame);
+                        Storyboard.SetTargetProperty(zoomanimation2, new PropertyPath("(UIElement.RenderTransform).Children[0].(ScaleTransform.ScaleY)"));
+                        Storyboard.SetTarget(translateanimation, CarouselPluginFrame);
+                        Storyboard.SetTargetProperty(translateanimation, new PropertyPath("(UIElement.RenderTransform).Children[1].(TranslateTransform.Y)"));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(fadeanimation);
+                        storyboard.Children.Add(zoomanimation1);
+                        storyboard.Children.Add(zoomanimation2);
+                        storyboard.Children.Add(translateanimation);
+                        storyboard.Begin();
+                    }
+
+                    await Task.Delay(500);
+                    MenuPluginFrame.Navigate(null);
+                    CarouselPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[CarouselIndex]].GetMain());
+
+                    {
+                        var fadeanimation = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        var zoomanimation1 = new DoubleAnimation
+                        {
+                            From = 0.9,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        var zoomanimation2 = new DoubleAnimation
+                        {
+                            From = 0.9,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        var translateanimation = new DoubleAnimation
+                        {
+                            From = -10,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        Storyboard.SetTarget(fadeanimation, CarouselPluginFrame);
+                        Storyboard.SetTargetProperty(fadeanimation, new PropertyPath(OpacityProperty));
+                        Storyboard.SetTarget(zoomanimation1, CarouselPluginFrame);
+                        Storyboard.SetTargetProperty(zoomanimation1, new PropertyPath("(UIElement.RenderTransform).Children[0].(ScaleTransform.ScaleX)"));
+                        Storyboard.SetTarget(zoomanimation2, CarouselPluginFrame);
+                        Storyboard.SetTargetProperty(zoomanimation2, new PropertyPath("(UIElement.RenderTransform).Children[0].(ScaleTransform.ScaleY)"));
+                        Storyboard.SetTarget(translateanimation, CarouselPluginFrame);
+                        Storyboard.SetTargetProperty(translateanimation, new PropertyPath("(UIElement.RenderTransform).Children[1].(TranslateTransform.Y)"));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(fadeanimation);
+                        storyboard.Children.Add(zoomanimation1);
+                        storyboard.Children.Add(zoomanimation2);
+                        storyboard.Children.Add(translateanimation);
+                        storyboard.Begin();
+                    }
+                }
+            }
+        }
+
+        private async void CarouselFrameClickGrid_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (CarouselPluginList.Count != 0)
+            {
+                {
+                    var translateAnimation = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = -100,
+                        Duration = TimeSpan.FromSeconds(zoomspeed),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    };
+                    var fadeAnimation = new DoubleAnimation
+                    {
+                        From = 1,
+                        To = 0,
+                        Duration = TimeSpan.FromSeconds(fadespeed),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    Storyboard.SetTarget(translateAnimation, PluginGrid);
+                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                    Storyboard.SetTarget(fadeAnimation, PluginGrid);
+                    Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                    var storyboard = new Storyboard();
+                    storyboard.Children.Add(translateAnimation);
+                    storyboard.Children.Add(fadeAnimation);
+                    storyboard.Begin();
+                }
+
+                await Task.Delay(400);
+
+                PluginGrid.Visibility = Visibility.Hidden;
+                MenuPluginGrid.Visibility = Visibility.Visible;
+
+                int index = 0;
+                foreach (var plugin in PluginList)
+                {
+                    if (plugin == CarouselPluginList[CarouselIndex])
+                    {
+                        PluginIndex = index;
+                        break;
+                    }
+                }
+                if (index == 0)
+                {
+                    LeftMenuPluginBtn.IsEnabled = false;
+                }
+                if (index == PluginList.Count - 1)
+                {
+                    RightMenuPluginBtn.IsEnabled = false;
+                }
+                CarouselPluginFrame.Navigate(null);
+                MenuPluginFrame.Navigate(PluginLoader.PluginModules[PluginList[index]].GetMain());
+
+                {
+                    var translateAnimation = new DoubleAnimation
+                    {
+                        From = 100,
+                        To = 0,
+                        Duration = TimeSpan.FromSeconds(zoomspeed),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    var fadeAnimation = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(fadespeed),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    };
+                    Storyboard.SetTarget(translateAnimation, MenuPluginGrid);
+                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                    Storyboard.SetTarget(fadeAnimation, MenuPluginGrid);
+                    Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                    var storyboard = new Storyboard();
+                    storyboard.Children.Add(translateAnimation);
+                    storyboard.Children.Add(fadeAnimation);
+                    storyboard.Begin();
+                }
+            }
         }
     }
 }

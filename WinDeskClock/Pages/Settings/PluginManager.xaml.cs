@@ -153,12 +153,39 @@ namespace WinDeskClock.Pages.Settings
             PluginCardMainGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Auto) });
 
             System.Windows.Controls.Image PluginIcon = new System.Windows.Controls.Image();
-            PluginIcon.Source = PluginLoader.PluginInfos[id].Icon;
             PluginIcon.Width = 150;
             PluginIcon.Height = 150;
             PluginIcon.Margin = new Thickness(5, 0, 0, 0);
             PluginIcon.Tag = $"{id}_PluginIcon";
             PluginIcon.SetValue(RenderOptions.BitmapScalingModeProperty, BitmapScalingMode.HighQuality);
+            {
+                BitmapImage OriginalIcon = PluginLoader.PluginInfos[id].Icon;
+                FormatConvertedBitmap FinalIcon = new FormatConvertedBitmap();
+                FinalIcon.BeginInit();
+                FinalIcon.Source = OriginalIcon;
+                FinalIcon.DestinationFormat = PixelFormats.Pbgra32;
+                FinalIcon.EndInit();
+                WriteableBitmap bitmap = new WriteableBitmap(FinalIcon);
+                int width = bitmap.PixelWidth;
+                int height = bitmap.PixelHeight;
+                int[] pixels = new int[width * height];
+                bitmap.CopyPixels(pixels, width * 4, 0);
+                if (!await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID))
+                {
+                    for (int i = 0; i < pixels.Length; i++)
+                    {
+                        int pixel = pixels[i];
+                        byte a = (byte)((pixel >> 24) & 0xFF);
+                        byte r = (byte)((pixel >> 16) & 0xFF);
+                        byte g = (byte)((pixel >> 8) & 0xFF);
+                        byte b = (byte)(pixel & 0xFF);
+                        byte gray = (byte)(0.299 * r + 0.587 * g + 0.114 * b);
+                        pixels[i] = (a << 24) | (gray << 16) | (gray << 8) | gray;
+                    }
+                }
+                bitmap.WritePixels(new Int32Rect(0, 0, width, height), pixels, width * 4, 0);
+                PluginIcon.Source = bitmap;
+            }
 
             Grid PluginCardInfoGrid = new Grid();
             PluginCardInfoGrid.SetValue(Grid.ColumnProperty, 1);
@@ -292,9 +319,10 @@ namespace WinDeskClock.Pages.Settings
             PluginActionButtonGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
 
             ToggleButton PluginEnableToggleButton = new ToggleButton();
-            PluginEnableToggleButton.Content = await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) ? "Disabled" : "Enabled";
+            PluginEnableToggleButton.Content = (await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) || !await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID)) ? "Disabled" : "Enabled";
             PluginEnableToggleButton.SetValue(Grid.RowProperty, 0);
-            PluginEnableToggleButton.IsChecked = !await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID);
+            PluginEnableToggleButton.IsChecked = !await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) && await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID);
+            PluginEnableToggleButton.IsEnabled = await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID);
             PluginEnableToggleButton.HorizontalAlignment = HorizontalAlignment.Stretch;
             PluginEnableToggleButton.Tag = $"{id}_PluginEnableToggleButton";
             PluginEnableToggleButton.Click += async (s, e) =>
@@ -325,6 +353,7 @@ namespace WinDeskClock.Pages.Settings
             PluginSettingsButton.SetValue(Grid.RowProperty, 2);
             PluginSettingsButton.HorizontalAlignment = HorizontalAlignment.Stretch;
             PluginSettingsButton.Tag = $"{id}_PluginSettingsButton";
+            PluginSettingsButton.IsEnabled = !(await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) || !await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID));
             PluginSettingsButton.Click += async (s, e) =>
             {
                 await ShowPluginSettings(PluginLoader.PluginInfos[id].ID);

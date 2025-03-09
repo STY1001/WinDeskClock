@@ -77,7 +77,7 @@ namespace WinDeskClock.Pages.Settings
                 }
             };
 
-            AlarmTimeoutSlider.Value = double.Parse(ConfigManager.Variable.AlarmTimeoutDelay);
+            AlarmTimeoutSlider.Value = ConfigManager.Variable.AlarmTimeoutDelay;
             if (AlarmTimeoutSlider.Value == 0)
             {
                 AlarmTimeoutText.Text = "Never";
@@ -89,7 +89,7 @@ namespace WinDeskClock.Pages.Settings
             AlarmTimeoutSlider.ValueChanged += async (s, e) =>
             {
                 ConfigManager.NewVariable.RestartNeeded = true;
-                ConfigManager.NewVariable.AlarmTimeoutDelay = AlarmTimeoutSlider.Value.ToString("0");
+                ConfigManager.NewVariable.AlarmTimeoutDelay = (int)AlarmTimeoutSlider.Value;
                 if (AlarmTimeoutSlider.Value == 0)
                 {
                     AlarmTimeoutText.Text = "Never";
@@ -127,6 +127,14 @@ namespace WinDeskClock.Pages.Settings
                 VolumeText.Text = VolumeSlider.Value.ToString("0") + "%";
             };
 
+            CarouselDelaySlider.Value = ConfigManager.Variable.CarouselDelay;
+            CarouselDelayText.Text = CarouselDelaySlider.Value.ToString("0") + " second(s)";
+            CarouselDelaySlider.ValueChanged += async (s, e) =>
+            {
+                ConfigManager.NewVariable.RestartNeeded = true;
+                ConfigManager.NewVariable.CarouselDelay = (int)CarouselDelaySlider.Value;
+                CarouselDelayText.Text = CarouselDelaySlider.Value.ToString("0") + " second(s)";
+            };
 
             // Load settings
             Loaded += async (s, e) => await Load();
@@ -152,7 +160,7 @@ namespace WinDeskClock.Pages.Settings
             ShowSecondsToggleSwitch.IsChecked = ConfigManager.Variable.ClockShowSecond;
             FbxStyleToggleSwitch.IsChecked = ConfigManager.Variable.ClockFbxStyle;
             DefaultAlarmSoundBtn.Content = ConfigManager.Variable.DefaultAlarmSound;
-            AlarmTimeoutSlider.Value = double.Parse(ConfigManager.Variable.AlarmTimeoutDelay);
+            AlarmTimeoutSlider.Value = ConfigManager.Variable.AlarmTimeoutDelay;
             if (AlarmTimeoutSlider.Value == 0)
             {
                 AlarmTimeoutText.Text = "Never";
@@ -167,6 +175,26 @@ namespace WinDeskClock.Pages.Settings
             MMDevice device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
             VolumeSlider.Value = (int)(device.AudioEndpointVolume.MasterVolumeLevelScalar * 100);
             VolumeText.Text = VolumeSlider.Value.ToString() + "%";
+            
+            CarouselSelectStack.Children.Clear();
+            foreach (string id in PluginLoader.PluginModules.Keys)
+            {
+                CheckBox checkBox = new CheckBox();
+                checkBox.Content = PluginLoader.PluginInfos[id].Name;
+                checkBox.Checked += async (s, e) =>
+                {
+                    await ConfigManager.AddPinnedPlugin(id);
+                };
+                checkBox.Unchecked += async (s, e) =>
+                {
+                    await ConfigManager.DelPinnedPlugin(id);
+                };
+                checkBox.IsChecked = await ConfigManager.CheckPinnedPlugin(id);
+                CarouselSelectStack.Children.Add(checkBox);
+            }
+
+            CarouselDelaySlider.Value = ConfigManager.Variable.CarouselDelay;
+            CarouselDelayText.Text = CarouselDelaySlider.Value.ToString("0") + " second(s)";
         }
     }
 }
