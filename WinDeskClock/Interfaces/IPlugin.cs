@@ -15,8 +15,8 @@ namespace WinDeskClock.Interfaces
         string Author { get; }  // Author of the plugin
         string AuthorURL { get; }  // Author's URL
         string Version { get; }  // Version of the plugin
-        string VersionUpdateCheckURL { get; }  // URL to check for updates
-        string VersionUpdateDownloadURL { get; }  // URL to download the latest version
+        int VersionCode { get; }  // Version code of the plugin
+        string UpdateURL { get; }  // URL to check and download updates
         BitmapImage Icon { get; }  // Icon of the plugin
         string ProjectWebsiteURL { get; }  // URL to the project
         string ProjectSourceURL { get; }  // URL to the project source code

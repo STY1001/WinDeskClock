@@ -32,18 +32,19 @@ namespace WinDeskClockPlugin
         // Information of your plugin (IPuginInfo)
         // - For the ID, don't use spaces or special characters and start with "WDC." (The main program will use this ID to identify the plugin)
         // - For the Icon, you need to use a square image (recommended 1024x1024 pixels) and with transparent background (recommended PNG format)
-        // Remember to change these values, the icon and the namespace (WinDeskClockPlugin (in Plugin.cs,Main.xaml(.cs),Settings.xaml(.cs)) and the AssemblyName (WDC.WinDeskClockPlugin (in Project file))
+        // Remember to change these values, the icon and the namespace ("WinDeskClockPlugin" in Plugin.cs,Main.xaml(.cs),Settings.xaml(.cs)) and the AssemblyName ("WDC.WinDeskClockPlugin" in Project file)
         // - For the namespace and AssemblyName, use the same as the Plugin ID
-        // Remember also to change the Company (STY Inc. (STY1001) (in Project file)), the Copyright (STY101 (in Project file)) and the Description (A plugin for WinDeskClock (in Project file))
+        // Remember also to change the Company ("STY Inc. (STY1001)" in Project file), the Copyright ("STY101" in Project file) and the Description ("A plugin for WinDeskClock" in Project file)
         // - For the Company and the Copyright, use the same as the Plugin Author
         // - For the Description, use the same as the Plugin Description
-        // You can add some URL for the AuthorURL, the VersionUpdateCheckURL, the VersionUpdateDownloadURL, the ProjectWebsiteURL and the ProjectSourceURL
-        // Theses URLs are optional, if you don't want to use them, just set "none" (as string, not null object), VersionUpdateCheckURL and VersionUpdateDownloadURL are paired, if you set one, you need to set the other
+        // You can add some URL for the AuthorURL, the UpdateURL, the ProjectWebsiteURL and the ProjectSourceURL
+        // Theses URLs are optional, if you don't want to use them, just set "none" (as string, not null object)
         // - For the AuthorURL, you can use the URL of your website or your GitHub profile for example
-        // - For the VersionUpdateCheckURL, the URL need to return just a raw text of the latest version of your plugin (the main program will compare the version with the Version variable)
-        // - For the VersionUpdateDownloadURL, the URL need to return the download link of the latest version of your plugin as a raw text
+        // - For the UpdateURL, the URL need to return a raw json that contains specific fields (needed for the main program to check and download updates). For more information, see the example file in the plugin template
         // - For the ProjectWebsiteURL, you can use the URL of your project website
         // - For the ProjectSourceURL, you can use the URL of your project source code repo (GitHub, GitLab, etc.)
+        // You need to use the Version and VersionCode to manage the plugin version, the Version is the version name (like "1.0") and the VersionCode is the version code (like 100)
+        // - The VersionCode is used to compare the versions, if the VersionCode is higher than the current version code, it's considered as an update available
 
         public string ID => "WDC.PluginTemplate";
         public string Name => "Plugin Template";
@@ -51,8 +52,8 @@ namespace WinDeskClockPlugin
         public string Author => "STY1001";
         public string AuthorURL => "https://sty1001.com";
         public string Version => "1.0";
-        public string VersionUpdateCheckURL => "none";
-        public string VersionUpdateDownloadURL => "none";
+        public int VersionCode => 100;
+        public string UpdateURL => "none";
         public BitmapImage Icon => new BitmapImage(new Uri($"pack://application:,,,/{GetType().Assembly.GetName().Name};component/Resources/icon.png", UriKind.Absolute));
         public string ProjectWebsiteURL => "none";
         public string ProjectSourceURL => "https://github.com/STY1001/WinDeskClock";
