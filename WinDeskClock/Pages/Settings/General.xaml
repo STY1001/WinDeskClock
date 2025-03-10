@@ -55,7 +55,9 @@
                                    x:Name="VolumeText"/>
                         <Slider x:Name="VolumeSlider"
                                 Minimum="0"
-                                Maximum="100" />
+                                Maximum="100"
+                                TickFrequency="1"
+                                IsSnapToTickEnabled="True"/>
                     </StackPanel>
                 </ui:CardControl>
                 <Grid HorizontalAlignment="Stretch"
@@ -148,7 +150,9 @@
                                    x:Name="AlarmTimeoutText"/>
                         <Slider x:Name="AlarmTimeoutSlider"
                                 Minimum="0"
-                                Maximum="60" />
+                                Maximum="60"
+                                TickFrequency="1"
+                                IsSnapToTickEnabled="True"/>
                     </StackPanel>
                 </ui:CardControl>
                 <Grid HorizontalAlignment="Stretch"
