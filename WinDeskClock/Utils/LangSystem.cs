@@ -27,19 +27,22 @@ namespace WinDeskClock.Utils
             }
         }
 
-        public static async Task<string> GetLang(string id)
+        public static async Task<string> GetLang(string id, params string[] replace)
         {
+            id = ConfigManager.Variable.Language + "." + "content" + "." + id;
             var json = LangData;
-            string[] keys = id.Split('.');
-            for (int i = 0; i < keys.Length - 1; i++)
+            string[] path = id.Split('.');
+            JToken value = json[path[0]];
+            for (int i = 1; i < path.Length; i++)
             {
-                if (json[keys[i]] == null)
-                {
-                    throw new KeyNotFoundException($"Key '{keys[i]}' not found.");
-                }
-                json = (JObject)LangData[keys[i]];
+                value = value[path[i]];
             }
-            return json[keys[^1]]?.ToString();
+            string valueStr = value.ToString();
+            foreach (var item in replace)
+            {
+                valueStr = valueStr.Replace("%" + replace.ToList().IndexOf(item).ToString(), item);
+            }
+            return valueStr;
         }
     }
 }

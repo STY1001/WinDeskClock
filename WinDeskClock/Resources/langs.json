@@ -19,8 +19,10 @@
         "general": {
           "titlename": "General",
           "lang": {
-            "name": "Language",
-            "desc": "Set the language of the interface"
+            "name": "Language"
+          },
+          "volume": {
+            "name": "Volume"
           },
           "clock": {
             "titlename": "Clock",
@@ -30,7 +32,43 @@
             },
             "fbxstyle": {
               "name": "Freebox style",
-              "desc": "Use the mythical Freebox Revolution clock style (also hide date and clock second)"
+              "desc": "Use the mythical Freebox Revolution clock style (also hide the clock second)"
+            }
+          },
+          "alarm": {
+            "titlename": "Alarm",
+            "defaultsound": {
+              "name": "Default alarm sound",
+              "desc": "Select the default sound for the alarm (current: %0)",
+              "choose": "Choose a file"
+            },
+            "timeout": {
+              "name": "Alarm timeout delay",
+              "desc": "Delay before the alarm stops ringing",
+              "never": "Never",
+              "min": "%0 minute",
+              "mins": "%0 minutes"
+            }
+          },
+          "timer": {
+            "titlename": "Timer",
+            "defaultsound": {
+              "name": "Timer sound",
+              "desc": "Select the sound for the timer (current: %0)",
+              "choose": "Choose a file"
+            }
+          },
+          "plugin": {
+            "titlename": "Plugin",
+            "pinned": {
+              "name": "Pinned plugins",
+              "desc": "Select what plugin(s) you want to see on the main screen (carousel)"
+            },
+            "carouseldelay": {
+              "name": "Carousel delay",
+              "desc": "Delay between each plugin change (only when 2 or more plugins are pinned)",
+              "sec": "%0 second",
+              "secs": "%0 seconds"
             }
           }
         },
@@ -39,10 +77,13 @@
           "enabled": "Enabled",
           "disabled": "Disabled",
           "update": "Update",
+          "updating": "Updating...",
+          "updated": "Updated",
           "settings": "Settings",
           "delete": "Delete",
           "website": "Website",
-          "Source": "Source"
+          "Source": "Source",
+          "noplugin": "No plugin here"
         }
       },
       "clock": {
@@ -139,9 +180,9 @@
           "weekend": "Weekend"
         },
         "remaining": {
-          "inhour": "in %h h and %m min",
-          "inmin": "in %m min",
-          "inday": "in %d day"
+          "inhour": "in %0 h and %1 min",
+          "inmin": "in %0 min",
+          "inday": "in %0 day"
         }
       },
       "stopwatch": {
@@ -157,6 +198,10 @@
         "stop": "Stop",
         "reset": "Reset",
         "timeup": "Time is up"
+      },
+      "plugin": {
+        "noload": "No plugin loaded",
+        "nopin": "No pinned plugin"
       }
     }
   },
@@ -165,6 +210,7 @@
     "name": "Français (France)",
     "content": {
       "mainmenu": {
+        "titlename": "Menu principal",
         "back": "Retour",
         "screenoff": "Éteindre l'écran",
         "fullscreen": "Plein écran",
@@ -172,7 +218,82 @@
         "settings": "Paramètres",
         "exit": "Quitter"
       },
+      "settings": {
+        "titlename": "Paramètres",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "general": {
+          "titlename": "Général",
+          "lang": {
+            "name": "Langue"
+          },
+          "volume": {
+            "name": "Volume"
+          },
+          "clock": {
+            "titlename": "Horloge",
+            "showsec": {
+              "name": "Afficher les secondes",
+              "desc": "Afficher les secondes sur l'horloge (et aussi l'année)"
+            },
+            "fbxstyle": {
+              "name": "Style Freebox",
+              "desc": "Utiliser le style d'horloge mythique de la Freebox Revolution (et aussi cacher les secondes de l'horloge)"
+            }
+          },
+          "alarm": {
+            "titlename": "Réveil",
+            "defaultsound": {
+              "name": "Son par défaut",
+              "desc": "Sélectionner le son par défaut pour le réveil (actuel: %0)",
+              "choose": "Choisir un fichier"
+            },
+            "timeout": {
+              "name": "Délai d'arrêt du réveil",
+              "desc": "Délai avant que le réveil arrête de sonner",
+              "never": "Jamais",
+              "min": "%0 minute",
+              "mins": "%0 minutes"
+            }
+          },
+          "timer": {
+            "titlename": "Minuteur",
+            "defaultsound": {
+              "name": "Son du minuteur",
+              "desc": "Sélectionner le son du minuteur (actuel: %0)",
+              "choose": "Choisir un fichier"
+            }
+          },
+          "plugin": {
+            "titlename": "Extention",
+            "pinned": {
+              "name": "Extention épinglée",
+              "desc": "Sélectionner quelle(s) extention(s) vous voulez voir sur l'écran principal (carrousel)"
+            },
+            "carouseldelay": {
+              "name": "Délai du carrousel",
+              "desc": "Délai entre chaque changement d'extention (seulement quand 2 ou plus d'extentions sont épinglées)",
+              "sec": "%0 seconde",
+              "secs": "%0 secondes"
+            }
+          }
+        },
+        "pluginmanager": {
+          "titlename": "Gestionnaire d'extention",
+          "enabled": "Activé",
+          "disabled": "Désactivé",
+          "update": "Mettre à jour",
+          "updating": "Mise à jour...",
+          "updated": "Mis à jour",
+          "settings": "Paramètres",
+          "delete": "Supprimer",
+          "website": "Site web",
+          "Source": "Source",
+          "noplugin": "Pas d'extention ici"
+        }
+      },
       "clock": {
+        "titlename": "Horloge",
         "days": {
           "long": {
             "sunday": "Dimanche",
@@ -226,7 +347,7 @@
             "june": "Juin",
             "july": "Juil",
             "august": "Août",
-            "september": "Sep",
+            "september": "Sept",
             "october": "Oct",
             "november": "Nov",
             "december": "Déc"
@@ -246,6 +367,47 @@
             "december": "D"
           }
         }
+      },
+      "alarm": {
+        "titlename": "Réveil",
+        "name": "Nom",
+        "defsounds": "Sons par défaut",
+        "custsounds": "Sons personnalisés",
+        "add": "Ajouter un réveil",
+        "noalarm": "Pas de réveil ici",
+        "delete": "Supprimer",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "stop": "Arrêter",
+        "repeat": {
+          "once": "Une fois",
+          "eveyday": "Tous les jours",
+          "workdays": "Jours de travail",
+          "weekend": "Weekend"
+        },
+        "remaining": {
+          "inhour": "dans %0 h et %1 min",
+          "inmin": "dans %0 min",
+          "inday": "dans %0 jour"
+        }
+      },
+      "stopwatch": {
+        "titlename": "Chronomètre",
+        "start": "Démarrer",
+        "stop": "Arrêter",
+        "reset": "Réinitialiser",
+        "lap": "Tour"
+      },
+      "timer": {
+        "titlename": "Minuteur",
+        "start": "Démarrer",
+        "stop": "Arrêter",
+        "reset": "Réinitialiser",
+        "timeup": "Le temps est écoulé"
+      },
+      "plugin": {
+        "noload": "Pas d'extention chargée",
+        "nopin": "Pas d'extention épinglée"
       }
     }
   }
