@@ -40,7 +40,7 @@ namespace WinDeskClockPlugin
         // You can add some URL for the AuthorURL, the UpdateURL, the ProjectWebsiteURL and the ProjectSourceURL
         // Theses URLs are optional, if you don't want to use them, just set "none" (as string, not null object)
         // - For the AuthorURL, you can use the URL of your website or your GitHub profile for example
-        // - For the UpdateURL, the URL need to return a raw json that contains specific fields (needed for the main program to check and download updates). For more information, see the example file in the plugin template
+        // - For the UpdateURL, the URL need to return a raw json that contains specific fields (needed for the main program to check and download updates). For more information, see the example file (update.json) in the plugin template
         // - For the ProjectWebsiteURL, you can use the URL of your project website
         // - For the ProjectSourceURL, you can use the URL of your project source code repo (GitHub, GitLab, etc.)
         // You need to use the Version and VersionCode to manage the plugin version, the Version is the version name (like "1.0") and the VersionCode is the version code (like 100)

@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.Windows.Controls.Primitives;
 using System.IO;
 using System.Windows.Media.Animation;
+using System.Net.Http;
 
 namespace WinDeskClock.Pages.Settings
 {
@@ -295,6 +296,7 @@ namespace WinDeskClock.Pages.Settings
             PluginInfoWebsiteButton.Content = "Website";
             PluginInfoWebsiteButton.SetValue(Grid.ColumnProperty, 0);
             PluginInfoWebsiteButton.Tag = $"{id}_PluginInfoWebsiteButton";
+            PluginInfoWebsiteButton.IsEnabled = PluginLoader.PluginInfos[id].ProjectWebsiteURL != "none";
             PluginInfoWebsiteButton.Click += async (s, e) =>
             {
                 Process.Start(new ProcessStartInfo(PluginLoader.PluginInfos[id].ProjectWebsiteURL) { UseShellExecute = true });
@@ -304,6 +306,7 @@ namespace WinDeskClock.Pages.Settings
             PluginInfoSourceButton.Content = "Source";
             PluginInfoSourceButton.SetValue(Grid.ColumnProperty, 2);
             PluginInfoSourceButton.Tag = $"{id}_PluginInfoSourceButton";
+            PluginInfoSourceButton.IsEnabled = PluginLoader.PluginInfos[id].ProjectSourceURL != "none";
             PluginInfoSourceButton.Click += async (s, e) =>
             {
                 Process.Start(new ProcessStartInfo(PluginLoader.PluginInfos[id].ProjectSourceURL) { UseShellExecute = true });
@@ -345,8 +348,27 @@ namespace WinDeskClock.Pages.Settings
             PluginUpdateButton.Content = "Update";
             PluginUpdateButton.SetValue(Grid.RowProperty, 1);
             PluginUpdateButton.HorizontalAlignment = HorizontalAlignment.Stretch;
-            PluginUpdateButton.IsEnabled = false;
+            PluginUpdateButton.IsEnabled = PluginLoader.PluginInfos[id].UpdateURL != "none";
             PluginUpdateButton.Tag = $"{id}_PluginUpdateButton";
+            PluginUpdateButton.Click += async (s, e) =>
+            {
+                ControlAppearance controlAppearance = PluginUpdateButton.Appearance;
+                PluginUpdateButton.Appearance = ControlAppearance.Secondary;
+                PluginUpdateButton.Content = "Updating...";
+                if (await PluginLoader.UpdatePlugin(PluginLoader.PluginInfos[id].ID))
+                {
+                    PluginUpdateButton.Content = "Updated";
+                }
+                else
+                {
+                    PluginUpdateButton.Content = "Update";
+                    if (controlAppearance == ControlAppearance.Primary)
+                    {
+                        PluginUpdateButton.Appearance = ControlAppearance.Primary;
+                    }
+                }
+            };
+            UpdateCheck(id, PluginUpdateButton);
 
             Wpf.Ui.Controls.Button PluginSettingsButton = new Wpf.Ui.Controls.Button();
             PluginSettingsButton.Content = "Settings";
@@ -411,6 +433,30 @@ namespace WinDeskClock.Pages.Settings
             ConfigManager.NewVariable.RestartNeeded = true;
             await PluginLoader.PluginModules[SettingsPluginID].SaveConfig();
             await HidePluginSettings();
+        }
+
+        private async Task UpdateCheck(string id, Wpf.Ui.Controls.Button btn)
+        {
+            if (PluginLoader.PluginInfos[id].UpdateURL != "none")
+            {
+                if (await PluginLoader.UpdateValidate(id))
+                {
+                    btn.IsEnabled = true;
+                }
+                else
+                {
+                    btn.IsEnabled = false;
+                }
+
+                if (await PluginLoader.UpdateCheck(id))
+                {
+                    btn.Appearance = ControlAppearance.Primary;
+                }
+                else
+                {
+                    btn.Appearance = ControlAppearance.Secondary;
+                }
+            }
         }
     }
 }

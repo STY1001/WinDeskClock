@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using Newtonsoft.Json;
+using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Windows;
@@ -58,6 +60,72 @@ namespace WinDeskClock.Utils
             }
         }
 
+        public static async Task<bool> UpdateValidate(string id)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                string json = await client.GetStringAsync(PluginInfos[id].UpdateURL);
+                dynamic data = JsonConvert.DeserializeObject(json);
+                if (data["version"] != null && data["versioncode"] != null && data["downloadlink"] != null)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static async Task<bool> UpdateCheck(string id)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                string json = await client.GetStringAsync(PluginInfos[id].UpdateURL);
+                dynamic data = JsonConvert.DeserializeObject(json);
+                if (data["versioncode"] > PluginInfos[id].VersionCode)
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            return false;
+        }
+
+        public static async Task<bool> UpdatePlugin(string id)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                string json = await client.GetStringAsync(PluginInfos[id].UpdateURL);
+                dynamic data = JsonConvert.DeserializeObject(json);
+                string downloadURL = data["downloadlink"];
+                string downloadPath = Path.Combine(PluginPath, id + ".dll");
+                if (File.Exists(downloadPath))
+                {
+                    File.Delete(downloadPath);
+                }
+                using (var downloadStream = await client.GetStreamAsync(downloadURL))
+                {
+                    using (var fileStream = new FileStream(downloadPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        await downloadStream.CopyToAsync(fileStream);
+                    }
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static async Task LoadPlugins()
         {
             AppDomain.CurrentDomain.SetData("PluginFolderPath", PluginPath);
@@ -113,7 +181,7 @@ namespace WinDeskClock.Utils
                         pluginInfo = Activator.CreateInstance(pluginInfoType) as IPluginInfo;
                     }
                 }
-                catch 
+                catch
                 {
 
                 }
