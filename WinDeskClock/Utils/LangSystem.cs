@@ -37,6 +37,10 @@ namespace WinDeskClock.Utils
             {
                 value = value[path[i]];
             }
+            if (value == null)
+            {
+                throw new Exception($"Lang not found: {id}");
+            }
             string valueStr = value.ToString();
             foreach (var item in replace)
             {

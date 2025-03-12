@@ -10,7 +10,8 @@
         "fullscreen": "Fullscreen",
         "kiosk": "Kiosk mode",
         "settings": "Settings",
-        "exit": "Exit"
+        "exit": "Exit",
+        "exiting": "Exiting..."
       },
       "settings": {
         "titlename": "Settings",
@@ -62,7 +63,8 @@
             "titlename": "Plugin",
             "pinned": {
               "name": "Pinned plugins",
-              "desc": "Select what plugin(s) you want to see on the main screen (carousel)"
+              "desc": "Select what plugin(s) you want to see on the main screen (carousel)",
+              "noplugin": "No plugin loaded"
             },
             "carouseldelay": {
               "name": "Carousel delay",
@@ -82,42 +84,47 @@
           "settings": "Settings",
           "delete": "Delete",
           "website": "Website",
-          "Source": "Source",
-          "noplugin": "No plugin here"
+          "source": "Source",
+          "noplugin": "No plugin loaded",
+          "save": "Save",
+          "cancel": "Cancel"
+        },
+        "about": {
+          "titlename": "About"
         }
       },
       "clock": {
         "titlename": "Clock",
         "days": {
           "long": {
-            "sunday": "Sunday",
             "monday": "Monday",
             "tuesday": "Tuesday",
             "wednesday": "Wednesday",
             "thursday": "Thursday",
             "friday": "Friday",
-            "saturday": "Saturday"
+            "saturday": "Saturday",
+            "sunday": "Sunday"
           },
           "short": {
-            "sunday": "Sun",
             "monday": "Mon",
             "tuesday": "Tue",
             "wednesday": "Wed",
             "thursday": "Thu",
             "friday": "Fri",
-            "saturday": "Sat"
+            "saturday": "Sat",
+            "sunday": "Sun"
           },
           "abbr": {
-            "sunday": "S",
             "monday": "M",
             "tuesday": "T",
             "wednesday": "W",
             "thursday": "T",
             "friday": "F",
-            "saturday": "S"
+            "saturday": "S",
+            "sunday": "S"
           }
         },
-        "mouths": {
+        "months": {
           "long": {
             "january": "January",
             "february": "February",
@@ -175,27 +182,29 @@
         "stop": "Stop",
         "repeat": {
           "once": "Once",
-          "eveyday": "Everyday",
+          "everyday": "Everyday",
           "workdays": "Working days",
           "weekend": "Weekend"
         },
         "remaining": {
           "inhour": "in %0 h and %1 min",
           "inmin": "in %0 min",
-          "inday": "in %0 day"
+          "inday": "in %0 day",
+          "indays": "in %0 days"
         }
       },
       "stopwatch": {
         "titlename": "Stopwatch",
         "start": "Start",
-        "stop": "Stop",
+        "pause": "Pause",
         "reset": "Reset",
         "lap": "Lap"
       },
       "timer": {
         "titlename": "Timer",
         "start": "Start",
-        "stop": "Stop",
+        "pause": "Pause",
+        "stop":  "Stop",
         "reset": "Reset",
         "timeup": "Time is up"
       },
@@ -216,7 +225,8 @@
         "fullscreen": "Plein écran",
         "kiosk": "Mode kiosque",
         "settings": "Paramètres",
-        "exit": "Quitter"
+        "exit": "Fermer",
+        "exiting": "Fermeture..."
       },
       "settings": {
         "titlename": "Paramètres",
@@ -268,7 +278,8 @@
             "titlename": "Extention",
             "pinned": {
               "name": "Extention épinglée",
-              "desc": "Sélectionner quelle(s) extention(s) vous voulez voir sur l'écran principal (carrousel)"
+              "desc": "Sélectionner quelle(s) extention(s) vous voulez voir sur l'écran principal (carrousel)",
+              "noplugin": "Pas d'extention chargée"
             },
             "carouseldelay": {
               "name": "Délai du carrousel",
@@ -288,42 +299,47 @@
           "settings": "Paramètres",
           "delete": "Supprimer",
           "website": "Site web",
-          "Source": "Source",
-          "noplugin": "Pas d'extention ici"
+          "source": "Source",
+          "noplugin": "Pas d'extention chargée",
+          "save": "Enregistrer",
+          "cancel": "Annuler"
+        },
+        "about": {
+          "titlename": "À propos"
         }
       },
       "clock": {
         "titlename": "Horloge",
         "days": {
           "long": {
-            "sunday": "Dimanche",
             "monday": "Lundi",
             "tuesday": "Mardi",
             "wednesday": "Mercredi",
             "thursday": "Jeudi",
             "friday": "Vendredi",
-            "saturday": "Samedi"
+            "saturday": "Samedi",
+            "sunday": "Dimanche"
           },
           "short": {
-            "sunday": "Dim",
             "monday": "Lun",
             "tuesday": "Mar",
             "wednesday": "Mer",
             "thursday": "Jeu",
             "friday": "Ven",
-            "saturday": "Sam"
+            "saturday": "Sam",
+            "sunday": "Dim"
           },
           "abbr": {
-            "sunday": "D",
             "monday": "L",
             "tuesday": "M",
             "wednesday": "M",
             "thursday": "J",
             "friday": "V",
-            "saturday": "S"
+            "saturday": "S",
+            "sunday": "D"
           }
         },
-        "mouths": {
+        "months": {
           "long": {
             "january": "Janvier",
             "february": "Février",
@@ -381,26 +397,28 @@
         "stop": "Arrêter",
         "repeat": {
           "once": "Une fois",
-          "eveyday": "Tous les jours",
+          "everyday": "Tous les jours",
           "workdays": "Jours de travail",
           "weekend": "Weekend"
         },
         "remaining": {
           "inhour": "dans %0 h et %1 min",
           "inmin": "dans %0 min",
-          "inday": "dans %0 jour"
+          "inday": "dans %0 jour",
+          "indays": "dans %0 jours"
         }
       },
       "stopwatch": {
         "titlename": "Chronomètre",
         "start": "Démarrer",
-        "stop": "Arrêter",
+        "pause": "Pause",
         "reset": "Réinitialiser",
         "lap": "Tour"
       },
       "timer": {
         "titlename": "Minuteur",
         "start": "Démarrer",
+        "pause": "Pause",
         "stop": "Arrêter",
         "reset": "Réinitialiser",
         "timeup": "Le temps est écoulé"

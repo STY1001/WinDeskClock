@@ -33,13 +33,35 @@ namespace WinDeskClock.Pages.Settings
             Loaded += async (s, e) => await Load();
         }
 
+        private bool Init = false;
         private async Task Load()
         {
+            if (!Init)
+            {
+                PluginSettingsSaveBtn.Content = await LangSystem.GetLang("settings.pluginmanager.save");
+                PluginSettingsCancelBtn.Content = await LangSystem.GetLang("settings.pluginmanager.cancel");
+
+                Init = true;
+            }
+
             PluginCardStack.Children.Clear();
             foreach (var id in PluginLoader.PluginInfos.Keys)
             {
                 Debug.WriteLine(id);
                 await CreatePluginCard(id);
+            }
+
+            if (PluginCardStack.Children.Count == 0)
+            {
+                System.Windows.Controls.TextBlock PluginNoPluginTextBlock = new System.Windows.Controls.TextBlock();
+                PluginNoPluginTextBlock.Text = await LangSystem.GetLang("settings.pluginmanager.noplugin");
+                PluginNoPluginTextBlock.FontSize = 18;
+                PluginNoPluginTextBlock.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
+                PluginNoPluginTextBlock.FontFamily = new FontFamily("Segoe UI");
+                PluginNoPluginTextBlock.HorizontalAlignment = HorizontalAlignment.Center;
+                PluginNoPluginTextBlock.VerticalAlignment = VerticalAlignment.Center;
+                PluginCardStack.Children.Add(PluginNoPluginTextBlock);
+                PluginCardStack.VerticalAlignment = VerticalAlignment.Center;
             }
         }
 
@@ -293,7 +315,7 @@ namespace WinDeskClock.Pages.Settings
             PluginInfoButtonGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Auto) });
 
             Wpf.Ui.Controls.Button PluginInfoWebsiteButton = new Wpf.Ui.Controls.Button();
-            PluginInfoWebsiteButton.Content = "Website";
+            PluginInfoWebsiteButton.Content = await LangSystem.GetLang("settings.pluginmanager.website");
             PluginInfoWebsiteButton.SetValue(Grid.ColumnProperty, 0);
             PluginInfoWebsiteButton.Tag = $"{id}_PluginInfoWebsiteButton";
             PluginInfoWebsiteButton.IsEnabled = PluginLoader.PluginInfos[id].ProjectWebsiteURL != "none";
@@ -303,7 +325,7 @@ namespace WinDeskClock.Pages.Settings
             };
 
             Wpf.Ui.Controls.Button PluginInfoSourceButton = new Wpf.Ui.Controls.Button();
-            PluginInfoSourceButton.Content = "Source";
+            PluginInfoSourceButton.Content = await LangSystem.GetLang("settings.pluginmanager.source");
             PluginInfoSourceButton.SetValue(Grid.ColumnProperty, 2);
             PluginInfoSourceButton.Tag = $"{id}_PluginInfoSourceButton";
             PluginInfoSourceButton.IsEnabled = PluginLoader.PluginInfos[id].ProjectSourceURL != "none";
@@ -322,7 +344,7 @@ namespace WinDeskClock.Pages.Settings
             PluginActionButtonGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
 
             ToggleButton PluginEnableToggleButton = new ToggleButton();
-            PluginEnableToggleButton.Content = (await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) || !await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID)) ? "Disabled" : "Enabled";
+            PluginEnableToggleButton.Content = (await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) || !await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID)) ? await LangSystem.GetLang("settings.pluginmanager.disabled") : await LangSystem.GetLang("settings.pluginmanager.enabled");
             PluginEnableToggleButton.SetValue(Grid.RowProperty, 0);
             PluginEnableToggleButton.IsChecked = !await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) && await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID);
             PluginEnableToggleButton.IsEnabled = await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID);
@@ -334,18 +356,18 @@ namespace WinDeskClock.Pages.Settings
 
                 if (PluginEnableToggleButton.IsChecked == true)
                 {
-                    PluginEnableToggleButton.Content = "Enabled";
+                    PluginEnableToggleButton.Content = await LangSystem.GetLang("settings.pluginmanager.enabled");
                     PluginLoader.DelDisabledPlugin(PluginLoader.PluginInfos[id].ID);
                 }
                 else
                 {
-                    PluginEnableToggleButton.Content = "Disabled";
+                    PluginEnableToggleButton.Content = await LangSystem.GetLang("settings.pluginmanager.disabled");
                     PluginLoader.AddDisabledPlugin(PluginLoader.PluginInfos[id].ID);
                 }
             };
 
             Wpf.Ui.Controls.Button PluginUpdateButton = new Wpf.Ui.Controls.Button();
-            PluginUpdateButton.Content = "Update";
+            PluginUpdateButton.Content = await LangSystem.GetLang("settings.pluginmanager.update");
             PluginUpdateButton.SetValue(Grid.RowProperty, 1);
             PluginUpdateButton.HorizontalAlignment = HorizontalAlignment.Stretch;
             PluginUpdateButton.IsEnabled = PluginLoader.PluginInfos[id].UpdateURL != "none";
@@ -354,14 +376,14 @@ namespace WinDeskClock.Pages.Settings
             {
                 ControlAppearance controlAppearance = PluginUpdateButton.Appearance;
                 PluginUpdateButton.Appearance = ControlAppearance.Secondary;
-                PluginUpdateButton.Content = "Updating...";
+                PluginUpdateButton.Content = await LangSystem.GetLang("settings.pluginmanager.updating");
                 if (await PluginLoader.UpdatePlugin(PluginLoader.PluginInfos[id].ID))
                 {
-                    PluginUpdateButton.Content = "Updated";
+                    PluginUpdateButton.Content = await LangSystem.GetLang("settings.pluginmanager.updated");
                 }
                 else
                 {
-                    PluginUpdateButton.Content = "Update";
+                    PluginUpdateButton.Content = await LangSystem.GetLang("settings.pluginmanager.update");
                     if (controlAppearance == ControlAppearance.Primary)
                     {
                         PluginUpdateButton.Appearance = ControlAppearance.Primary;
@@ -371,7 +393,7 @@ namespace WinDeskClock.Pages.Settings
             UpdateCheck(id, PluginUpdateButton);
 
             Wpf.Ui.Controls.Button PluginSettingsButton = new Wpf.Ui.Controls.Button();
-            PluginSettingsButton.Content = "Settings";
+            PluginSettingsButton.Content = await LangSystem.GetLang("settings.pluginmanager.settings");
             PluginSettingsButton.SetValue(Grid.RowProperty, 2);
             PluginSettingsButton.HorizontalAlignment = HorizontalAlignment.Stretch;
             PluginSettingsButton.Tag = $"{id}_PluginSettingsButton";
@@ -382,7 +404,7 @@ namespace WinDeskClock.Pages.Settings
             };
 
             Wpf.Ui.Controls.Button PluginDeleteButton = new Wpf.Ui.Controls.Button();
-            PluginDeleteButton.Content = "Delete";
+            PluginDeleteButton.Content = await LangSystem.GetLang("settings.pluginmanager.delete");
             PluginDeleteButton.SetValue(Grid.RowProperty, 3);
             PluginDeleteButton.HorizontalAlignment = HorizontalAlignment.Stretch;
             PluginDeleteButton.Tag = $"{id}_PluginDeleteButton";

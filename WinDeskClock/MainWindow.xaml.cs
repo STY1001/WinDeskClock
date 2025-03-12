@@ -153,7 +153,7 @@ namespace WinDeskClock
             {
                 Wpf.Ui.Controls.TextBlock tb = new Wpf.Ui.Controls.TextBlock
                 {
-                    Text = "No plugin loaded",
+                    Text = await LangSystem.GetLang("plugin.noload"),
                     FontSize = 20,
                     Foreground = Brushes.White,
                     HorizontalAlignment = HorizontalAlignment.Center,
@@ -166,7 +166,7 @@ namespace WinDeskClock
             {
                 Wpf.Ui.Controls.TextBlock tb = new Wpf.Ui.Controls.TextBlock
                 {
-                    Text = "No pinned plugin",
+                    Text = await LangSystem.GetLang("plugin.nopin"),
                     FontSize = 20,
                     Foreground = Brushes.White,
                     HorizontalAlignment = HorizontalAlignment.Center,
@@ -179,6 +179,32 @@ namespace WinDeskClock
             {
                 CarouselPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[0]].GetMain());
             }
+
+            // Lang apply
+            BackBtn.Content = await LangSystem.GetLang("mainmenu.back");
+            ScreenOffBtn.Content = await LangSystem.GetLang("mainmenu.screenoff");
+            FullScreenBtn.Content = await LangSystem.GetLang("mainmenu.fullscreen");
+            KioskModeBtn.Content = await LangSystem.GetLang("mainmenu.kiosk");
+            SettingsBtn.Content = await LangSystem.GetLang("mainmenu.settings");
+            ExitAppBtn.Content = await LangSystem.GetLang("mainmenu.exit");
+            AlarmAlertStopBtn.Content = await LangSystem.GetLang("alarm.stop");
+            AlarmAlertText.Text = await LangSystem.GetLang("alarm.titlename");
+            TimeUpStopBtn.Content = await LangSystem.GetLang("timer.stop");
+            TimeUpText.Text = await LangSystem.GetLang("timer.timeup");
+            AboutTabItemHeader.Text = await LangSystem.GetLang("settings.about.titlename");
+            PMTabItemHeader.Text = await LangSystem.GetLang("settings.pluginmanager.titlename");
+            GeneralTabItemHeader.Text = await LangSystem.GetLang("settings.general.titlename");
+            SettingsSaveBtn.Content = await LangSystem.GetLang("settings.save");
+            SettingsTitleText.Text = await LangSystem.GetLang("settings.titlename");
+            ResetTimerBtn.Content = await LangSystem.GetLang("timer.reset");
+            PauseTimerBtn.Content = await LangSystem.GetLang("timer.pause");
+            StartTimerBtn.Content = await LangSystem.GetLang("timer.start");
+            LapStopwatchBtn.Content = await LangSystem.GetLang("stopwatch.lap");
+            ResetStopwatchBtn.Content = await LangSystem.GetLang("stopwatch.reset");
+            PauseStopwatchBtn.Content = await LangSystem.GetLang("stopwatch.pause");
+            StartStopwatchBtn.Content = await LangSystem.GetLang("stopwatch.start");
+            AddAlarmBtn.Content = await LangSystem.GetLang("alarm.add");
+            NoAlarmText.Text = await LangSystem.GetLang("alarm.noalarm");
         }
 
         // Create all timer of the app
@@ -3611,21 +3637,21 @@ namespace WinDeskClock
                 string daysArray = await ConfigManager.GetAlarm($"{uid}.days");
                 if (daysArray == "0")
                 {
-                    days = "Once";
+                    days = await LangSystem.GetLang("alarm.repeat.once");
                 }
                 else
                 {
                     if (daysArray == "12345")
                     {
-                        days = "Working days";
+                        days = await LangSystem.GetLang("alarm.repeat.workdays");
                     }
                     else if (daysArray == "67")
                     {
-                        days = "Weekend";
+                        days = await LangSystem.GetLang("alarm.repeat.weekend");
                     }
                     else if (daysArray == "1234567")
                     {
-                        days = "Everyday";
+                        days = await LangSystem.GetLang("alarm.repeat.everyday");
                     }
                     else
                     {
@@ -3634,25 +3660,25 @@ namespace WinDeskClock
                             switch (day)
                             {
                                 case '1':
-                                    days += "Monday, ";
+                                    days += $"{await LangSystem.GetLang("clock.days.long.monday")}, ";
                                     break;
                                 case '2':
-                                    days += "Tuesday, ";
+                                    days += $"{await LangSystem.GetLang("clock.days.long.tuesday")}, ";
                                     break;
                                 case '3':
-                                    days += "Wednesday, ";
+                                    days += $"{await LangSystem.GetLang("clock.days.long.wednesday")}, ";
                                     break;
                                 case '4':
-                                    days += "Thursday, ";
+                                    days += $"{await LangSystem.GetLang("clock.days.long.thursday")}, ";
                                     break;
                                 case '5':
-                                    days += "Friday, ";
+                                    days += $"{await LangSystem.GetLang("clock.days.long.friday")}, ";
                                     break;
                                 case '6':
-                                    days += "Saturday, ";
+                                    days += $"{await LangSystem.GetLang("clock.days.long.saturday")}, ";
                                     break;
                                 case '7':
-                                    days += "Sunday, ";
+                                    days += $"{await LangSystem.GetLang("clock.days.long.sunday")}, ";
                                     break;
                             }
                         }
@@ -3858,38 +3884,53 @@ namespace WinDeskClock
             string daysArray = await ConfigManager.GetAlarm($"{uid}.days");
             if (daysArray == "0")
             {
-                days = "Once";
+                days = await LangSystem.GetLang("alarm.repeat.once");
             }
             else
             {
-                foreach (char day in daysArray)
+                if (daysArray == "12345")
                 {
-                    switch (day)
-                    {
-                        case '1':
-                            days += "Monday, ";
-                            break;
-                        case '2':
-                            days += "Tuesday, ";
-                            break;
-                        case '3':
-                            days += "Wednesday, ";
-                            break;
-                        case '4':
-                            days += "Thursday, ";
-                            break;
-                        case '5':
-                            days += "Friday, ";
-                            break;
-                        case '6':
-                            days += "Saturday, ";
-                            break;
-                        case '7':
-                            days += "Sunday, ";
-                            break;
-                    }
+                    days = await LangSystem.GetLang("alarm.repeat.workdays");
                 }
-                days = days.Remove(days.Length - 2);
+                else if (daysArray == "67")
+                {
+                    days = await LangSystem.GetLang("alarm.repeat.weekend");
+                }
+                else if (daysArray == "1234567")
+                {
+                    days = await LangSystem.GetLang("alarm.repeat.everyday");
+                }
+                else
+                {
+                    foreach (char day in daysArray)
+                    {
+                        switch (day)
+                        {
+                            case '1':
+                                days += $"{await LangSystem.GetLang("clock.days.long.monday")}, ";
+                                break;
+                            case '2':
+                                days += $"{await LangSystem.GetLang("clock.days.long.tuesday")}, ";
+                                break;
+                            case '3':
+                                days += $"{await LangSystem.GetLang("clock.days.long.wednesday")}, ";
+                                break;
+                            case '4':
+                                days += $"{await LangSystem.GetLang("clock.days.long.thursday")}, ";
+                                break;
+                            case '5':
+                                days += $"{await LangSystem.GetLang("clock.days.long.friday")}, ";
+                                break;
+                            case '6':
+                                days += $"{await LangSystem.GetLang("clock.days.long.saturday")}, ";
+                                break;
+                            case '7':
+                                days += $"{await LangSystem.GetLang("clock.days.long.sunday")}, ";
+                                break;
+                        }
+                    }
+                    days = days.Remove(days.Length - 2);
+                }
             }
             string remaningtime = await GetETAAlarmString(uid);
 
@@ -3940,7 +3981,7 @@ namespace WinDeskClock
             AlarmCardNameTextBox.Text = await ConfigManager.GetAlarm($"{uid}.name");
             AlarmCardNameTextBox.SetValue(Grid.ColumnProperty, 0);
             AlarmCardNameTextBox.PlaceholderEnabled = true;
-            AlarmCardNameTextBox.PlaceholderText = "Name";
+            AlarmCardNameTextBox.PlaceholderText = await LangSystem.GetLang("alarm.name");
             AlarmCardNameTextBox.VerticalAlignment = VerticalAlignment.Center;
             AlarmCardNameTextBox.Margin = new Thickness(0, 0, 10, 0);
 
@@ -4131,7 +4172,7 @@ namespace WinDeskClock
 
             ToggleButton AlarmCardDayMonday = new ToggleButton();
             AlarmCardDayMonday.Tag = $"{uid}_AlarmCardDayMonday";
-            AlarmCardDayMonday.Content = "M";
+            AlarmCardDayMonday.Content = await LangSystem.GetLang("clock.days.abbr.monday");
             AlarmCardDayMonday.Margin = new Thickness(0, 0, 3, 0);
             AlarmCardDayMonday.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
             AlarmCardDayMonday.FontFamily = new FontFamily("Segoe UI Variable Display Regular");
@@ -4146,7 +4187,7 @@ namespace WinDeskClock
 
             ToggleButton AlarmCardDayTuesday = new ToggleButton();
             AlarmCardDayTuesday.Tag = $"{uid}_AlarmCardDayTuesday";
-            AlarmCardDayTuesday.Content = "T";
+            AlarmCardDayTuesday.Content = await LangSystem.GetLang("clock.days.abbr.tuesday");
             AlarmCardDayTuesday.Margin = new Thickness(0, 0, 3, 0);
             AlarmCardDayTuesday.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
             AlarmCardDayTuesday.FontFamily = new FontFamily("Segoe UI Variable Display Regular");
@@ -4161,7 +4202,7 @@ namespace WinDeskClock
 
             ToggleButton AlarmCardDayWednesday = new ToggleButton();
             AlarmCardDayWednesday.Tag = $"{uid}_AlarmCardDayWednesday";
-            AlarmCardDayWednesday.Content = "W";
+            AlarmCardDayWednesday.Content = await LangSystem.GetLang("clock.days.abbr.wednesday");
             AlarmCardDayWednesday.Margin = new Thickness(0, 0, 3, 0);
             AlarmCardDayWednesday.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
             AlarmCardDayWednesday.FontFamily = new FontFamily("Segoe UI Variable Display Regular");
@@ -4176,7 +4217,7 @@ namespace WinDeskClock
 
             ToggleButton AlarmCardDayThursday = new ToggleButton();
             AlarmCardDayThursday.Tag = $"{uid}_AlarmCardDayThursday";
-            AlarmCardDayThursday.Content = "T";
+            AlarmCardDayThursday.Content = await LangSystem.GetLang("clock.days.abbr.thursday");
             AlarmCardDayThursday.Margin = new Thickness(0, 0, 3, 0);
             AlarmCardDayThursday.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
             AlarmCardDayThursday.FontFamily = new FontFamily("Segoe UI Variable Display Regular");
@@ -4191,7 +4232,7 @@ namespace WinDeskClock
 
             ToggleButton AlarmCardDayFriday = new ToggleButton();
             AlarmCardDayFriday.Tag = $"{uid}_AlarmCardDayFriday";
-            AlarmCardDayFriday.Content = "F";
+            AlarmCardDayFriday.Content = await LangSystem.GetLang("clock.days.abbr.friday");
             AlarmCardDayFriday.Margin = new Thickness(0, 0, 3, 0);
             AlarmCardDayFriday.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
             AlarmCardDayFriday.FontFamily = new FontFamily("Segoe UI Variable Display Regular");
@@ -4206,7 +4247,7 @@ namespace WinDeskClock
 
             ToggleButton AlarmCardDaySaturday = new ToggleButton();
             AlarmCardDaySaturday.Tag = $"{uid}_AlarmCardDaySaturday";
-            AlarmCardDaySaturday.Content = "S";
+            AlarmCardDaySaturday.Content = await LangSystem.GetLang("clock.days.abbr.saturday");
             AlarmCardDaySaturday.Margin = new Thickness(0, 0, 3, 0);
             AlarmCardDaySaturday.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
             AlarmCardDaySaturday.FontFamily = new FontFamily("Segoe UI Variable Display Regular");
@@ -4221,7 +4262,7 @@ namespace WinDeskClock
 
             ToggleButton AlarmCardDaySunday = new ToggleButton();
             AlarmCardDaySunday.Tag = $"{uid}_AlarmCardDaySunday";
-            AlarmCardDaySunday.Content = "S";
+            AlarmCardDaySunday.Content = await LangSystem.GetLang("clock.days.abbr.sunday");
             AlarmCardDaySunday.Margin = new Thickness(0, 0, 3, 0);
             AlarmCardDaySunday.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
             AlarmCardDaySunday.FontFamily = new FontFamily("Segoe UI Variable Display Regular");
@@ -4282,7 +4323,7 @@ namespace WinDeskClock
 
             ComboBoxItem AlarmCardSoundComboBoxItemDefault = new ComboBoxItem();
             AlarmCardSoundComboBoxItemDefault.Tag = $"{uid}_AlarmCardSoundComboBoxItemDefault";
-            AlarmCardSoundComboBoxItemDefault.Content = "Default sound";
+            AlarmCardSoundComboBoxItemDefault.Content = await LangSystem.GetLang("alarm.defsounds");
             if (!(await ConfigManager.GetAlarm($"{uid}.sound")).Contains("default"))
             {
                 AlarmCardSoundComboBoxItemDefault.IsSelected = false;
@@ -4294,7 +4335,7 @@ namespace WinDeskClock
 
             ComboBoxItem AlarmCardSoundComboBoxItemCustom = new ComboBoxItem();
             AlarmCardSoundComboBoxItemCustom.Tag = $"{uid}_AlarmCardSoundComboBoxItemCustom";
-            AlarmCardSoundComboBoxItemCustom.Content = "Custom sound";
+            AlarmCardSoundComboBoxItemCustom.Content = await LangSystem.GetLang("alarm.custsounds");
             if (AlarmCardSoundComboBox.IsEnabled && !AlarmCardSoundComboBoxItemDefault.IsSelected)
             {
                 AlarmCardSoundComboBoxItemCustom.IsSelected = true;
@@ -4314,7 +4355,7 @@ namespace WinDeskClock
 
             Wpf.Ui.Controls.Button AlarmCardBigGridBottomBtnDelete = new Wpf.Ui.Controls.Button();
             AlarmCardBigGridBottomBtnDelete.Tag = $"{uid}_AlarmCardBigGridBottomBtnDelete";
-            AlarmCardBigGridBottomBtnDelete.Content = "Delete";
+            AlarmCardBigGridBottomBtnDelete.Content = await LangSystem.GetLang("alarm.delete");
             AlarmCardBigGridBottomBtnDelete.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
             AlarmCardBigGridBottomBtnDelete.HorizontalAlignment = HorizontalAlignment.Stretch;
             AlarmCardBigGridBottomBtnDelete.Appearance = ControlAppearance.Secondary;
@@ -4327,7 +4368,7 @@ namespace WinDeskClock
 
             Wpf.Ui.Controls.Button AlarmCardBigGridBottomBtnCancel = new Wpf.Ui.Controls.Button();
             AlarmCardBigGridBottomBtnCancel.Tag = $"{uid}_AlarmCardBigGridBottomBtnCancel";
-            AlarmCardBigGridBottomBtnCancel.Content = "Cancel";
+            AlarmCardBigGridBottomBtnCancel.Content = await LangSystem.GetLang("alarm.cancel");
             AlarmCardBigGridBottomBtnCancel.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
             AlarmCardBigGridBottomBtnCancel.HorizontalAlignment = HorizontalAlignment.Stretch;
             AlarmCardBigGridBottomBtnCancel.Appearance = ControlAppearance.Secondary;
@@ -4341,7 +4382,7 @@ namespace WinDeskClock
 
             Wpf.Ui.Controls.Button AlarmCardBigGridBottomBtnSave = new Wpf.Ui.Controls.Button();
             AlarmCardBigGridBottomBtnSave.Tag = $"{uid}_AlarmCardBigGridBottomBtnSave";
-            AlarmCardBigGridBottomBtnSave.Content = "Save";
+            AlarmCardBigGridBottomBtnSave.Content = await LangSystem.GetLang("alarm.save");
             AlarmCardBigGridBottomBtnSave.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
             AlarmCardBigGridBottomBtnSave.HorizontalAlignment = HorizontalAlignment.Stretch;
             AlarmCardBigGridBottomBtnSave.Appearance = ControlAppearance.Primary;
@@ -4456,11 +4497,25 @@ namespace WinDeskClock
 
             if (diff.Days == 0)
             {
-                return $"in {diff.Hours} h and {diff.Minutes} m";
+                if (diff.Hours == 0)
+                {
+                    return await LangSystem.GetLang("alarm.remaining.inmin", diff.Minutes.ToString());
+                }
+                else
+                {
+                    return await LangSystem.GetLang("alarm.remaining.inhour", diff.Hours.ToString(), diff.Minutes.ToString());
+                }
             }
             else
             {
-                return $"in {diff.Days} day{(diff.Days > 1 ? "s" : "")}";
+                if(diff.Days == 1)
+                {
+                    return await LangSystem.GetLang("alarm.remaining.inday", diff.Days.ToString());
+                }
+                else
+                {
+                    return await LangSystem.GetLang("alarm.remaining.indays", diff.Days.ToString());
+                }
             }
         }
 
@@ -4483,7 +4538,7 @@ namespace WinDeskClock
 
             ((ComboBoxItem)AlarmCardSoundComboBoxItemDefault).IsSelected = true;
             ((ComboBoxItem)AlarmCardSoundComboBoxItemCustom).IsSelected = false;
-            ((ComboBoxItem)AlarmCardSoundComboBoxItemCustom).Content = "Custom";
+            ((ComboBoxItem)AlarmCardSoundComboBoxItemCustom).Content = await LangSystem.GetLang("alarm.custsounds");
 
         }
         private async Task AlarmCardDaysToggleButton(string uid, string source)
@@ -5697,7 +5752,7 @@ namespace WinDeskClock
         }
         private async void ExitAppBtn_Click(object sender, RoutedEventArgs e)
         {
-            ExitAppBtn.Content = "Exiting...";
+            ExitAppBtn.Content = await LangSystem.GetLang("mainmenu.exiting");
             if (Process.GetProcessesByName("explorer").Length == 0)
             {
                 Process.Start("explorer.exe");
