@@ -29,7 +29,7 @@ namespace WinDeskClock.Utils
 
         public static async Task<string> GetLang(string id, params string[] replace)
         {
-            id = ConfigManager.Variable.Language + "." + "content" + "." + id;
+            id = ConfigManager.Variables.Language + "." + "content" + "." + id;
             var json = LangData;
             string[] path = id.Split('.');
             JToken value = json[path[0]];

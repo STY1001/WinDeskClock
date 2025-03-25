@@ -23,7 +23,7 @@ namespace WinDeskClock.Utils
 
         public static async Task<bool> CheckDisabledPlugin(string id)
         {
-            foreach (string plugin in ConfigManager.Variable.DisabledPlugin)
+            foreach (string plugin in ConfigManager.Variables.DisabledPlugin)
             {
                 if (plugin == id) { return true; }
             }
@@ -41,20 +41,20 @@ namespace WinDeskClock.Utils
 
         public static async Task AddDisabledPlugin(string id)
         {
-            foreach (string plugin in ConfigManager.NewVariable.DisabledPlugin)
+            foreach (string plugin in ConfigManager.NewVariables.DisabledPlugin)
             {
                 if (plugin == id) { return; }
             }
-            ConfigManager.NewVariable.DisabledPlugin.Add(id);
+            ConfigManager.NewVariables.DisabledPlugin.Add(id);
         }
 
         public static async Task DelDisabledPlugin(string id)
         {
-            foreach (string plugin in ConfigManager.NewVariable.DisabledPlugin)
+            foreach (string plugin in ConfigManager.NewVariables.DisabledPlugin)
             {
                 if (plugin == id)
                 {
-                    ConfigManager.NewVariable.DisabledPlugin.Remove(id);
+                    ConfigManager.NewVariables.DisabledPlugin.Remove(id);
                     return;
                 }
             }

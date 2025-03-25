@@ -7,8 +7,8 @@ namespace WinDeskClock.Utils
 {
     public static class ConfigManager
     {
-        public static string ConfigPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "data", "config.json");
-        public static string AlarmPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "data", "alarms.json");
+        public static readonly string ConfigPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "data", "config.json");
+        public static readonly string AlarmPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "data", "alarms.json");
 
         public static async Task CheckAndCreateConfigs()
         {
@@ -52,76 +52,76 @@ namespace WinDeskClock.Utils
 
         public static async Task LoadSettings()
         {
-            Variable.Language = await GetConfig("Language");
-            Variable.DefaultTimeUpSound = await GetConfig("DefaultTimeUpSound");
-            Variable.DefaultAlarmSound = await GetConfig("DefaultAlarmSound");
-            Variable.AlarmTimeoutDelay = int.Parse(await GetConfig("AlarmTimeoutDelay"));
-            Variable.CarouselDelay = int.Parse(await GetConfig("CarouselDelay"));
-            Variable.ClockShowSecond = bool.Parse(await GetConfig("ClockShowSecond"));
-            Variable.ClockFbxStyle = bool.Parse(await GetConfig("ClockFbxStyle"));
+            Variables.Language = await GetConfig("Language");
+            Variables.DefaultTimeUpSound = await GetConfig("DefaultTimeUpSound");
+            Variables.DefaultAlarmSound = await GetConfig("DefaultAlarmSound");
+            Variables.AlarmTimeoutDelay = int.Parse(await GetConfig("AlarmTimeoutDelay"));
+            Variables.CarouselDelay = int.Parse(await GetConfig("CarouselDelay"));
+            Variables.ClockShowSecond = bool.Parse(await GetConfig("ClockShowSecond"));
+            Variables.ClockFbxStyle = bool.Parse(await GetConfig("ClockFbxStyle"));
 
             if (await GetConfig("PinnedPlugin") != "")
             {
-                Variable.PinnedPlugin = (await GetConfig("PinnedPlugin")).Split(',').ToList();
+                Variables.PinnedPlugin = (await GetConfig("PinnedPlugin")).Split(',').ToList();
             }
             else
             {
-                Variable.PinnedPlugin = new List<string>();
+                Variables.PinnedPlugin = new List<string>();
             }
 
             if (await GetConfig("PluginOrder") != "")
             {
-                Variable.PluginOrder = (await GetConfig("PluginOrder")).Split(',').ToList();
+                Variables.PluginOrder = (await GetConfig("PluginOrder")).Split(',').ToList();
             }
             else
             {
-                Variable.PluginOrder = new List<string>();
+                Variables.PluginOrder = new List<string>();
             }
 
             if (await GetConfig("DisabledPlugin") != "")
             {
-                Variable.DisabledPlugin = (await GetConfig("DisabledPlugin")).Split(',').ToList();
+                Variables.DisabledPlugin = (await GetConfig("DisabledPlugin")).Split(',').ToList();
             }
             else
             {
-                Variable.DisabledPlugin = new List<string>();
+                Variables.DisabledPlugin = new List<string>();
             }
 
-            NewVariable.Language = Variable.Language;
-            NewVariable.DefaultTimeUpSound = Variable.DefaultTimeUpSound;
-            NewVariable.DefaultAlarmSound = Variable.DefaultAlarmSound;
-            NewVariable.ClockShowSecond = Variable.ClockShowSecond;
-            NewVariable.AlarmTimeoutDelay = Variable.AlarmTimeoutDelay;
-            NewVariable.CarouselDelay = Variable.CarouselDelay;
-            NewVariable.PinnedPlugin = new List<string>();
-            foreach (string plugin in Variable.PinnedPlugin)
+            NewVariables.Language = Variables.Language;
+            NewVariables.DefaultTimeUpSound = Variables.DefaultTimeUpSound;
+            NewVariables.DefaultAlarmSound = Variables.DefaultAlarmSound;
+            NewVariables.ClockShowSecond = Variables.ClockShowSecond;
+            NewVariables.AlarmTimeoutDelay = Variables.AlarmTimeoutDelay;
+            NewVariables.CarouselDelay = Variables.CarouselDelay;
+            NewVariables.PinnedPlugin = new List<string>();
+            foreach (string plugin in Variables.PinnedPlugin)
             {
-                NewVariable.PinnedPlugin.Add(plugin);
+                NewVariables.PinnedPlugin.Add(plugin);
             }
-            NewVariable.PluginOrder = new List<string>();
-            foreach (string plugin in Variable.PluginOrder)
+            NewVariables.PluginOrder = new List<string>();
+            foreach (string plugin in Variables.PluginOrder)
             {
-                NewVariable.PluginOrder.Add(plugin);
+                NewVariables.PluginOrder.Add(plugin);
             }
-            NewVariable.DisabledPlugin = new List<string>();
-            foreach (string plugin in Variable.DisabledPlugin)
+            NewVariables.DisabledPlugin = new List<string>();
+            foreach (string plugin in Variables.DisabledPlugin)
             {
-                NewVariable.DisabledPlugin.Add(plugin);
+                NewVariables.DisabledPlugin.Add(plugin);
             }
         }
 
         public static async Task SaveNewSettings()
         {
-            await SetConfig("Language", NewVariable.Language);
-            await SetConfig("DefaultTimeUpSound", NewVariable.DefaultTimeUpSound);
-            await SetConfig("DefaultAlarmSound", NewVariable.DefaultAlarmSound);
-            await SetConfig("ClockShowSecond", NewVariable.ClockShowSecond.ToString());
-            await SetConfig("ClockFbxStyle", NewVariable.ClockFbxStyle.ToString());
-            await SetConfig("AlarmTimeoutDelay", NewVariable.AlarmTimeoutDelay.ToString());
-            await SetConfig("CarouselDelay", NewVariable.CarouselDelay.ToString());
-            await SetConfig("PinnedPlugin", string.Join(',', NewVariable.PinnedPlugin));
-            await SetConfig("PluginOrder", string.Join(',', NewVariable.PluginOrder));
-            await SetConfig("DisabledPlugin", string.Join(',', NewVariable.DisabledPlugin));
+            await SetConfig("Language", NewVariables.Language);
+            await SetConfig("DefaultTimeUpSound", NewVariables.DefaultTimeUpSound);
+            await SetConfig("DefaultAlarmSound", NewVariables.DefaultAlarmSound);
+            await SetConfig("ClockShowSecond", NewVariables.ClockShowSecond.ToString());
+            await SetConfig("ClockFbxStyle", NewVariables.ClockFbxStyle.ToString());
+            await SetConfig("AlarmTimeoutDelay", NewVariables.AlarmTimeoutDelay.ToString());
+            await SetConfig("CarouselDelay", NewVariables.CarouselDelay.ToString());
+            await SetConfig("PinnedPlugin", string.Join(',', NewVariables.PinnedPlugin));
+            await SetConfig("PluginOrder", string.Join(',', NewVariables.PluginOrder));
+            await SetConfig("DisabledPlugin", string.Join(',', NewVariables.DisabledPlugin));
 
             await LoadSettings();
         }
@@ -218,7 +218,7 @@ namespace WinDeskClock.Utils
 
         public static async Task<bool> CheckPinnedPlugin(string id)
         {
-            foreach (string plugin in Variable.PinnedPlugin)
+            foreach (string plugin in Variables.PinnedPlugin)
             {
                 if (plugin == id) { return true; }
             }
@@ -227,26 +227,26 @@ namespace WinDeskClock.Utils
 
         public static async Task AddPinnedPlugin(string id)
         {
-            foreach (string plugin in NewVariable.PinnedPlugin)
+            foreach (string plugin in NewVariables.PinnedPlugin)
             {
                 if (plugin == id) { return; }
             }
-            NewVariable.PinnedPlugin.Add(id);
+            NewVariables.PinnedPlugin.Add(id);
         }
 
         public static async Task DelPinnedPlugin(string id)
         {
-            foreach (string plugin in NewVariable.PinnedPlugin)
+            foreach (string plugin in NewVariables.PinnedPlugin)
             {
                 if (plugin == id)
                 {
-                    NewVariable.PinnedPlugin.Remove(id);
+                    NewVariables.PinnedPlugin.Remove(id);
                     return;
                 }
             }
         }
 
-        public static class Variable
+        public static class Variables
         {
             public static string DefaultTimeUpSound;
             public static string DefaultAlarmSound;
@@ -260,7 +260,7 @@ namespace WinDeskClock.Utils
             public static List<string> DisabledPlugin;
         }
 
-        public static class NewVariable
+        public static class NewVariables
         {
             public static bool RestartNeeded = false;
             public static string DefaultTimeUpSound;

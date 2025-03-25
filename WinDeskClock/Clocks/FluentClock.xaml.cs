@@ -55,7 +55,7 @@ namespace WinDeskClock.Clocks
         public async Task UIUpdate()
         {
             // - Show seconds
-            if (ConfigManager.Variable.ClockShowSecond)
+            if (ConfigManager.Variables.ClockShowSecond)
             {
                 ClockGridSecondCol1.Width = new GridLength(20);
                 ClockGridSecondCol2.Width = new GridLength(1, GridUnitType.Star);

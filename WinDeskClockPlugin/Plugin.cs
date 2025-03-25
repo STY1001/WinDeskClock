@@ -23,7 +23,7 @@ namespace WinDeskClockPlugin
             // Plugin data path
             PluginDataPath = Path.Combine((string)AppDomain.CurrentDomain.GetData("PluginFolderPath"), "plugins_data", pluginInfo.ID);
             // Plugin language
-            Language = ConfigManager.Variable.Language;
+            Language = ConfigManager.Variables.Language;
         }
     }
 

@@ -120,7 +120,7 @@ namespace WinDeskClock
         // Change UI elements depending on the settings
         private async Task UIUpdate()
         {
-            if (ConfigManager.Variable.ClockFbxStyle)
+            if (ConfigManager.Variables.ClockFbxStyle)
             {
                 ClockPage = new Clocks.FbxClock();
             }
@@ -138,9 +138,9 @@ namespace WinDeskClock
                 }
             }
 
-            if (ConfigManager.Variable.PinnedPlugin.Count != 0)
+            if (ConfigManager.Variables.PinnedPlugin.Count != 0)
             {
-                foreach (string id in ConfigManager.Variable.PinnedPlugin)
+                foreach (string id in ConfigManager.Variables.PinnedPlugin)
                 {
                     if (PluginList.Contains(id))
                     {
@@ -244,7 +244,7 @@ namespace WinDeskClock
             // Create the timer for the carousel
             carousel = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(ConfigManager.Variable.CarouselDelay)
+                Interval = TimeSpan.FromSeconds(ConfigManager.Variables.CarouselDelay)
             };
             carousel.Tick += Carousel_Tick;
             carousel.Start();
@@ -2519,7 +2519,7 @@ namespace WinDeskClock
         // Time up function
         private async Task TimeUpShow()
         {
-            TimeUpSoundPlayer = new SoundPlayer(ConfigManager.Variable.DefaultTimeUpSound);
+            TimeUpSoundPlayer = new SoundPlayer(ConfigManager.Variables.DefaultTimeUpSound);
             TimeUpSoundPlayer.Load();
             TimeUpSoundPlayer.PlayLooping();
             TimeUpGrid.Visibility = Visibility.Visible;
@@ -3511,7 +3511,7 @@ namespace WinDeskClock
                 string sound = await ConfigManager.GetAlarm($"{uid}.sound");
                 if (!sound.Contains("none"))
                 {
-                    if (sound.Contains("default")) sound = ConfigManager.Variable.DefaultAlarmSound;
+                    if (sound.Contains("default")) sound = ConfigManager.Variables.DefaultAlarmSound;
                     AlarmSoundPlayer = new SoundPlayer(sound);
                     AlarmSoundPlayer.Load();
                     AlarmSoundPlayer.PlayLooping();
@@ -3552,7 +3552,7 @@ namespace WinDeskClock
                     storyboard.Begin();
                 }
 
-                double timeout = ConfigManager.Variable.AlarmTimeoutDelay;
+                double timeout = ConfigManager.Variables.AlarmTimeoutDelay;
                 TimeSpan alerttime = new TimeSpan(0, 0, 0, 0, 0);
 
                 while (AlarmAlert)
@@ -5939,7 +5939,7 @@ namespace WinDeskClock
         {
             await ConfigManager.SaveNewSettings();
 
-            if (ConfigManager.NewVariable.RestartNeeded)
+            if (ConfigManager.NewVariables.RestartNeeded)
             {
                 await App.RestartApp();
             }

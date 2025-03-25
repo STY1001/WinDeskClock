@@ -352,7 +352,7 @@ namespace WinDeskClock.Pages.Settings
             PluginEnableToggleButton.Tag = $"{id}_PluginEnableToggleButton";
             PluginEnableToggleButton.Click += async (s, e) =>
             {
-                ConfigManager.NewVariable.RestartNeeded = true;
+                ConfigManager.NewVariables.RestartNeeded = true;
 
                 if (PluginEnableToggleButton.IsChecked == true)
                 {
@@ -410,7 +410,7 @@ namespace WinDeskClock.Pages.Settings
             PluginDeleteButton.Tag = $"{id}_PluginDeleteButton";
             PluginDeleteButton.Click += async (s, e) =>
             {
-                ConfigManager.NewVariable.RestartNeeded = true;
+                ConfigManager.NewVariables.RestartNeeded = true;
                 File.Delete(System.IO.Path.Combine(PluginLoader.PluginPath, $"{id}.dll"));
                 PluginCardStack.Children.Remove(PluginCard);
             };
@@ -452,7 +452,7 @@ namespace WinDeskClock.Pages.Settings
 
         private async void PluginSettingsSaveBtn_Click(object sender, RoutedEventArgs e)
         {
-            ConfigManager.NewVariable.RestartNeeded = true;
+            ConfigManager.NewVariables.RestartNeeded = true;
             await PluginLoader.PluginModules[SettingsPluginID].SaveConfig();
             await HidePluginSettings();
         }

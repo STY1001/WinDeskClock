@@ -11,7 +11,7 @@
       Title="General">
 
     <Grid>
-        <ScrollViewer>
+        <ScrollViewer PanningMode="VerticalOnly">
             <StackPanel>
                 <Grid HorizontalAlignment="Stretch"
                       Margin="20,10,20,5">

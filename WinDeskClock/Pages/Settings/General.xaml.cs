@@ -28,40 +28,40 @@ namespace WinDeskClock.Pages.Settings
         {
             InitializeComponent();
 
-            ShowSecondsToggleSwitch.IsChecked = ConfigManager.Variable.ClockShowSecond;
-            if (ConfigManager.Variable.ClockFbxStyle)
+            ShowSecondsToggleSwitch.IsChecked = ConfigManager.Variables.ClockShowSecond;
+            if (ConfigManager.Variables.ClockFbxStyle)
             {
                 ShowSecondsToggleSwitch.IsEnabled = false;
                 ShowSecondsToggleSwitch.IsChecked = false;
             }
             ShowSecondsToggleSwitch.Checked += async (s, e) =>
             {
-                ConfigManager.NewVariable.RestartNeeded = true;
-                ConfigManager.NewVariable.ClockShowSecond = true;
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.ClockShowSecond = true;
             };
             ShowSecondsToggleSwitch.Unchecked += async (s, e) =>
             {
-                ConfigManager.NewVariable.RestartNeeded = true;
-                ConfigManager.NewVariable.ClockShowSecond = false;
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.ClockShowSecond = false;
             };
 
-            FbxStyleToggleSwitch.IsChecked = ConfigManager.Variable.ClockFbxStyle;
+            FbxStyleToggleSwitch.IsChecked = ConfigManager.Variables.ClockFbxStyle;
             FbxStyleToggleSwitch.Checked += async (s, e) =>
             {
-                ConfigManager.NewVariable.RestartNeeded = true;
-                ConfigManager.NewVariable.ClockFbxStyle = true;
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.ClockFbxStyle = true;
                 ShowSecondsToggleSwitch.IsChecked = false;
                 ShowSecondsToggleSwitch.IsEnabled = false;
             };
             FbxStyleToggleSwitch.Unchecked += async (s, e) =>
             {
-                ConfigManager.NewVariable.RestartNeeded = true;
-                ConfigManager.NewVariable.ClockFbxStyle = false;
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.ClockFbxStyle = false;
                 ShowSecondsToggleSwitch.IsEnabled = true;
                 ShowSecondsToggleSwitch.IsChecked = true;
             };
 
-            DefaultAlarmSoundDesc.Text = LangSystem.GetLang("settings.general.alarm.defaultsound.desc", ConfigManager.Variable.DefaultAlarmSound).Result;
+            DefaultAlarmSoundDesc.Text = LangSystem.GetLang("settings.general.alarm.defaultsound.desc", ConfigManager.Variables.DefaultAlarmSound).Result;
             DefaultAlarmSoundBtn.Click += async (s, e) =>
             {
                 var ofd = new Microsoft.Win32.OpenFileDialog();
@@ -72,13 +72,13 @@ namespace WinDeskClock.Pages.Settings
                 var result = ofd.ShowDialog();
                 if (result == true)
                 {
-                    ConfigManager.NewVariable.RestartNeeded = true;
-                    ConfigManager.NewVariable.DefaultAlarmSound = ofd.FileName;
+                    ConfigManager.NewVariables.RestartNeeded = true;
+                    ConfigManager.NewVariables.DefaultAlarmSound = ofd.FileName;
                     DefaultAlarmSoundDesc.Text = await LangSystem.GetLang("settings.general.alarm.defaultsound.desc", ofd.FileName);
                 }
             };
 
-            AlarmTimeoutSlider.Value = ConfigManager.Variable.AlarmTimeoutDelay;
+            AlarmTimeoutSlider.Value = ConfigManager.Variables.AlarmTimeoutDelay;
             if (AlarmTimeoutSlider.Value == 0)
             {
                 AlarmTimeoutText.Text = LangSystem.GetLang("settings.general.alarm.timeout.never").Result;
@@ -93,8 +93,8 @@ namespace WinDeskClock.Pages.Settings
             }
             AlarmTimeoutSlider.ValueChanged += async (s, e) =>
             {
-                ConfigManager.NewVariable.RestartNeeded = true;
-                ConfigManager.NewVariable.AlarmTimeoutDelay = (int)AlarmTimeoutSlider.Value;
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.AlarmTimeoutDelay = (int)AlarmTimeoutSlider.Value;
                 if (AlarmTimeoutSlider.Value == 0)
                 {
                     AlarmTimeoutText.Text = await LangSystem.GetLang("settings.general.alarm.timeout.never");
@@ -109,7 +109,7 @@ namespace WinDeskClock.Pages.Settings
                 }
             };
 
-            TimerSoundDesc.Text= LangSystem.GetLang("settings.general.timer.defaultsound.desc", ConfigManager.Variable.DefaultTimeUpSound).Result;
+            TimerSoundDesc.Text= LangSystem.GetLang("settings.general.timer.defaultsound.desc", ConfigManager.Variables.DefaultTimeUpSound).Result;
             TimerSoundBtn.Click += async (s, e) =>
             {
                 var ofd = new Microsoft.Win32.OpenFileDialog();
@@ -120,8 +120,8 @@ namespace WinDeskClock.Pages.Settings
                 var result = ofd.ShowDialog();
                 if (result == true)
                 {
-                    ConfigManager.NewVariable.RestartNeeded = true;
-                    ConfigManager.NewVariable.DefaultTimeUpSound = ofd.FileName;
+                    ConfigManager.NewVariables.RestartNeeded = true;
+                    ConfigManager.NewVariables.DefaultTimeUpSound = ofd.FileName;
                     TimerSoundDesc.Text = await LangSystem.GetLang("settings.general.timer.defaultsound.desc", ofd.FileName);
                 }
             };
@@ -136,12 +136,12 @@ namespace WinDeskClock.Pages.Settings
                 VolumeText.Text = VolumeSlider.Value.ToString("0") + "%";
             };
 
-            CarouselDelaySlider.Value = ConfigManager.Variable.CarouselDelay;
+            CarouselDelaySlider.Value = ConfigManager.Variables.CarouselDelay;
             CarouselDelayText.Text = LangSystem.GetLang("settings.general.plugin.carouseldelay.secs", CarouselDelaySlider.Value.ToString("0")).Result;
             CarouselDelaySlider.ValueChanged += async (s, e) =>
             {
-                ConfigManager.NewVariable.RestartNeeded = true;
-                ConfigManager.NewVariable.CarouselDelay = (int)CarouselDelaySlider.Value;
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.CarouselDelay = (int)CarouselDelaySlider.Value;
                 CarouselDelayText.Text = await LangSystem.GetLang("settings.general.plugin.carouseldelay.secs", CarouselDelaySlider.Value.ToString("0"));
             };
 
@@ -169,13 +169,13 @@ namespace WinDeskClock.Pages.Settings
                 FbxStyleDesc.Text = await LangSystem.GetLang("settings.general.clock.fbxstyle.desc");
 
                 DefaultAlarmSoundTitle.Text = await LangSystem.GetLang("settings.general.alarm.defaultsound.name");
-                DefaultAlarmSoundDesc.Text = await LangSystem.GetLang("settings.general.alarm.defaultsound.desc", ConfigManager.Variable.DefaultAlarmSound);
+                DefaultAlarmSoundDesc.Text = await LangSystem.GetLang("settings.general.alarm.defaultsound.desc", ConfigManager.Variables.DefaultAlarmSound);
                 DefaultAlarmSoundBtn.Content = await LangSystem.GetLang("settings.general.alarm.defaultsound.choose");
                 AlarmTimeoutTitle.Text = await LangSystem.GetLang("settings.general.alarm.timeout.name");
                 AlarmTimeoutDesc.Text = await LangSystem.GetLang("settings.general.alarm.timeout.desc");
 
                 TimerSoundText.Text = await LangSystem.GetLang("settings.general.timer.defaultsound.name");
-                TimerSoundDesc.Text = await LangSystem.GetLang("settings.general.timer.defaultsound.desc", ConfigManager.Variable.DefaultTimeUpSound);
+                TimerSoundDesc.Text = await LangSystem.GetLang("settings.general.timer.defaultsound.desc", ConfigManager.Variables.DefaultTimeUpSound);
                 TimerSoundBtn.Content = await LangSystem.GetLang("settings.general.timer.defaultsound.choose");
 
                 CarouselSelectTitle.Text = await LangSystem.GetLang("settings.general.plugin.pinned.name");
@@ -196,17 +196,17 @@ namespace WinDeskClock.Pages.Settings
                 item.Content = lang.Value;
                 item.Selected += async (s, e) =>
                 {
-                    ConfigManager.NewVariable.RestartNeeded = true;
-                    ConfigManager.NewVariable.Language = lang.Key;
+                    ConfigManager.NewVariables.RestartNeeded = true;
+                    ConfigManager.NewVariables.Language = lang.Key;
                 };
                 LangComboBox.Items.Add(item);
             }
-            LangComboBox.Text = LangSystem.LangList[ConfigManager.Variable.Language];
+            LangComboBox.Text = LangSystem.LangList[ConfigManager.Variables.Language];
 
-            ShowSecondsToggleSwitch.IsChecked = ConfigManager.Variable.ClockShowSecond;
-            FbxStyleToggleSwitch.IsChecked = ConfigManager.Variable.ClockFbxStyle;
-            DefaultAlarmSoundDesc.Text = await LangSystem.GetLang("settings.general.alarm.defaultsound.desc", ConfigManager.Variable.DefaultAlarmSound);
-            AlarmTimeoutSlider.Value = ConfigManager.Variable.AlarmTimeoutDelay;
+            ShowSecondsToggleSwitch.IsChecked = ConfigManager.Variables.ClockShowSecond;
+            FbxStyleToggleSwitch.IsChecked = ConfigManager.Variables.ClockFbxStyle;
+            DefaultAlarmSoundDesc.Text = await LangSystem.GetLang("settings.general.alarm.defaultsound.desc", ConfigManager.Variables.DefaultAlarmSound);
+            AlarmTimeoutSlider.Value = ConfigManager.Variables.AlarmTimeoutDelay;
             if (AlarmTimeoutSlider.Value == 0)
             {
                 AlarmTimeoutText.Text = await LangSystem.GetLang("settings.general.alarm.timeout.never");
@@ -219,7 +219,7 @@ namespace WinDeskClock.Pages.Settings
             {
                 AlarmTimeoutText.Text = await LangSystem.GetLang("settings.general.alarm.timeout.mins", AlarmTimeoutSlider.Value.ToString("0"));
             }
-            TimerSoundDesc.Text = await LangSystem.GetLang("settings.general.timer.defaultsound.desc", ConfigManager.Variable.DefaultTimeUpSound);
+            TimerSoundDesc.Text = await LangSystem.GetLang("settings.general.timer.defaultsound.desc", ConfigManager.Variables.DefaultTimeUpSound);
 
             MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
             MMDevice device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
@@ -251,7 +251,7 @@ namespace WinDeskClock.Pages.Settings
                 CarouselSelectStack.Children.Add(textBlock);
             }
 
-            CarouselDelaySlider.Value = ConfigManager.Variable.CarouselDelay;
+            CarouselDelaySlider.Value = ConfigManager.Variables.CarouselDelay;
             CarouselDelayText.Text = await LangSystem.GetLang("settings.general.plugin.carouseldelay.secs", CarouselDelaySlider.Value.ToString("0"));
         }
     }
