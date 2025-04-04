@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using WinDeskClock.Utils;
 using Wpf.Ui.Controls;
@@ -151,31 +152,71 @@ namespace WinDeskClock
 
             if (PluginList.Count == 0)
             {
+                Grid grid = new Grid
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    RowDefinitions =
+                    {
+                        new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) },
+                        new RowDefinition { Height = new GridLength(10) },
+                        new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) }
+                    }
+                };
+                System.Windows.Controls.Image img = new System.Windows.Controls.Image
+                {
+                    Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/Plugin.png")),
+                    Width = 72,
+                    Height = 72
+                };
+                img.SetValue(Grid.RowProperty, 0);
+                img.SetValue(RenderOptions.BitmapScalingModeProperty, BitmapScalingMode.HighQuality);
                 Wpf.Ui.Controls.TextBlock tb = new Wpf.Ui.Controls.TextBlock
                 {
                     Text = await LangSystem.GetLang("plugin.noload"),
                     FontSize = 20,
-                    Foreground = Brushes.White,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
+                    Foreground = (Brush)FindResource("TextFillColorPrimaryBrush")
                 };
-                CarouselPluginFrame.Navigate(tb);
+                tb.SetValue(Grid.RowProperty, 2);
+                grid.Children.Add(img);
+                grid.Children.Add(tb);
+                CarouselPluginFrame.Navigate(grid);
                 EnterDownMenuPluginBtn.IsEnabled = false;
             }
             else if (CarouselPluginList.Count == 0)
             {
+                Grid grid = new Grid
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    RowDefinitions =
+                    {
+                        new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) },
+                        new RowDefinition { Height = new GridLength(10) },
+                        new RowDefinition { Height = new GridLength(1, GridUnitType.Auto) }
+                    }
+                };
+                System.Windows.Controls.Image img = new System.Windows.Controls.Image
+                {
+                    Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/Carousel.png")),
+                    Width = 72,
+                    Height = 72
+                };
+                img.SetValue(Grid.RowProperty, 0);
+                img.SetValue(RenderOptions.BitmapScalingModeProperty, BitmapScalingMode.HighQuality);
                 Wpf.Ui.Controls.TextBlock tb = new Wpf.Ui.Controls.TextBlock
                 {
                     Text = await LangSystem.GetLang("plugin.nopin"),
                     FontSize = 20,
-                    Foreground = Brushes.White,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
+                    Foreground = (Brush)FindResource("TextFillColorPrimaryBrush")
                 };
-                CarouselPluginFrame.Navigate(tb);
+                tb.SetValue(Grid.RowProperty, 2);
+                grid.Children.Add(img);
+                grid.Children.Add(tb);
+                CarouselPluginFrame.Navigate(grid);
             }
 
-            if(CarouselPluginList.Count != 0)
+            if (CarouselPluginList.Count != 0)
             {
                 CarouselPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[0]].GetMain());
             }
@@ -183,8 +224,8 @@ namespace WinDeskClock
             // Lang apply
             BackBtn.Content = await LangSystem.GetLang("mainmenu.back");
             ScreenOffBtn.Content = await LangSystem.GetLang("mainmenu.screenoff");
-            FullScreenBtn.Content = await LangSystem.GetLang("mainmenu.fullscreen");
-            KioskModeBtn.Content = await LangSystem.GetLang("mainmenu.kiosk");
+            FullScreenBtnText.Text = await LangSystem.GetLang("mainmenu.fullscreen");
+            KioskModeBtnText.Text = await LangSystem.GetLang("mainmenu.kiosk");
             SettingsBtn.Content = await LangSystem.GetLang("mainmenu.settings");
             ExitAppBtn.Content = await LangSystem.GetLang("mainmenu.exit");
             AlarmAlertStopBtn.Content = await LangSystem.GetLang("alarm.stop");
@@ -3977,6 +4018,7 @@ namespace WinDeskClock
             AlarmCardBigGridTop.SetValue(Grid.RowProperty, 0);
 
             Wpf.Ui.Controls.TextBox AlarmCardNameTextBox = new Wpf.Ui.Controls.TextBox();
+            AlarmCardNameTextBox.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/rename.png")), Width = 16, Height = 16 };
             AlarmCardNameTextBox.Tag = $"{uid}_AlarmCardNameTextBox";
             AlarmCardNameTextBox.Text = await ConfigManager.GetAlarm($"{uid}.name");
             AlarmCardNameTextBox.SetValue(Grid.ColumnProperty, 0);
@@ -4030,8 +4072,7 @@ namespace WinDeskClock
             AlarmCardEditHourUpBtn.Tag = $"{uid}_AlarmCardEditHourUpBtn";
             AlarmCardEditHourUpBtn.SetValue(Grid.ColumnProperty, 0);
             AlarmCardEditHourUpBtn.SetValue(Grid.RowProperty, 0);
-            AlarmCardEditHourUpBtn.Content = "▲";
-            AlarmCardEditHourUpBtn.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
+            AlarmCardEditHourUpBtn.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/up.png")), Width = 16, Height = 16 };
             AlarmCardEditHourUpBtn.HorizontalAlignment = HorizontalAlignment.Stretch;
             AlarmCardEditHourUpBtn.Appearance = ControlAppearance.Secondary;
             AlarmCardEditHourUpBtn.Click += async (sender, e) =>
@@ -4043,8 +4084,7 @@ namespace WinDeskClock
             AlarmCardEditHourDownBtn.Tag = $"{uid}_AlarmCardEditHourDownBtn";
             AlarmCardEditHourDownBtn.SetValue(Grid.ColumnProperty, 0);
             AlarmCardEditHourDownBtn.SetValue(Grid.RowProperty, 2);
-            AlarmCardEditHourDownBtn.Content = "▼";
-            AlarmCardEditHourDownBtn.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
+            AlarmCardEditHourDownBtn.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/down.png")), Width = 16, Height = 16 };
             AlarmCardEditHourDownBtn.HorizontalAlignment = HorizontalAlignment.Stretch;
             AlarmCardEditHourDownBtn.Appearance = ControlAppearance.Secondary;
             AlarmCardEditHourDownBtn.Click += async (sender, e) =>
@@ -4056,8 +4096,7 @@ namespace WinDeskClock
             AlarmCardEditMinuteUpBtn.Tag = $"{uid}_AlarmCardEditMinuteUpBtn";
             AlarmCardEditMinuteUpBtn.SetValue(Grid.ColumnProperty, 2);
             AlarmCardEditMinuteUpBtn.SetValue(Grid.RowProperty, 0);
-            AlarmCardEditMinuteUpBtn.Content = "▲";
-            AlarmCardEditMinuteUpBtn.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
+            AlarmCardEditMinuteUpBtn.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/up.png")), Width = 16, Height = 16 };
             AlarmCardEditMinuteUpBtn.HorizontalAlignment = HorizontalAlignment.Stretch;
             AlarmCardEditMinuteUpBtn.Appearance = ControlAppearance.Secondary;
             AlarmCardEditMinuteUpBtn.Click += async (sender, e) =>
@@ -4069,8 +4108,7 @@ namespace WinDeskClock
             AlarmCardEditMinuteDownBtn.Tag = $"{uid}_AlarmCardEditMinuteDownBtn";
             AlarmCardEditMinuteDownBtn.SetValue(Grid.ColumnProperty, 2);
             AlarmCardEditMinuteDownBtn.SetValue(Grid.RowProperty, 2);
-            AlarmCardEditMinuteDownBtn.Content = "▼";
-            AlarmCardEditMinuteDownBtn.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
+            AlarmCardEditMinuteDownBtn.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/down.png")), Width = 16, Height = 16 };
             AlarmCardEditMinuteDownBtn.HorizontalAlignment = HorizontalAlignment.Stretch;
             AlarmCardEditMinuteDownBtn.Appearance = ControlAppearance.Secondary;
             AlarmCardEditMinuteDownBtn.Click += async (sender, e) =>
@@ -4303,6 +4341,7 @@ namespace WinDeskClock
             ComboBox AlarmCardSoundComboBox = new ComboBox();
             AlarmCardSoundComboBox.Tag = $"{uid}_AlarmCardSoundComboBox";
             AlarmCardSoundComboBox.SetValue(Grid.ColumnProperty, 1);
+            AlarmCardSoundComboBox.Width = 234;
             if (AlarmCardSoundToggle.IsChecked == false)
             {
                 AlarmCardSoundComboBox.IsEnabled = false;
@@ -4360,6 +4399,7 @@ namespace WinDeskClock
             AlarmCardBigGridBottomBtnDelete.HorizontalAlignment = HorizontalAlignment.Stretch;
             AlarmCardBigGridBottomBtnDelete.Appearance = ControlAppearance.Secondary;
             AlarmCardBigGridBottomBtnDelete.SetValue(Grid.ColumnProperty, 0);
+            AlarmCardBigGridBottomBtnDelete.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/delete.png")), Width = 16, Height = 16 };
             AlarmCardBigGridBottomBtnDelete.Click += async (sender, e) =>
             {
                 await AlarmCardClose(uid);
@@ -4374,6 +4414,7 @@ namespace WinDeskClock
             AlarmCardBigGridBottomBtnCancel.Appearance = ControlAppearance.Secondary;
             AlarmCardBigGridBottomBtnCancel.SetValue(Grid.ColumnProperty, 1);
             AlarmCardBigGridBottomBtnCancel.Margin = new Thickness(10, 0, 10, 0);
+            AlarmCardBigGridBottomBtnCancel.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/cross.png")), Width = 16, Height = 16 };
             AlarmCardBigGridBottomBtnCancel.Click += async (sender, e) =>
             {
                 await AlarmCardCancel(uid);
@@ -4387,6 +4428,7 @@ namespace WinDeskClock
             AlarmCardBigGridBottomBtnSave.HorizontalAlignment = HorizontalAlignment.Stretch;
             AlarmCardBigGridBottomBtnSave.Appearance = ControlAppearance.Primary;
             AlarmCardBigGridBottomBtnSave.SetValue(Grid.ColumnProperty, 2);
+            AlarmCardBigGridBottomBtnSave.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/checkmark.png")), Width = 16, Height = 16 };
             AlarmCardBigGridBottomBtnSave.Click += async (sender, e) =>
             {
                 await AlarmCardSave(uid);
@@ -4454,7 +4496,7 @@ namespace WinDeskClock
 
             AlarmStack.Children.Add(AlarmCard);
 
-            NoAlarmText.Visibility = Visibility.Collapsed;
+            NoAlarmGrid.Visibility = Visibility.Collapsed;
         }
 
         // Get alarme ETA with UID
@@ -4508,7 +4550,7 @@ namespace WinDeskClock
             }
             else
             {
-                if(diff.Days == 1)
+                if (diff.Days == 1)
                 {
                     return await LangSystem.GetLang("alarm.remaining.inday", diff.Days.ToString());
                 }
@@ -4867,7 +4909,7 @@ namespace WinDeskClock
             AlarmStack.Children.Remove((CardAction)AlarmCard);
             if (AlarmStack.Children.Count == 0)
             {
-                NoAlarmText.Visibility = Visibility.Visible;
+                NoAlarmGrid.Visibility = Visibility.Visible;
             }
         }
         // - Hour Up/Down
@@ -6048,7 +6090,7 @@ namespace WinDeskClock
             PluginGrid.Visibility = Visibility.Visible;
 
             if (CarouselPluginList.Count != 0)
-            {   
+            {
                 MenuPluginFrame.Navigate(null);
                 CarouselPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[0]].GetMain());
             }

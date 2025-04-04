@@ -19,6 +19,7 @@ using System.Windows.Controls.Primitives;
 using System.IO;
 using System.Windows.Media.Animation;
 using System.Net.Http;
+using Wpf.Ui.Markup;
 
 namespace WinDeskClock.Pages.Settings
 {
@@ -319,6 +320,8 @@ namespace WinDeskClock.Pages.Settings
             PluginInfoWebsiteButton.SetValue(Grid.ColumnProperty, 0);
             PluginInfoWebsiteButton.Tag = $"{id}_PluginInfoWebsiteButton";
             PluginInfoWebsiteButton.IsEnabled = PluginLoader.PluginInfos[id].ProjectWebsiteURL != "none";
+            PluginInfoWebsiteButton.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/internet.png")), Width = 16, Height = 16 }
+            ;
             PluginInfoWebsiteButton.Click += async (s, e) =>
             {
                 Process.Start(new ProcessStartInfo(PluginLoader.PluginInfos[id].ProjectWebsiteURL) { UseShellExecute = true });
@@ -329,6 +332,7 @@ namespace WinDeskClock.Pages.Settings
             PluginInfoSourceButton.SetValue(Grid.ColumnProperty, 2);
             PluginInfoSourceButton.Tag = $"{id}_PluginInfoSourceButton";
             PluginInfoSourceButton.IsEnabled = PluginLoader.PluginInfos[id].ProjectSourceURL != "none";
+            PluginInfoSourceButton.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/sourcecode.png")), Width = 16, Height = 16 };
             PluginInfoSourceButton.Click += async (s, e) =>
             {
                 Process.Start(new ProcessStartInfo(PluginLoader.PluginInfos[id].ProjectSourceURL) { UseShellExecute = true });
@@ -343,8 +347,32 @@ namespace WinDeskClock.Pages.Settings
             PluginActionButtonGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
             PluginActionButtonGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
 
+
+            Grid PluginEnableGrid = new Grid();
+            PluginEnableGrid.Tag = $"{id}_PluginEnableGrid";
+            PluginEnableGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Auto) });
+            PluginEnableGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(10) });
+            PluginEnableGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Auto) });
+            System.Windows.Controls.Image PluginEnableImage = new System.Windows.Controls.Image();
+            PluginEnableImage.Source = new BitmapImage(new Uri($"pack://application:,,,/Resources/Icons/{((await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) || !await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID)) ? "cross" : "checkmark")}.png"));
+            PluginEnableImage.Width = 16;
+            PluginEnableImage.Height = 16;
+            PluginEnableImage.Tag = $"{id}_PluginEnableImage";
+            PluginEnableImage.SetValue(Grid.ColumnProperty, 0);
+            PluginEnableImage.VerticalAlignment = VerticalAlignment.Center;
+            PluginEnableImage.HorizontalAlignment = HorizontalAlignment.Center;
+            System.Windows.Controls.TextBlock PluginEnableTextBlock = new System.Windows.Controls.TextBlock();
+            PluginEnableTextBlock.Text = (await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) || !await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID)) ? await LangSystem.GetLang("settings.pluginmanager.disabled") : await LangSystem.GetLang("settings.pluginmanager.enabled");
+            PluginEnableTextBlock.FontSize = 14;
+            PluginEnableTextBlock.Foreground = (Brush)FindResource("TextFillColorPrimaryBrush");
+            PluginEnableTextBlock.HorizontalAlignment = HorizontalAlignment.Center;
+            PluginEnableTextBlock.VerticalAlignment = VerticalAlignment.Center;
+            PluginEnableTextBlock.SetValue(Grid.ColumnProperty, 2);
+            PluginEnableTextBlock.Tag = $"{id}_PluginEnableTextBlock";
+            PluginEnableGrid.Children.Add(PluginEnableImage);
+            PluginEnableGrid.Children.Add(PluginEnableTextBlock);
             ToggleButton PluginEnableToggleButton = new ToggleButton();
-            PluginEnableToggleButton.Content = (await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) || !await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID)) ? await LangSystem.GetLang("settings.pluginmanager.disabled") : await LangSystem.GetLang("settings.pluginmanager.enabled");
+            PluginEnableToggleButton.Content = PluginEnableGrid;
             PluginEnableToggleButton.SetValue(Grid.RowProperty, 0);
             PluginEnableToggleButton.IsChecked = !await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) && await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID);
             PluginEnableToggleButton.IsEnabled = await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID);
@@ -356,12 +384,14 @@ namespace WinDeskClock.Pages.Settings
 
                 if (PluginEnableToggleButton.IsChecked == true)
                 {
-                    PluginEnableToggleButton.Content = await LangSystem.GetLang("settings.pluginmanager.enabled");
+                    PluginEnableTextBlock.Text = await LangSystem.GetLang("settings.pluginmanager.enabled");
+                    PluginEnableImage.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/checkmark.png"));
                     PluginLoader.DelDisabledPlugin(PluginLoader.PluginInfos[id].ID);
                 }
                 else
                 {
-                    PluginEnableToggleButton.Content = await LangSystem.GetLang("settings.pluginmanager.disabled");
+                    PluginEnableTextBlock.Text = await LangSystem.GetLang("settings.pluginmanager.disabled");
+                    PluginEnableImage.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/cross.png"));
                     PluginLoader.AddDisabledPlugin(PluginLoader.PluginInfos[id].ID);
                 }
             };
@@ -372,6 +402,7 @@ namespace WinDeskClock.Pages.Settings
             PluginUpdateButton.HorizontalAlignment = HorizontalAlignment.Stretch;
             PluginUpdateButton.IsEnabled = PluginLoader.PluginInfos[id].UpdateURL != "none";
             PluginUpdateButton.Tag = $"{id}_PluginUpdateButton";
+            PluginUpdateButton.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/update.png")), Width = 16, Height = 16 };
             PluginUpdateButton.Click += async (s, e) =>
             {
                 ControlAppearance controlAppearance = PluginUpdateButton.Appearance;
@@ -398,6 +429,7 @@ namespace WinDeskClock.Pages.Settings
             PluginSettingsButton.HorizontalAlignment = HorizontalAlignment.Stretch;
             PluginSettingsButton.Tag = $"{id}_PluginSettingsButton";
             PluginSettingsButton.IsEnabled = !(await PluginLoader.CheckDisabledPlugin(PluginLoader.PluginInfos[id].ID) || !await PluginLoader.CheckCompatiblePlugin(PluginLoader.PluginInfos[id].ID));
+            PluginSettingsButton.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/settings.png")), Width = 16, Height = 16 };
             PluginSettingsButton.Click += async (s, e) =>
             {
                 await ShowPluginSettings(PluginLoader.PluginInfos[id].ID);
@@ -408,6 +440,7 @@ namespace WinDeskClock.Pages.Settings
             PluginDeleteButton.SetValue(Grid.RowProperty, 3);
             PluginDeleteButton.HorizontalAlignment = HorizontalAlignment.Stretch;
             PluginDeleteButton.Tag = $"{id}_PluginDeleteButton";
+            PluginDeleteButton.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/delete.png")), Width = 16, Height = 16 };
             PluginDeleteButton.Click += async (s, e) =>
             {
                 ConfigManager.NewVariables.RestartNeeded = true;
