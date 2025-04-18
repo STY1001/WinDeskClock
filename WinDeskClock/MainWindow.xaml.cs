@@ -227,6 +227,21 @@ namespace WinDeskClock
                 TimeUpBlur.Visibility = Visibility.Collapsed;
                 SettingsBlur.Visibility = Visibility.Collapsed;
                 GlobalMenuBlur.Visibility = Visibility.Collapsed;
+
+                AlarmAlertBlur.Fill = new SolidColorBrush(Colors.Transparent);
+                TimeUpBlur.Fill = new SolidColorBrush(Colors.Transparent);
+                SettingsBlur.Fill = new SolidColorBrush(Colors.Transparent);
+                GlobalMenuBlur.Fill = new SolidColorBrush(Colors.Transparent);
+
+                AlarmAlertBlur.Effect = null;
+                TimeUpBlur.Effect = null;
+                SettingsBlur.Effect = null;
+                GlobalMenuBlur.Effect = null;
+
+                AlarmAlertBlur.CacheMode = null;
+                TimeUpBlur.CacheMode = null;
+                SettingsBlur.CacheMode = null;
+                GlobalMenuBlur.CacheMode = null;
             }
 
             // Lang apply
