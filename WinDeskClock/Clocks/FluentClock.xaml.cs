@@ -148,7 +148,7 @@ namespace WinDeskClock.Clocks
                     {
                         From = 180,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                        Duration = TimeSpan.FromSeconds(txtslidespeed*2),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, H1Text);
@@ -186,7 +186,7 @@ namespace WinDeskClock.Clocks
                     {
                         From = 180,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                        Duration = TimeSpan.FromSeconds(txtslidespeed*2),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, H2Text);
@@ -224,7 +224,7 @@ namespace WinDeskClock.Clocks
                     {
                         From = -180,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                        Duration = TimeSpan.FromSeconds(txtslidespeed*2),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, M1Text);
@@ -262,7 +262,7 @@ namespace WinDeskClock.Clocks
                     {
                         From = -180,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                        Duration = TimeSpan.FromSeconds(txtslidespeed*2),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, M2Text);
@@ -300,7 +300,7 @@ namespace WinDeskClock.Clocks
                     {
                         From = -110,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                        Duration = TimeSpan.FromSeconds(txtslidespeed*2),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, S1Text);
@@ -338,7 +338,7 @@ namespace WinDeskClock.Clocks
                     {
                         From = -110,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                        Duration = TimeSpan.FromSeconds(txtslidespeed*2),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, S2Text);
@@ -377,7 +377,7 @@ namespace WinDeskClock.Clocks
                     {
                         From = 55,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                        Duration = TimeSpan.FromSeconds(txtslidespeed*2),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, DNameText);
@@ -416,7 +416,7 @@ namespace WinDeskClock.Clocks
                     {
                         From = 55,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                        Duration = TimeSpan.FromSeconds(txtslidespeed*2),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, DDayText);
@@ -455,7 +455,7 @@ namespace WinDeskClock.Clocks
                     {
                         From = 55,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
+                        Duration = TimeSpan.FromSeconds(txtslidespeed*2),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
                     Storyboard.SetTarget(translateAnimation, DMonthText);
