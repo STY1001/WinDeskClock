@@ -5869,6 +5869,7 @@ namespace WinDeskClock
                 storyboard.Begin();
             }
             await Task.Delay(300);
+            GeneralFrame.Navigate(SettingsTabs["About"]);
             SettingsGrid.Visibility = Visibility.Hidden;
         }
 
