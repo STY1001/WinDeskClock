@@ -77,6 +77,24 @@
                                 IsSnapToTickEnabled="True" />
                     </StackPanel>
                 </ui:CardControl>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/effect.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Blur effect"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="BlurEffectTitle" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <ui:ToggleSwitch x:Name="BlurEffectSwitch" />
+                </ui:CardControl>
                 <Grid HorizontalAlignment="Stretch"
                       Margin="20,0,20,5">
                     <Grid.ColumnDefinitions>

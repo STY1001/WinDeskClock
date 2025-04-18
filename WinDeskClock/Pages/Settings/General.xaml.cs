@@ -28,6 +28,18 @@ namespace WinDeskClock.Pages.Settings
         {
             InitializeComponent();
 
+            BlurEffectSwitch.IsChecked = ConfigManager.Variables.BlurEffect;
+            BlurEffectSwitch.Checked += async (s, e) =>
+            {
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.BlurEffect = true;
+            };
+            BlurEffectSwitch.Unchecked += async (s, e) =>
+            {
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.BlurEffect = false;
+            };
+
             ShowSecondsToggleSwitch.IsChecked = ConfigManager.Variables.ClockShowSecond;
             if (ConfigManager.Variables.ClockFbxStyle)
             {
@@ -203,6 +215,7 @@ namespace WinDeskClock.Pages.Settings
             }
             LangComboBox.Text = LangSystem.LangList[ConfigManager.Variables.Language];
 
+            BlurEffectSwitch.IsChecked = ConfigManager.Variables.BlurEffect;
             ShowSecondsToggleSwitch.IsChecked = ConfigManager.Variables.ClockShowSecond;
             FbxStyleToggleSwitch.IsChecked = ConfigManager.Variables.ClockFbxStyle;
             DefaultAlarmSoundDesc.Text = await LangSystem.GetLang("settings.general.alarm.defaultsound.desc", ConfigManager.Variables.DefaultAlarmSound);

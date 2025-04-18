@@ -855,7 +855,8 @@
                   Grid.RowSpan="2"
                   Background="#a0000000">
                 <Rectangle VerticalAlignment="Stretch"
-                           HorizontalAlignment="Stretch">
+                           HorizontalAlignment="Stretch"
+                           x:Name="SettingsBlur">
                     <Rectangle.Effect>
                         <BlurEffect Radius="10" />
                     </Rectangle.Effect>
@@ -995,7 +996,8 @@
                 </Grid.RowDefinitions>
                 <Rectangle VerticalAlignment="Stretch"
                            HorizontalAlignment="Stretch"
-                           Grid.RowSpan="2">
+                           Grid.RowSpan="2"
+                           x:Name="TimeUpBlur">
                     <Rectangle.Effect>
                         <BlurEffect Radius="10" />
                     </Rectangle.Effect>
@@ -1060,7 +1062,8 @@
                 </Grid.RowDefinitions>
                 <Rectangle VerticalAlignment="Stretch"
                            HorizontalAlignment="Stretch"
-                           Grid.RowSpan="2">
+                           Grid.RowSpan="2"
+                           x:Name="AlarmAlertBlur">
                     <Rectangle.Effect>
                         <BlurEffect Radius="10" />
                     </Rectangle.Effect>
@@ -1121,7 +1124,8 @@
                   Visibility="Hidden"
                   Background="#a0000000">
                 <Rectangle VerticalAlignment="Stretch"
-                           HorizontalAlignment="Stretch">
+                           HorizontalAlignment="Stretch"
+                           x:Name="GlobalMenuBlur">
                     <Rectangle.Effect>
                         <BlurEffect Radius="10" />
                     </Rectangle.Effect>

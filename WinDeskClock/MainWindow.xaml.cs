@@ -221,6 +221,14 @@ namespace WinDeskClock
                 CarouselPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[0]].GetMain());
             }
 
+            if (!ConfigManager.Variables.BlurEffect)
+            {
+                AlarmAlertBlur.Visibility = Visibility.Collapsed;
+                TimeUpBlur.Visibility = Visibility.Collapsed;
+                SettingsBlur.Visibility = Visibility.Collapsed;
+                GlobalMenuBlur.Visibility = Visibility.Collapsed;
+            }
+
             // Lang apply
             BackBtn.Content = await LangSystem.GetLang("mainmenu.back");
             ScreenOffBtn.Content = await LangSystem.GetLang("mainmenu.screenoff");
@@ -5988,6 +5996,8 @@ namespace WinDeskClock
         }
         #endregion
 
+        #region Plugin Menu
+
         private async void EnterDownMenuPluginBtn_Click(object sender, RoutedEventArgs e)
         {
             {
@@ -6448,5 +6458,7 @@ namespace WinDeskClock
                 }
             }
         }
+
+        #endregion
     }
 }

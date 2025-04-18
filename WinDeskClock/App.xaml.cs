@@ -25,13 +25,14 @@ namespace WinDeskClock
 
         public static async Task RestartApp()
         {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
             string args = "";
-            if (StartupOptions.FullScreen && !StartupOptions.KioskMode)
+            if (/*(StartupOptions.FullScreen && !StartupOptions.KioskMode) ||*/ ((mainWindow.FullScreenBtn.IsChecked == true) && (mainWindow.KioskModeBtn.IsChecked == false)))
             {
                 args += " -fullscreen";
             }
 
-            if (StartupOptions.KioskMode)
+            if (/*StartupOptions.KioskMode ||*/ (mainWindow.KioskModeBtn.IsChecked == true))
             {
                 args += " -kiosk";
             }

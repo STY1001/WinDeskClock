@@ -57,10 +57,12 @@ namespace WinDeskClock.Clocks
             // - Show seconds
             if (ConfigManager.Variables.ClockShowSecond)
             {
-                ClockGridSecondCol1.Width = new GridLength(20);
+                ClockGridSecondCol1.Width = new GridLength(10);
                 ClockGridSecondCol2.Width = new GridLength(1, GridUnitType.Star);
                 DateGridYearCol1.Width = new GridLength(10);
                 DateGridYearCol2.Width = new GridLength(1, GridUnitType.Auto);
+                DateGridCol1.Width = new GridLength(140);
+                DateGridCol2.Width = new GridLength(260);
             }
             else
             {
@@ -68,6 +70,8 @@ namespace WinDeskClock.Clocks
                 ClockGridSecondCol2.Width = new GridLength(0);
                 DateGridYearCol1.Width = new GridLength(0);
                 DateGridYearCol2.Width = new GridLength(0);
+                DateGridCol1.Width = new GridLength(1, GridUnitType.Star);
+                DateGridCol2.Width = new GridLength(1, GridUnitType.Star);
             }
         }
 

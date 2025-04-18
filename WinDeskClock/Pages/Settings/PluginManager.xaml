@@ -11,7 +11,8 @@
       Title="PluginManager">
 
     <Grid>
-        <ScrollViewer Padding="5">
+        <ScrollViewer Padding="5"
+                      PanningMode="VerticalOnly">
             <StackPanel x:Name="PluginCardStack">
             </StackPanel>
         </ScrollViewer>
