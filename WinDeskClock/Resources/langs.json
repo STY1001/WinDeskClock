@@ -429,4 +429,219 @@
       }
     }
   }
+  "tr-tr": {
+    "id": "tr-tr",
+    "name": "Türkçe (Türkiye)",
+    "content": {
+      "mainmenu": {
+        "titlename": "Ana menü",
+        "back": "Geri",
+        "screenoff": "Ekranı kapat",
+        "fullscreen": "Tam ekran",
+        "kiosk": "Kiosk modu",
+        "settings": "Ayarlar",
+        "exit": "Çıkış",
+        "exiting": "Çıkılıyor..."
+      },
+      "settings": {
+        "titlename": "Ayarlar",
+        "save": "Kaydet",
+        "cancel": "İptal",
+        "general": {
+          "titlename": "Genel",
+          "lang": {
+            "name": "Dil"
+          },
+          "volume": {
+            "name": "Ses"
+          },
+          "clock": {
+            "titlename": "Saat",
+            "showsec": {
+              "name": "Saniyeleri göster",
+              "desc": "Saate saniyeleri (ve yılı) ekle"
+            },
+            "fbxstyle": {
+              "name": "Freebox tarzı",
+              "desc": "Efsanevi Freebox Revolution saat stilini kullan (saniyeleri gizler)"
+            }
+          },
+          "alarm": {
+            "titlename": "Alarm",
+            "defaultsound": {
+              "name": "Varsayılan alarm sesi",
+              "desc": "Alarm için varsayılan sesi seç (şu anki: %0)",
+              "choose": "Bir dosya seç"
+            },
+            "timeout": {
+              "name": "Alarm zaman aşımı",
+              "desc": "Alarmın durması için bekleme süresi",
+              "never": "Asla",
+              "min": "%0 dakika",
+              "mins": "%0 dakika"
+            }
+          },
+          "timer": {
+            "titlename": "Zamanlayıcı",
+            "defaultsound": {
+              "name": "Zamanlayıcı sesi",
+              "desc": "Zamanlayıcı sesi seç (şu anki: %0)",
+              "choose": "Bir dosya seç"
+            }
+          },
+          "plugin": {
+            "titlename": "Eklenti",
+            "pinned": {
+              "name": "Sabitlenmiş eklentiler",
+              "desc": "Ana ekranda görmek istediğiniz eklentileri seçin (karusel)",
+              "noplugin": "Yüklü eklenti yok"
+            },
+            "carouseldelay": {
+              "name": "Karusel gecikmesi",
+              "desc": "Her eklenti değişimi arasındaki süre (2 veya daha fazla eklenti varsa)",
+              "sec": "%0 saniye",
+              "secs": "%0 saniye"
+            }
+          }
+        },
+        "pluginmanager": {
+          "titlename": "Eklenti yöneticisi",
+          "enabled": "Etkin",
+          "disabled": "Devre dışı",
+          "update": "Güncelle",
+          "updating": "Güncelleniyor...",
+          "updated": "Güncellendi",
+          "settings": "Ayarlar",
+          "delete": "Sil",
+          "website": "Web sitesi",
+          "source": "Kaynak",
+          "noplugin": "Yüklü eklenti yok",
+          "save": "Kaydet",
+          "cancel": "İptal"
+        },
+        "about": {
+          "titlename": "Hakkında"
+        }
+      },
+      "clock": {
+        "titlename": "Saat",
+        "days": {
+          "long": {
+            "monday": "Pazartesi",
+            "tuesday": "Salı",
+            "wednesday": "Çarşamba",
+            "thursday": "Perşembe",
+            "friday": "Cuma",
+            "saturday": "Cumartesi",
+            "sunday": "Pazar"
+          },
+          "short": {
+            "monday": "Pzt",
+            "tuesday": "Sal",
+            "wednesday": "Çar",
+            "thursday": "Per",
+            "friday": "Cum",
+            "saturday": "Cmt",
+            "sunday": "Paz"
+          },
+          "abbr": {
+            "monday": "P",
+            "tuesday": "S",
+            "wednesday": "Ç",
+            "thursday": "P",
+            "friday": "C",
+            "saturday": "C",
+            "sunday": "P"
+          }
+        },
+        "months": {
+          "long": {
+            "january": "Ocak",
+            "february": "Şubat",
+            "march": "Mart",
+            "april": "Nisan",
+            "may": "Mayıs",
+            "june": "Haziran",
+            "july": "Temmuz",
+            "august": "Ağustos",
+            "september": "Eylül",
+            "october": "Ekim",
+            "november": "Kasım",
+            "december": "Aralık"
+          },
+          "short": {
+            "january": "Oca",
+            "february": "Şub",
+            "march": "Mar",
+            "april": "Nis",
+            "may": "May",
+            "june": "Haz",
+            "july": "Tem",
+            "august": "Ağu",
+            "september": "Eyl",
+            "october": "Eki",
+            "november": "Kas",
+            "december": "Ara"
+          },
+          "abbr": {
+            "january": "O",
+            "february": "Ş",
+            "march": "M",
+            "april": "N",
+            "may": "M",
+            "june": "H",
+            "july": "T",
+            "august": "A",
+            "september": "E",
+            "october": "E",
+            "november": "K",
+            "december": "A"
+          }
+        }
+      },
+      "alarm": {
+        "titlename": "Alarm",
+        "name": "Ad",
+        "defsounds": "Varsayılan sesler",
+        "custsounds": "Özel sesler",
+        "add": "Ekle",
+        "noalarm": "Alarm yok",
+        "delete": "Sil",
+        "cancel": "İptal",
+        "save": "Kaydet",
+        "stop": "Durdur",
+        "repeat": {
+          "once": "Bir kez",
+          "everyday": "Her gün",
+          "workdays": "Hafta içi",
+          "weekend": "Hafta sonu"
+        },
+        "remaining": {
+          "inhour": "%0 s ve %1 dk içinde",
+          "inmin": "%0 dk içinde",
+          "inday": "%0 gün içinde",
+          "indays": "%0 gün içinde"
+        }
+      },
+      "stopwatch": {
+        "titlename": "Kronometre",
+        "start": "Başlat",
+        "pause": "Duraklat",
+        "reset": "Sıfırla",
+        "lap": "Tur"
+      },
+      "timer": {
+        "titlename": "Zamanlayıcı",
+        "start": "Başlat",
+        "pause": "Duraklat",
+        "stop": "Durdur",
+        "reset": "Sıfırla",
+        "timeup": "Süre doldu"
+      },
+      "plugin": {
+        "noload": "Yüklü eklenti yok",
+        "nopin": "Sabitlenmiş eklenti yok"
+      }
+    }
+  }
 }
