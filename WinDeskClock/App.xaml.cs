@@ -1,8 +1,11 @@
 ﻿using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Markup;
 
 namespace WinDeskClock
 {
@@ -96,6 +99,26 @@ namespace WinDeskClock
 
             var mainWindow = new MainWindow();
             mainWindow.Show();
+        }
+
+        private async void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            e.Handled = true;
+            Exception exp = e.Exception;
+            MessageBoxResult result = System.Windows.MessageBox.Show($"WinDeskClock has crashed.\n\n\nReason:\n{exp.Message}\n\n\n - Yes: Restart WinDeskClock\n\n - No: Close WinDeskClock\n\n - Cancel: Try to continue (can be unstable)", "WinDeskClock crash handler", MessageBoxButton.YesNoCancel, MessageBoxImage.Error);
+            if (result == MessageBoxResult.Yes)
+            {
+                RestartApp();
+
+            }
+            else if (result == MessageBoxResult.No)
+            {
+                Application.Current.Shutdown();
+            }
+            else if (result == MessageBoxResult.Cancel)
+            {
+
+            }
         }
     }
 

@@ -119,6 +119,10 @@ namespace WinDeskClock.Clocks
             UpdateDDay(now.Day.ToString());  // Day of the month
             UpdateDMonth(now.ToString("MMM", CultureInfo.GetCultureInfo("en-US")).ToUpper());  // Month
             UpdateDYear(now.Year.ToString("0000"));  // Year
+
+            //Time variation ajustement
+            int nextsecms = 1000 - DateTime.Now.Millisecond;
+            time.Interval = TimeSpan.FromMilliseconds(nextsecms);
         }
 
         // Update the clock with animation

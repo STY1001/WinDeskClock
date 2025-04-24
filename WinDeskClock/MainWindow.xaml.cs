@@ -80,7 +80,7 @@ namespace WinDeskClock
         private Page ClockPage;
 
         private List<Grid> MenuClockGrids = new List<Grid>();
-        private DispatcherTimer time;
+        private DispatcherTimer minitime;
         private Stopwatch stopwatch;
         private DispatcherTimer stopwatchTimer;
         private DispatcherTimer timerTimer;
@@ -274,13 +274,13 @@ namespace WinDeskClock
         // Create all timer of the app
         private async Task CreateTimers()
         {
-            // Create a timer to update the clock every second
-            time = new DispatcherTimer
+            // Create a timer to update the mini clock every minutes
+            minitime = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(1)
             };
-            time.Tick += Time_Tick;
-            time.Start();
+            minitime.Tick += MiniTime_Tick;
+            minitime.Start();
 
             // Create the stopwatch for... the stopwatch (lol)
             stopwatch = new Stopwatch();
@@ -300,7 +300,7 @@ namespace WinDeskClock
             // Create the timer for the alarm
             alarm = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(1)
+                Interval = TimeSpan.FromMinutes(1)
             };
             alarm.Tick += Alarm_Tick;
             alarm.Start();
@@ -789,11 +789,15 @@ namespace WinDeskClock
         private int MenuClockIndex = 0;
 
         // Update the MiniClock
-        private async void Time_Tick(object sender, EventArgs e)
+        private async void MiniTime_Tick(object sender, EventArgs e)
         {
             DateTime now = DateTime.Now;
             await UpdateMiniClockHour(now.Hour.ToString("0"));  // Update the MiniClock Hour
             await UpdateMiniClockMinute(now.Minute.ToString("00"));  // Update the MiniClock Minute
+
+            // Time variation fix
+            int nextsecond = 60 - DateTime.Now.Second;
+            minitime.Interval = TimeSpan.FromSeconds(nextsecond);
         }
 
         // MiniClock Update
@@ -3507,57 +3511,55 @@ namespace WinDeskClock
         private SoundPlayer AlarmSoundPlayer;
         // - Is Alarm ActionCard deployed ?
         private bool CardDeployed = false;
-        // - Temp value for Alarm_Tick synchronization
-        private int AlarmTickTempMinute = 0;
         // Tick event
         private async void Alarm_Tick(object sender, EventArgs e)
         {
             DateTime now = DateTime.Now;
-            if (now.Minute != AlarmTickTempMinute)
+            AlarmCardETAUpdate();
+
+            string nowdaynumber = "0";
+            string nowday = now.DayOfWeek.ToString();
+
+            switch (nowday)
             {
-                AlarmTickTempMinute = now.Minute;
-                AlarmCardETAUpdate();
+                case "Monday":
+                    nowdaynumber = "1";
+                    break;
+                case "Tuesday":
+                    nowdaynumber = "2";
+                    break;
+                case "Wednesday":
+                    nowdaynumber = "3";
+                    break;
+                case "Thursday":
+                    nowdaynumber = "4";
+                    break;
+                case "Friday":
+                    nowdaynumber = "5";
+                    break;
+                case "Saturday":
+                    nowdaynumber = "6";
+                    break;
+                case "Sunday":
+                    nowdaynumber = "7";
+                    break;
+            }
 
-                string nowdaynumber = "0";
-                string nowday = now.DayOfWeek.ToString();
-
-                switch (nowday)
+            foreach (CardAction card in AlarmStack.Children)
+            {
+                string uid = card.Tag.ToString().Replace("_AlarmCard", "");
+                string time = await ConfigManager.GetAlarm($"{uid}.time");
+                string days = await ConfigManager.GetAlarm($"{uid}.days");
+                string enabled = await ConfigManager.GetAlarm($"{uid}.enabled");
+                if (time == now.ToString("HH:mm") && (days.Contains(nowdaynumber) || days == "0") && enabled.Contains("true"))
                 {
-                    case "Monday":
-                        nowdaynumber = "1";
-                        break;
-                    case "Tuesday":
-                        nowdaynumber = "2";
-                        break;
-                    case "Wednesday":
-                        nowdaynumber = "3";
-                        break;
-                    case "Thursday":
-                        nowdaynumber = "4";
-                        break;
-                    case "Friday":
-                        nowdaynumber = "5";
-                        break;
-                    case "Saturday":
-                        nowdaynumber = "6";
-                        break;
-                    case "Sunday":
-                        nowdaynumber = "7";
-                        break;
-                }
-
-                foreach (CardAction card in AlarmStack.Children)
-                {
-                    string uid = card.Tag.ToString().Replace("_AlarmCard", "");
-                    string time = await ConfigManager.GetAlarm($"{uid}.time");
-                    string days = await ConfigManager.GetAlarm($"{uid}.days");
-                    string enabled = await ConfigManager.GetAlarm($"{uid}.enabled");
-                    if (time == now.ToString("HH:mm") && (days.Contains(nowdaynumber) || days == "0") && enabled.Contains("true"))
-                    {
-                        AlarmAlertShow(uid);
-                    }
+                    AlarmAlertShow(uid);
                 }
             }
+
+            // Time variation fix
+            int nextminute = 60 - DateTime.Now.Second;
+            alarm.Interval = TimeSpan.FromSeconds(nextminute);
         }
 
         // Alarm alert show
