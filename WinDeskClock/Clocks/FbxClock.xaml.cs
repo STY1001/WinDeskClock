@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -564,7 +565,7 @@ namespace WinDeskClock.Clocks
             UpdateM2(now.Minute.ToString("00")[1].ToString()); // Second digit of the minute
             UpdateDName(now.DayOfWeek.ToString().Substring(0, 3).ToUpper());   // Day of the week
             UpdateDDay(now.Day.ToString());  // Day of the month
-            UpdateMonth(now.ToString("MMM").ToUpper());  // Month
+            UpdateMonth(now.ToString("MMM", CultureInfo.GetCultureInfo("en-US")).ToUpper());  // Month
 
         }
 
