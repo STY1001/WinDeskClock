@@ -25,6 +25,9 @@
           "volume": {
             "name": "Volume"
           },
+          "blur": {
+            "name": "Blur effect"
+          },
           "clock": {
             "titlename": "Clock",
             "showsec": {
@@ -240,6 +243,9 @@
           "volume": {
             "name": "Volume"
           },
+          "blur": {
+            "name": "Effet de flou"
+          },
           "clock": {
             "titlename": "Horloge",
             "showsec": {
@@ -454,6 +460,9 @@
           },
           "volume": {
             "name": "Ses"
+          },
+          "blur": {
+            "name": "Bulanıklık efekti"
           },
           "clock": {
             "titlename": "Saat",

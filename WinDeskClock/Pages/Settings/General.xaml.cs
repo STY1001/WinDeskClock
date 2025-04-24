@@ -174,6 +174,7 @@ namespace WinDeskClock.Pages.Settings
 
                 LangTitle.Text = await LangSystem.GetLang("settings.general.lang.name");
                 VolumeTitle.Text = await LangSystem.GetLang("settings.general.volume.name");
+                BlurEffectTitle.Text = await LangSystem.GetLang("settings.general.blur.name");
 
                 ShowSecondsTitle.Text = await LangSystem.GetLang("settings.general.clock.showsec.name");
                 ShowSecondsDesc.Text = await LangSystem.GetLang("settings.general.clock.showsec.desc");
