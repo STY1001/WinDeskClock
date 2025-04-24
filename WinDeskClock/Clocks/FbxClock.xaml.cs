@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using WinDeskClock.Utils;
 
 namespace WinDeskClock.Clocks
 {
@@ -563,9 +564,9 @@ namespace WinDeskClock.Clocks
             UpdateH2(now.Hour.ToString("00")[1].ToString()); // Second digit of the hour
             UpdateM1(now.Minute.ToString("00")[0].ToString()); // First digit of the minute
             UpdateM2(now.Minute.ToString("00")[1].ToString()); // Second digit of the minute
-            UpdateDName(now.DayOfWeek.ToString().Substring(0, 3).ToUpper());   // Day of the week
+            UpdateDName(now.DayOfWeek.ToString().ToLower());   // Day of the week
             UpdateDDay(now.Day.ToString());  // Day of the month
-            UpdateMonth(now.ToString("MMM", CultureInfo.GetCultureInfo("en-US")).ToUpper());  // Month
+            UpdateMonth(now.ToString("MMMM", CultureInfo.GetCultureInfo("en-US")).ToLower());  // Month
 
             //Time variation ajustement
             int nextsecms = 1000 - DateTime.Now.Millisecond;
@@ -770,7 +771,8 @@ namespace WinDeskClock.Clocks
                 }
                 await Task.Delay(txtdelay);
                 DNameStack.Children.Clear();
-                foreach (char c in text)
+                string dayname = (await LangSystem.GetLang($"clock.days.short.{text}")).ToUpper();
+                foreach (char c in dayname)
                 {
                     string letter = c.ToString().ToUpper();
                     Image img = new Image();
@@ -870,7 +872,8 @@ namespace WinDeskClock.Clocks
                 }
                 await Task.Delay(txtdelay);
                 DMonthStack.Children.Clear();
-                foreach (char c in text)
+                string monthname = (await LangSystem.GetLang($"clock.months.short.{text}")).ToUpper();
+                foreach (char c in monthname)
                 {
                     string letter = c.ToString().ToUpper();
                     Image img = new Image();

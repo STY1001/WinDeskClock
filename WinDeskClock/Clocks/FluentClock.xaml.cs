@@ -115,9 +115,9 @@ namespace WinDeskClock.Clocks
             UpdateM2(now.Minute.ToString("00")[1].ToString()); // Second digit of the minute
             UpdateS1(now.Second.ToString("00")[0].ToString()); // First digit of the second
             UpdateS2(now.Second.ToString("00")[1].ToString()); // Second digit of the second
-            UpdateDName(now.DayOfWeek.ToString().Substring(0, 3).ToUpper());  // Day of the week
+            UpdateDName(now.DayOfWeek.ToString().ToLower());  // Day of the week
             UpdateDDay(now.Day.ToString());  // Day of the month
-            UpdateDMonth(now.ToString("MMM", CultureInfo.GetCultureInfo("en-US")).ToUpper());  // Month
+            UpdateDMonth(now.ToString("MMMM", CultureInfo.GetCultureInfo("en-US")).ToLower());  // Month
             UpdateDYear(now.Year.ToString("0000"));  // Year
 
             //Time variation ajustement
@@ -376,7 +376,7 @@ namespace WinDeskClock.Clocks
                     storyboard.Begin();
                 }
                 await Task.Delay(txtdelay);
-                DNameText.Text = text;
+                DNameText.Text = (await LangSystem.GetLang($"clock.days.short.{text}")).ToUpper();
                 {
                     var translateAnimation = new DoubleAnimation
                     {
@@ -454,7 +454,7 @@ namespace WinDeskClock.Clocks
                     storyboard.Begin();
                 }
                 await Task.Delay(txtdelay);
-                DMonthText.Text = text;
+                DMonthText.Text = (await LangSystem.GetLang($"clock.months.short.{text}")).ToUpper();
                 {
                     var translateAnimation = new DoubleAnimation
                     {
