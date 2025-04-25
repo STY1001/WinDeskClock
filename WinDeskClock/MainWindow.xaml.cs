@@ -604,7 +604,7 @@ namespace WinDeskClock
         private bool TurnOnSignal = false;
         private async Task TurnScreenOff()
         {
-            await ScreenOffAnimation("crt");
+            await ScreenOffAnimation(ConfigManager.Variables.ScreenOnOff);
             await Task.Delay(200);
             user32dll.User32SendMessage(0xFFFF, (int)user32dll.User32WM_SYSCOMMAND, (int)user32dll.User32SC_MONITORPOWER, user32dll.User32MONITOR_OFF);
             TurnOnSignal = false;
@@ -642,7 +642,7 @@ namespace WinDeskClock
 
             await Task.Delay(1000);
 
-            await ScreenOnAnimation("crt");
+            await ScreenOnAnimation(ConfigManager.Variables.ScreenOnOff);
 
             //nint thisHandle = new WindowInteropHelper(this).Handle;
             //oldWndProc = user32dll.User32SetWindowLongPtr(thisHandle, GWL_WNDPROC, Marshal.GetFunctionPointerForDelegate(new WndProcDelegate(WndProc)));
@@ -651,10 +651,14 @@ namespace WinDeskClock
             //await ScreenOnAnimation("crt");
         }
 
+
         private async Task ScreenOffAnimation(string animtype)
         {
             switch (animtype)
             {
+                case "none":
+                    NoneRect.Visibility = Visibility.Visible;
+                    break;
                 case "crt":
                     CRTRectUp.Visibility = Visibility.Visible;
                     CRTRectDown.Visibility = Visibility.Visible;
@@ -711,7 +715,24 @@ namespace WinDeskClock
                     }
                     await Task.Delay(200);
                     break;
-
+                case "fade":
+                    FadeRect.Visibility = Visibility.Visible;
+                    {
+                        var fadeAnimation = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        Storyboard.SetTarget(fadeAnimation, FadeGrid);
+                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(fadeAnimation);
+                        storyboard.Begin();
+                    }
+                    await Task.Delay(500);
+                    break;
             }
         }
 
@@ -719,6 +740,9 @@ namespace WinDeskClock
         {
             switch (animtype)
             {
+                case "none":
+                    NoneRect.Visibility = Visibility.Hidden;
+                    break;
                 case "crt":
                     {
                         var rectanglemiddlesize = new DoubleAnimation
@@ -773,6 +797,24 @@ namespace WinDeskClock
                     CRTRectUp.Visibility = Visibility.Hidden;
                     CRTRectDown.Visibility = Visibility.Hidden;
                     await Task.Delay(200);
+                    break;
+                case "fade":
+                    {
+                        var fadeAnimation = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        Storyboard.SetTarget(fadeAnimation, FadeGrid);
+                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(fadeAnimation);
+                        storyboard.Begin();
+                    }
+                    await Task.Delay(500);
+                    FadeRect.Visibility = Visibility.Hidden;
                     break;
             }
         }

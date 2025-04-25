@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:WinDeskClock.Pages.Settings"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d"
-      d:DesignHeight="900"
+      d:DesignHeight="1000"
       d:DesignWidth="800"
       Title="General">
 
@@ -94,6 +94,31 @@
                         </StackPanel>
                     </ui:CardControl.Header>
                     <ui:ToggleSwitch x:Name="BlurEffectSwitch" />
+                </ui:CardControl>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/screenoff.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Screen On/Off animation"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="ScreenOnOffTitle" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <ComboBox x:Name="ScreenOnOffComboBox">
+                        <ComboBoxItem Content="None"
+                                      x:Name="ScreenOnOffNone"/>
+                        <ComboBoxItem Content="Fade"
+                                      x:Name="ScreenOnOffFade"/>
+                        <ComboBoxItem Content="CRT"
+                                      x:Name="ScreenOnOffCRT"/>
+                    </ComboBox>
                 </ui:CardControl>
                 <Grid HorizontalAlignment="Stretch"
                       Margin="20,0,20,5">

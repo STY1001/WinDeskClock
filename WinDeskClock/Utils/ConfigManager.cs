@@ -15,6 +15,7 @@ namespace WinDeskClock.Utils
             Dictionary<string, string> DefaultConfigList = new Dictionary<string, string>
             {
                 { "Language", "en-us" },
+                { "ScreenOnOff", "crt" },
                 { "DefaultTimeUpSound", "C:\\Windows\\Media\\Alarm08.wav" },
                 { "DefaultAlarmSound", "C:\\Windows\\Media\\Alarm05.wav" },
                 { "AlarmTimeoutDelay", "1" },
@@ -54,6 +55,7 @@ namespace WinDeskClock.Utils
         public static async Task LoadSettings()
         {
             Variables.Language = await GetConfig("Language");
+            Variables.ScreenOnOff = await GetConfig("ScreenOnOff");
             Variables.DefaultTimeUpSound = await GetConfig("DefaultTimeUpSound");
             Variables.DefaultAlarmSound = await GetConfig("DefaultAlarmSound");
             Variables.AlarmTimeoutDelay = int.Parse(await GetConfig("AlarmTimeoutDelay"));
@@ -90,6 +92,7 @@ namespace WinDeskClock.Utils
             }
 
             NewVariables.Language = Variables.Language;
+            NewVariables.ScreenOnOff = Variables.ScreenOnOff;
             NewVariables.DefaultTimeUpSound = Variables.DefaultTimeUpSound;
             NewVariables.DefaultAlarmSound = Variables.DefaultAlarmSound;
             NewVariables.ClockShowSecond = Variables.ClockShowSecond;
@@ -117,6 +120,7 @@ namespace WinDeskClock.Utils
         public static async Task SaveNewSettings()
         {
             await SetConfig("Language", NewVariables.Language);
+            await SetConfig("ScreenOnOff", NewVariables.ScreenOnOff);
             await SetConfig("DefaultTimeUpSound", NewVariables.DefaultTimeUpSound);
             await SetConfig("DefaultAlarmSound", NewVariables.DefaultAlarmSound);
             await SetConfig("ClockShowSecond", NewVariables.ClockShowSecond.ToString());
@@ -256,6 +260,7 @@ namespace WinDeskClock.Utils
             public static string DefaultTimeUpSound;
             public static string DefaultAlarmSound;
             public static string Language;
+            public static string ScreenOnOff;
             public static int AlarmTimeoutDelay;
             public static int CarouselDelay;
             public static bool ClockShowSecond;
@@ -272,6 +277,7 @@ namespace WinDeskClock.Utils
             public static string DefaultTimeUpSound;
             public static string DefaultAlarmSound;
             public static string Language;
+            public static string ScreenOnOff;
             public static int AlarmTimeoutDelay;
             public static int CarouselDelay;
             public static bool ClockShowSecond;

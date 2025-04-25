@@ -28,6 +28,14 @@
           "blur": {
             "name": "Blur effect"
           },
+          "screenonoff": {
+            "name": "Screen on/off animation",
+            "type": {
+              "none": "None",
+              "fade": "Fade",
+              "crt": "CRT TV"
+            }
+          },
           "clock": {
             "titlename": "Clock",
             "showsec": {
@@ -246,6 +254,14 @@
           "blur": {
             "name": "Effet de flou"
           },
+          "screenonoff": {
+            "name": "Animation d'allumage/extinction de l'écran",
+            "type": {
+              "none": "Aucun",
+              "fade": "Fondu",
+              "crt": "Télé CRT"
+            }
+          },
           "clock": {
             "titlename": "Horloge",
             "showsec": {
@@ -463,6 +479,14 @@
           },
           "blur": {
             "name": "Bulanıklık efekti"
+          },
+          "screenonoff": {
+            "name": "Ekranı açma/kapatma animasyonu",
+            "type": {
+              "none": "Yok",
+              "fade": "Solma",
+              "crt": "CRT TV"
+            }
           },
           "clock": {
             "titlename": "Saat",

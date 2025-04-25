@@ -1350,6 +1350,13 @@
         </Grid>
         <Grid x:Name="OverlayGrid"
               Visibility="Hidden">
+            <Grid x:Name="NoneGrid">
+                <Rectangle x:Name="NoneRect"
+                           Fill="#000000"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           Visibility="Hidden" />
+            </Grid>
             <Grid x:Name="CRTGrid">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -1384,6 +1391,13 @@
                         <ScaleTransform ScaleX="1" />
                     </Rectangle.RenderTransform>
                 </Rectangle>
+            </Grid>
+            <Grid x:Name="FadeGrid">
+                <Rectangle x:Name="FadeRect"
+                           Fill="#000000"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           Visibility="Hidden"/>
             </Grid>
         </Grid>
     </Grid>

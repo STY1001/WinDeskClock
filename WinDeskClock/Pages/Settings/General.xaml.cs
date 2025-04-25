@@ -28,6 +28,37 @@ namespace WinDeskClock.Pages.Settings
         {
             InitializeComponent();
 
+            ScreenOnOffNone.IsSelected = false;
+            ScreenOnOffFade.IsSelected = false; 
+            ScreenOnOffFade.IsSelected = false;
+            switch (ConfigManager.Variables.ScreenOnOff)
+            {
+                case "none":
+                    ScreenOnOffNone.IsSelected = true;
+                    break;
+                case "fade":
+                    ScreenOnOffFade.IsSelected = true;
+                    break;
+                case "crt":
+                    ScreenOnOffCRT.IsSelected = true;
+                    break;
+            }
+            ScreenOnOffNone.Selected += async (s, e) =>
+            {
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.ScreenOnOff = "none";
+            };
+            ScreenOnOffFade.Selected += async (s, e) =>
+            {
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.ScreenOnOff = "fade";
+            };
+            ScreenOnOffCRT.Selected += async (s, e) =>
+            {
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.ScreenOnOff = "crt";
+            };
+
             BlurEffectSwitch.IsChecked = ConfigManager.Variables.BlurEffect;
             BlurEffectSwitch.Checked += async (s, e) =>
             {
@@ -175,6 +206,10 @@ namespace WinDeskClock.Pages.Settings
                 LangTitle.Text = await LangSystem.GetLang("settings.general.lang.name");
                 VolumeTitle.Text = await LangSystem.GetLang("settings.general.volume.name");
                 BlurEffectTitle.Text = await LangSystem.GetLang("settings.general.blur.name");
+                ScreenOnOffTitle.Text = await LangSystem.GetLang("settings.general.screenonoff.name");
+                ScreenOnOffNone.Content = await LangSystem.GetLang("settings.general.screenonoff.type.none");
+                ScreenOnOffFade.Content = await LangSystem.GetLang("settings.general.screenonoff.type.fade");
+                ScreenOnOffCRT.Content = await LangSystem.GetLang("settings.general.screenonoff.type.crt");
 
                 ShowSecondsTitle.Text = await LangSystem.GetLang("settings.general.clock.showsec.name");
                 ShowSecondsDesc.Text = await LangSystem.GetLang("settings.general.clock.showsec.desc");
@@ -216,6 +251,21 @@ namespace WinDeskClock.Pages.Settings
             }
             LangComboBox.Text = LangSystem.LangList[ConfigManager.Variables.Language];
 
+            ScreenOnOffNone.IsSelected = false;
+            ScreenOnOffFade.IsSelected = false;
+            ScreenOnOffFade.IsSelected = false;
+            switch (ConfigManager.Variables.ScreenOnOff)
+            {
+                case "none":
+                    ScreenOnOffNone.IsSelected = true;
+                    break;
+                case "fade":
+                    ScreenOnOffFade.IsSelected = true;
+                    break;
+                case "crt":
+                    ScreenOnOffCRT.IsSelected = true;
+                    break;
+            }
             BlurEffectSwitch.IsChecked = ConfigManager.Variables.BlurEffect;
             ShowSecondsToggleSwitch.IsChecked = ConfigManager.Variables.ClockShowSecond;
             FbxStyleToggleSwitch.IsChecked = ConfigManager.Variables.ClockFbxStyle;
