@@ -148,7 +148,8 @@
                                     </Grid.RowDefinitions>
                                     <Grid>
                                         <ScrollViewer x:Name="AlarmScroll"
-                                                      Margin="10,0,10,0">
+                                                      Margin="10,0,10,0"
+                                                      PanningMode="VerticalOnly">
                                             <StackPanel x:Name="AlarmStack"
                                                         Orientation="Vertical">
                                             </StackPanel>
@@ -414,7 +415,8 @@
                                             </Grid>
                                         </Border>
                                         <ScrollViewer Grid.Row="1"
-                                                      x:Name="StopwatchLapScrollView">
+                                                      x:Name="StopwatchLapScrollView"
+                                                      PanningMode="VerticalOnly">
                                             <StackPanel Orientation="Vertical"
                                                         x:Name="LapStopwatchStack">
                                             </StackPanel>
