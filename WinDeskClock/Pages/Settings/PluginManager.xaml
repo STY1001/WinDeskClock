@@ -45,12 +45,14 @@
                             </Grid.ColumnDefinitions>
                             <ui:Button Content="Cancel"
                                        Icon="{ui:ImageIcon '/Resources/icons/cross.png'}"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                        Grid.Column="0"
                                        Margin="5,10,5,10"
                                        x:Name="PluginSettingsCancelBtn"
                                        Click="PluginSettingsCancelBtn_Click" />
                             <ui:Button Content="Save"
                                        Icon="{ui:ImageIcon '/Resources/icons/checkmark.png'}"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                        Grid.Column="1"
                                        Margin="5,10,10,10"
                                        Appearance="Primary"
