@@ -26,50 +26,58 @@ namespace WinDeskClock
 
     public class User32
     {
+        private const int HWND_BROADCAST = 0xFFFF;
         private const uint WM_SYSCOMMAND = 0x0112;
         private const uint SC_MONITORPOWER = 0xF170;
         private const int MONITOR_OFF = 2;
         private const int MONITOR_ON = -1;
+        private const int WM_POWERBROADCAST = 0x0218;
+        private const int PBT_POWERSETTINGCHANGE = 0x8013;
+        private Guid CONSOLE_DISPLAY_STATE = new Guid("6FE69556-704A-47A0-8F24-C28D936FDA47");
+        private const uint MOUSE_EVENTF_MOVE = 0x0001;
+
+        public int User32HWND_BROADCAST { get { return HWND_BROADCAST; } }
         public uint User32WM_SYSCOMMAND { get { return WM_SYSCOMMAND; } }
         public uint User32SC_MONITORPOWER { get { return SC_MONITORPOWER; } }
         public int User32MONITOR_OFF { get { return MONITOR_OFF; } }
         public int User32MONITOR_ON { get { return MONITOR_ON; } }
+        public int User32WM_POWERBROADCAST { get { return WM_POWERBROADCAST; } }
+        public int User32PBT_POWERSETTINGCHANGE { get { return PBT_POWERSETTINGCHANGE; } }
+        public Guid User32CONSOLE_DISPLAY_STATE { get { return CONSOLE_DISPLAY_STATE; } }
+        public uint User32MOUSE_EVENTF_MOVE { get { return MOUSE_EVENTF_MOVE; } }
+
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct PowerBroadcastSetting
+        {
+            public Guid PowerSetting;
+            public uint DataLength;
+            public byte Data;
+        }
 
         [DllImport("user32.dll")]
         private static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);
         [DllImport("user32.dll")]
-        private static extern int GetMessage(out MSG lpMsg, int hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
+        private static extern IntPtr RegisterPowerSettingNotification(IntPtr hRecipient, ref Guid PowerSettingGuid, uint Flags);
         [DllImport("user32.dll")]
-        private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+        private static extern bool UnregisterPowerSettingNotification(IntPtr Handle); 
         [DllImport("user32.dll")]
-        private static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
-        [DllImport("user32.dll")]
-        private static extern IntPtr CallWindowProc(IntPtr lpPrevWndProc, IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-        [DllImport("user32.dll")]
-        private static extern IntPtr DefWindowProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+        private static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, IntPtr dwExtraInfo);
         public int User32SendMessage(int hWnd, int hMsg, int wParam, int lParam)
         {
             return SendMessage(hWnd, hMsg, wParam, lParam);
         }
-        public int User32GetMessage(out MSG lpMsg, int hWnd, uint wMsgFilterMin, uint wMsgFilterMax)
+        public IntPtr User32RegisterPowerSettingNotification(IntPtr hRecipient, ref Guid PowerSettingGuid, uint Flags)
         {
-            return GetMessage(out lpMsg, hWnd, wMsgFilterMin, wMsgFilterMax);
+            return RegisterPowerSettingNotification(hRecipient, ref PowerSettingGuid, Flags);
         }
-        public IntPtr User32SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
+        public bool User32UnregisterPowerSettingNotification(IntPtr Handle)
         {
-            return SetWindowLongPtr(hWnd, nIndex, dwNewLong);
+            return UnregisterPowerSettingNotification(Handle);
         }
-        public IntPtr User32GetWindowLongPtr(IntPtr hWnd, int nIndex)
+        public void User32MouseEvent(uint dwFlags, int dx, int dy, uint dwData, IntPtr dwExtraInfo)
         {
-            return GetWindowLongPtr(hWnd, nIndex);
-        }
-        public IntPtr User32CallWindowProc(IntPtr lpPrevWndProc, IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
-        {
-            return CallWindowProc(lpPrevWndProc, hWnd, msg, wParam, lParam);
-        }
-        public IntPtr User32DefWindowProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
-        {
-            return DefWindowProc(hWnd, msg, wParam, lParam);
+            mouse_event(dwFlags, dx, dy, dwData, dwExtraInfo);
         }
     }
 
@@ -116,6 +124,21 @@ namespace WinDeskClock
             this.MouseMove += MouseMoved;
 
             Loaded += MainWindow_Loaded;
+        }
+
+        // WndProc for intercepting system messages (like screen off/on)
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == user32dll.User32WM_POWERBROADCAST && wParam.ToInt32() == user32dll.User32PBT_POWERSETTINGCHANGE)
+            {
+                // Handle screen on/off events
+                var powerSetting = (User32.PowerBroadcastSetting)Marshal.PtrToStructure(lParam, typeof(User32.PowerBroadcastSetting));
+                if (powerSetting.PowerSetting == user32dll.User32CONSOLE_DISPLAY_STATE && powerSetting.Data == 1)
+                {
+                    TurnScreenOn();
+                }
+            }
+            return IntPtr.Zero;
         }
 
         // Change UI elements depending on the settings
@@ -563,7 +586,6 @@ namespace WinDeskClock
             }
         }
 
-        #region Screen Off/On
         private bool MouseMovedExecuted = false;
         private async void MouseMoved(object sender, MouseEventArgs e)
         {
@@ -576,6 +598,8 @@ namespace WinDeskClock
                 MouseMovedExecuted = false;
             }
         }
+
+        #region Screen Off/On
 
         /*private const int GWL_WNDPROC = -4;
         private IntPtr oldWndProc;
@@ -602,13 +626,19 @@ namespace WinDeskClock
 
         //private DispatcherTimer ScreenPolling;
         private bool TurnOnSignal = false;
+        private IntPtr PowerNotifHandle;
         private async Task TurnScreenOff()
         {
             await ScreenOffAnimation(ConfigManager.Variables.ScreenOnOff);
             await Task.Delay(200);
+            Guid powerSettingGuid = user32dll.User32CONSOLE_DISPLAY_STATE;
+            var hwnd = new WindowInteropHelper(this).Handle;
+            HwndSource.FromHwnd(hwnd).AddHook(new HwndSourceHook(WndProc));
+            PowerNotifHandle = user32dll.User32RegisterPowerSettingNotification(hwnd, ref powerSettingGuid, 0);
             user32dll.User32SendMessage(0xFFFF, (int)user32dll.User32WM_SYSCOMMAND, (int)user32dll.User32SC_MONITORPOWER, user32dll.User32MONITOR_OFF);
             TurnOnSignal = false;
 
+            /*
             this.MouseMove += async (sender, e) =>
             {
                 TurnOnSignal = true;
@@ -621,12 +651,21 @@ namespace WinDeskClock
             {
                 TurnOnSignal = true;
             };
+            */
 
             while (!TurnOnSignal)
             {
                 await Task.Delay(100);
             }
 
+            user32dll.User32SendMessage(0xFFFF, (int)user32dll.User32WM_SYSCOMMAND, (int)user32dll.User32SC_MONITORPOWER, user32dll.User32MONITOR_ON);
+            if (PowerNotifHandle != IntPtr.Zero)
+            {
+                user32dll.User32UnregisterPowerSettingNotification(PowerNotifHandle);
+                PowerNotifHandle = IntPtr.Zero;
+            }
+
+            /*
             this.MouseDown -= async (sender, e) =>
             {
                 TurnOnSignal = true;
@@ -639,6 +678,7 @@ namespace WinDeskClock
             {
                 TurnOnSignal = true;
             };
+            */
 
             await Task.Delay(1000);
 
@@ -651,6 +691,13 @@ namespace WinDeskClock
             //await ScreenOnAnimation("crt");
         }
 
+        private async Task TurnScreenOn()
+        {
+            user32dll.User32MouseEvent(user32dll.User32MOUSE_EVENTF_MOVE, 1, 1, 0, IntPtr.Zero);
+            user32dll.User32MouseEvent(user32dll.User32MOUSE_EVENTF_MOVE, -1, -1, 0, IntPtr.Zero);
+            user32dll.User32SendMessage(0xFFFF, (int)user32dll.User32WM_SYSCOMMAND, (int)user32dll.User32SC_MONITORPOWER, user32dll.User32MONITOR_ON);
+            TurnOnSignal = true;
+        }
 
         private async Task ScreenOffAnimation(string animtype)
         {
@@ -2629,6 +2676,7 @@ namespace WinDeskClock
         // Time up function
         private async Task TimeUpShow()
         {
+            TurnScreenOn();
             TimeUpSoundPlayer = new SoundPlayer(ConfigManager.Variables.DefaultTimeUpSound);
             TimeUpSoundPlayer.Load();
             TimeUpSoundPlayer.PlayLooping();
@@ -3610,6 +3658,7 @@ namespace WinDeskClock
             if (!AlarmAlert)
             {
                 AlarmAlert = true;
+                TurnScreenOn();
                 AlarmAlertUID = uid;
                 string name = await ConfigManager.GetAlarm($"{uid}.name");
                 if (name == "") name = "Alarm";
