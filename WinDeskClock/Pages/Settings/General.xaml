@@ -120,6 +120,41 @@
                                       x:Name="ScreenOnOffCRT"/>
                     </ComboBox>
                 </ui:CardControl>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/wakeup.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Screen auto wake up"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="ScreenWakeUpTitle" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:NumberBox x:Name="ScreenWakeUpDelayHourNumberBox"
+                                      Minimum="0"
+                                      Maximum="23"
+                                      ClearButtonEnabled="False"/>
+                        <TextBlock Text=":"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   FontSize="12"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Margin="5,0,5,0" />
+                        <ui:NumberBox x:Name="ScreenWakeUpDelayMinuteNumberBox"
+                                      Minimum="0"
+                                      Maximum="59"
+                                      ClearButtonEnabled="False"/>
+                        <ui:ToggleSwitch x:Name="ScreenWakeUpToggleSwitch"
+                                         Margin="15,0,0,0" />
+                    </StackPanel>
+                </ui:CardControl>
                 <Grid HorizontalAlignment="Stretch"
                       Margin="20,0,20,5">
                     <Grid.ColumnDefinitions>

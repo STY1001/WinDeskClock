@@ -36,6 +36,9 @@
               "crt": "CRT TV"
             }
           },
+          "screenwakeup": {
+            "name": "Screen auto wake-up"
+          },
           "clock": {
             "titlename": "Clock",
             "showsec": {
@@ -262,6 +265,9 @@
               "crt": "Télé CRT"
             }
           },
+          "screenwakeup": {
+            "name": "Réveil automatique de l'écran"
+          },
           "clock": {
             "titlename": "Horloge",
             "showsec": {
@@ -487,6 +493,9 @@
               "fade": "Solma",
               "crt": "CRT TV"
             }
+          },
+          "screenwakeup": {
+            "name": "Ekranı otomatik uyandırma"
           },
           "clock": {
             "titlename": "Saat",

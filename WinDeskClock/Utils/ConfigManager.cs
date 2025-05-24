@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Windows.Input;
 
 namespace WinDeskClock.Utils
 {
@@ -23,6 +24,8 @@ namespace WinDeskClock.Utils
                 { "ClockShowSecond", "true" },
                 { "ClockFbxStyle", "false" },
                 { "BlurEffect", "true" },
+                { "ScreenAutoWakeUp", "false" },
+                { "ScreenAutoWakeUpTime", "10:56" },
                 { "PinnedPlugin", "" },
                 { "PluginOrder", "" },
                 { "DisabledPlugin", "" }
@@ -63,6 +66,8 @@ namespace WinDeskClock.Utils
             Variables.ClockShowSecond = bool.Parse(await GetConfig("ClockShowSecond"));
             Variables.ClockFbxStyle = bool.Parse(await GetConfig("ClockFbxStyle"));
             Variables.BlurEffect = bool.Parse(await GetConfig("BlurEffect"));
+            Variables.ScreenAutoWakeUp = bool.Parse(await GetConfig("ScreenAutoWakeUp"));
+            Variables.ScreenAutoWakeUpTime = TimeOnly.Parse(await GetConfig("ScreenAutoWakeUpTime"));
 
             if (await GetConfig("PinnedPlugin") != "")
             {
@@ -100,6 +105,8 @@ namespace WinDeskClock.Utils
             NewVariables.CarouselDelay = Variables.CarouselDelay;
             NewVariables.ClockFbxStyle = Variables.ClockFbxStyle;
             NewVariables.BlurEffect = Variables.BlurEffect;
+            NewVariables.ScreenAutoWakeUp = Variables.ScreenAutoWakeUp;
+            NewVariables.ScreenAutoWakeUpTime = new TimeOnly(Variables.ScreenAutoWakeUpTime.Hour, Variables.ScreenAutoWakeUpTime.Minute);
             NewVariables.PinnedPlugin = new List<string>();
             foreach (string plugin in Variables.PinnedPlugin)
             {
@@ -128,6 +135,8 @@ namespace WinDeskClock.Utils
             await SetConfig("AlarmTimeoutDelay", NewVariables.AlarmTimeoutDelay.ToString());
             await SetConfig("CarouselDelay", NewVariables.CarouselDelay.ToString());
             await SetConfig("BlurEffect", NewVariables.BlurEffect.ToString());
+            await SetConfig("ScreenAutoWakeUp", NewVariables.ScreenAutoWakeUp.ToString());
+            await SetConfig("ScreenAutoWakeUpTime", NewVariables.ScreenAutoWakeUpTime.ToString("HH:mm"));
             await SetConfig("PinnedPlugin", string.Join(',', NewVariables.PinnedPlugin));
             await SetConfig("PluginOrder", string.Join(',', NewVariables.PluginOrder));
             await SetConfig("DisabledPlugin", string.Join(',', NewVariables.DisabledPlugin));
@@ -266,6 +275,8 @@ namespace WinDeskClock.Utils
             public static bool ClockShowSecond;
             public static bool ClockFbxStyle;
             public static bool BlurEffect;
+            public static bool ScreenAutoWakeUp;
+            public static TimeOnly ScreenAutoWakeUpTime;
             public static List<string> PinnedPlugin;
             public static List<string> PluginOrder;
             public static List<string> DisabledPlugin;
@@ -283,6 +294,8 @@ namespace WinDeskClock.Utils
             public static bool ClockShowSecond;
             public static bool ClockFbxStyle;
             public static bool BlurEffect;
+            public static bool ScreenAutoWakeUp;
+            public static TimeOnly ScreenAutoWakeUpTime;
             public static List<string> PinnedPlugin;
             public static List<string> PluginOrder;
             public static List<string> DisabledPlugin;

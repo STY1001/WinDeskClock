@@ -94,6 +94,7 @@ namespace WinDeskClock
         private DispatcherTimer timerTimer;
         private DispatcherTimer alarm;
         private DispatcherTimer carousel;
+        private DispatcherTimer screenwakeup;
         private TimeSpan timer;
 
         private Dictionary<string, Page> SettingsTabs = new Dictionary<string, Page>();
@@ -335,6 +336,14 @@ namespace WinDeskClock
             };
             carousel.Tick += Carousel_Tick;
             carousel.Start();
+
+            // Create the timer for the screen wake-up
+            screenwakeup = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMinutes(1)
+            };
+            screenwakeup.Tick += ScreenWakeUp_Tick;
+            screenwakeup.Start();
         }
 
         private int TotalSplashStep = 10 + 1;
@@ -863,6 +872,21 @@ namespace WinDeskClock
                     await Task.Delay(500);
                     FadeRect.Visibility = Visibility.Hidden;
                     break;
+            }
+        }
+
+        private async void ScreenWakeUp_Tick(object sender, EventArgs e)
+        {
+            if (ConfigManager.Variables.ScreenAutoWakeUp)
+            {
+                DateTime now = DateTime.Now;
+                if (now.Hour == ConfigManager.Variables.ScreenAutoWakeUpTime.Hour && now.Minute == ConfigManager.Variables.ScreenAutoWakeUpTime.Minute)
+                {
+                    await TurnScreenOn();
+                }
+
+                int nextminute = 60 - DateTime.Now.Second;
+                screenwakeup.Interval = TimeSpan.FromSeconds(nextminute);
             }
         }
         #endregion

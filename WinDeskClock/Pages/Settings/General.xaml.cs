@@ -104,6 +104,46 @@ namespace WinDeskClock.Pages.Settings
                 ShowSecondsToggleSwitch.IsChecked = true;
             };
 
+            ScreenWakeUpToggleSwitch.IsChecked = ConfigManager.Variables.ScreenAutoWakeUp;
+            if (ConfigManager.Variables.ScreenAutoWakeUp)
+            {
+                ScreenWakeUpDelayHourNumberBox.IsEnabled = true;
+                ScreenWakeUpDelayMinuteNumberBox.IsEnabled = true;
+            }
+            else
+            {
+                ScreenWakeUpDelayHourNumberBox.IsEnabled = false;
+                ScreenWakeUpDelayMinuteNumberBox.IsEnabled = false;
+            }
+            ScreenWakeUpToggleSwitch.Checked += async (s, e) =>
+            {
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.ScreenAutoWakeUp = true;
+                ScreenWakeUpDelayHourNumberBox.IsEnabled = true;
+                ScreenWakeUpDelayMinuteNumberBox.IsEnabled = true;
+            };
+            ScreenWakeUpToggleSwitch.Unchecked += async (s, e) =>
+            {
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.ScreenAutoWakeUp = false;
+                ScreenWakeUpDelayHourNumberBox.IsEnabled = false;
+                ScreenWakeUpDelayMinuteNumberBox.IsEnabled = false;
+            };
+
+            ScreenWakeUpDelayHourNumberBox.Value = ConfigManager.Variables.ScreenAutoWakeUpTime.Hour;
+            ScreenWakeUpDelayHourNumberBox.ValueChanged += async (s, e) =>
+            {
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.ScreenAutoWakeUpTime = new TimeOnly((int)ScreenWakeUpDelayHourNumberBox.Value, (int)ScreenWakeUpDelayMinuteNumberBox.Value);
+            };
+
+            ScreenWakeUpDelayMinuteNumberBox.Value = ConfigManager.Variables.ScreenAutoWakeUpTime.Minute;
+            ScreenWakeUpDelayMinuteNumberBox.ValueChanged += async (s, e) =>
+            {
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.ScreenAutoWakeUpTime = new TimeOnly((int)ScreenWakeUpDelayHourNumberBox.Value, (int)ScreenWakeUpDelayMinuteNumberBox.Value);
+            };
+
             DefaultAlarmSoundDesc.Text = LangSystem.GetLang("settings.general.alarm.defaultsound.desc", ConfigManager.Variables.DefaultAlarmSound).Result;
             DefaultAlarmSoundBtn.Click += async (s, e) =>
             {
@@ -210,6 +250,7 @@ namespace WinDeskClock.Pages.Settings
                 ScreenOnOffNone.Content = await LangSystem.GetLang("settings.general.screenonoff.type.none");
                 ScreenOnOffFade.Content = await LangSystem.GetLang("settings.general.screenonoff.type.fade");
                 ScreenOnOffCRT.Content = await LangSystem.GetLang("settings.general.screenonoff.type.crt");
+                ScreenWakeUpTitle.Text = await LangSystem.GetLang("settings.general.screenwakeup.name");
 
                 ShowSecondsTitle.Text = await LangSystem.GetLang("settings.general.clock.showsec.name");
                 ShowSecondsDesc.Text = await LangSystem.GetLang("settings.general.clock.showsec.desc");
