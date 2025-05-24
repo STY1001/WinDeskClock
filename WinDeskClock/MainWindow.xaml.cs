@@ -629,12 +629,12 @@ namespace WinDeskClock
         private IntPtr PowerNotifHandle;
         private async Task TurnScreenOff()
         {
-            await ScreenOffAnimation(ConfigManager.Variables.ScreenOnOff);
-            await Task.Delay(200);
             Guid powerSettingGuid = user32dll.User32CONSOLE_DISPLAY_STATE;
             var hwnd = new WindowInteropHelper(this).Handle;
             HwndSource.FromHwnd(hwnd).AddHook(new HwndSourceHook(WndProc));
             PowerNotifHandle = user32dll.User32RegisterPowerSettingNotification(hwnd, ref powerSettingGuid, 0);
+            await ScreenOffAnimation(ConfigManager.Variables.ScreenOnOff);
+            await Task.Delay(200);
             user32dll.User32SendMessage(0xFFFF, (int)user32dll.User32WM_SYSCOMMAND, (int)user32dll.User32SC_MONITORPOWER, user32dll.User32MONITOR_OFF);
             TurnOnSignal = false;
 
