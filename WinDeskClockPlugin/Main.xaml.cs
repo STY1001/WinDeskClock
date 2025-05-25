@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using WinDeskClock.Interfaces;
 
 namespace WinDeskClockPlugin
 {
@@ -30,9 +31,9 @@ namespace WinDeskClockPlugin
         public async Task LoadLang()
         {
             // Place your code here to apply the language to the controls in the main page
-            // - You can get the language from the main program with:
-            //   Plugin plugin = new Plugin();
-            //   plugin.Language;
+            // - You need to use IPluginAppStatus.Language for your plugin language system, this variable is the same as the main program language. If your plugin don't have the language that set in the main program, you need to use the default language (en-us)
+            // - You can get the language from the main program with this variable:
+            // IPluginAppStatus.Language;
         }
 
         public async Task LoadConfig()
