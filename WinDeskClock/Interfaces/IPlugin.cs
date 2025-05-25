@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using WinDeskClock.Utils;
 
 namespace WinDeskClock.Interfaces
 {
@@ -29,5 +30,14 @@ namespace WinDeskClock.Interfaces
         Page GetMain();  // Main page of the plugin
         Page GetSettings();  // Settings page of the plugin
         Task SaveConfig();  // Save configuration of the plugin
+        Task OnEvent(string eventName, object? data = null);  // Event handler for the plugin
+    }
+
+    public static class IPluginAppStatus
+    {
+        // Application status for the plugin
+        // This is not an interface to ensure there is no crash or error if the plugin does not implement it or if there is update in the future
+        public static string Language { get { return ConfigManager.Variables.Language; } } // Language of the application
+
     }
 }
