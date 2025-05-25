@@ -140,7 +140,7 @@
                         <ui:NumberBox x:Name="ScreenWakeUpDelayHourNumberBox"
                                       Minimum="0"
                                       Maximum="23"
-                                      ClearButtonEnabled="False"/>
+                                      ClearButtonEnabled="False" />
                         <TextBlock Text=":"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    FontSize="12"
