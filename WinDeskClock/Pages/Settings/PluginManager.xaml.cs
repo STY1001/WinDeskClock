@@ -320,8 +320,7 @@ namespace WinDeskClock.Pages.Settings
             PluginInfoWebsiteButton.SetValue(Grid.ColumnProperty, 0);
             PluginInfoWebsiteButton.Tag = $"{id}_PluginInfoWebsiteButton";
             PluginInfoWebsiteButton.IsEnabled = PluginLoader.PluginInfos[id].ProjectWebsiteURL != "none";
-            PluginInfoWebsiteButton.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/internet.png")), Width = 16, Height = 16 }
-            ;
+            PluginInfoWebsiteButton.Icon = new ImageIcon { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/internet.png")), Width = 16, Height = 16 };
             PluginInfoWebsiteButton.Click += async (s, e) =>
             {
                 Process.Start(new ProcessStartInfo(PluginLoader.PluginInfos[id].ProjectWebsiteURL) { UseShellExecute = true });
