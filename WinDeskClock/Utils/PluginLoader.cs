@@ -214,8 +214,17 @@ namespace WinDeskClock.Utils
                             if (!await CheckDisabledPlugin(pluginInfo.ID))
                             {
                                 PluginModules.Add(pluginInfo.ID, pluginModule);
+                                Debug.WriteLine($"Plugin loaded: {pluginInfo.Name} ({pluginInfo.ID}) by {pluginInfo.Author}");
                             }
                         }
+                        else
+                        {
+                            IncompatiblePlugin.Add(pluginInfo.ID);
+                        }
+                    }
+                    else
+                    {
+                        IncompatiblePlugin.Add(pluginInfo.ID);
                     }
                 }
                 catch
