@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:WinDeskClock.Pages.Settings"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d"
-      d:DesignHeight="485"
+      d:DesignHeight="1000"
       d:DesignWidth="1180"
       Title="About">
 
@@ -18,10 +18,10 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Border Background="#0affffff"
-                    BorderThickness="1"
                     CornerRadius="8"
                     Padding="20"
-                    Margin="20">
+                    Margin="20"
+                    Grid.Row="0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
