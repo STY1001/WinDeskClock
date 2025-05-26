@@ -46,6 +46,7 @@ namespace WinDeskClock.Clocks
                 };
                 time.Tick += Time_Tick;
                 time.Start();
+                InitTextTransforms();
                 Init = true;
             }
 
@@ -125,7 +126,158 @@ namespace WinDeskClock.Clocks
             time.Interval = TimeSpan.FromMilliseconds(nextsecms);
         }
 
-        // Update the clock with animation
+        private void InitTextTransforms()
+        {
+            H1Text.RenderTransform = new TranslateTransform();
+            H2Text.RenderTransform = new TranslateTransform();
+            M1Text.RenderTransform = new TranslateTransform();
+            M2Text.RenderTransform = new TranslateTransform();
+            S1Text.RenderTransform = new TranslateTransform();
+            S2Text.RenderTransform = new TranslateTransform();
+            DNameText.RenderTransform = new TranslateTransform();
+            DDayText.RenderTransform = new TranslateTransform();
+            DMonthText.RenderTransform = new TranslateTransform();
+            DYearText.RenderTransform = new TranslateTransform();
+        }
+
+        private Task AnimateTextChange(TextBlock textBlock, string oldText, string newText, double from1, double to1, double from2, double to2, bool isXAxis = false)
+        {
+            var tcs = new TaskCompletionSource<object>();
+            var transform = textBlock.RenderTransform as TranslateTransform;
+            if (transform == null)
+            {
+                transform = new TranslateTransform();
+                textBlock.RenderTransform = transform;
+            }
+
+            DependencyProperty targetProp = isXAxis
+                ? TranslateTransform.XProperty
+                : TranslateTransform.YProperty;
+
+            textBlock.Text = oldText;
+
+            var animOut = new DoubleAnimation
+            {
+                From = from1,
+                To = to1,
+                Duration = TimeSpan.FromSeconds(txtslidespeed),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+            };
+
+            animOut.Completed += async (s, e) =>
+            {
+                await Task.Delay(txtdelay);
+                textBlock.Text = newText;
+
+                var animIn = new DoubleAnimation
+                {
+                    From = from2,
+                    To = to2,
+                    Duration = TimeSpan.FromSeconds(txtslidespeed * 2),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+
+                transform.BeginAnimation(targetProp, animIn);
+                animIn.Completed += (_, __) => tcs.SetResult(null);
+            };
+
+            transform.BeginAnimation(targetProp, animOut);
+            return tcs.Task;
+        }
+
+        private async Task UpdateH1(string text)
+        {
+            if (ActualH1 != text)
+            {
+                AnimateTextChange(H1Text, ActualH1, text, 0, -180, 180, 0);
+                ActualH1 = text;
+            }
+        }
+
+        private async Task UpdateH2(string text)
+        {
+            if (ActualH2 != text)
+            {
+                AnimateTextChange(H2Text, ActualH2, text, 0, -180, 180, 0);
+                ActualH2 = text;
+            }
+        }
+
+        private async Task UpdateM1(string text)
+        {
+            if (ActualM1 != text)
+            {
+                AnimateTextChange(M1Text, ActualM1, text, 0, 180, -180, 0);
+                ActualM1 = text;
+            }
+        }
+
+        private async Task UpdateM2(string text)
+        {
+            if (ActualM2 != text)
+            {
+                AnimateTextChange(M2Text, ActualM2, text, 0, 180, -180, 0);
+                ActualM2 = text;
+            }
+        }
+
+        private async Task UpdateS1(string text)
+        {
+            if (ActualS1 != text)
+            {
+                AnimateTextChange(S1Text, ActualS1, text, 0, 110, -110, 0, isXAxis: true);
+                ActualS1 = text;
+            }
+        }
+
+        private async Task UpdateS2(string text)
+        {
+            if (ActualS2 != text)
+            {
+                AnimateTextChange(S2Text, ActualS2, text, 0, 110, -110, 0, isXAxis: true);
+                ActualS2 = text;
+            }
+        }
+
+        private async Task UpdateDName(string text)
+        {
+            if (ActualDName != text)
+            {
+                var newText = (await LangSystem.GetLang($"clock.days.short.{text}")).ToUpper();
+                AnimateTextChange(DNameText, ActualDName, newText, 0, -55, 55, 0);
+                ActualDName = text;
+            }
+        }
+
+        private async Task UpdateDDay(string text)
+        {
+            if (ActualDDay != text)
+            {
+                AnimateTextChange(DDayText, ActualDDay, text, 0, -55, 55, 0);
+                ActualDDay = text;
+            }
+        }
+
+        private async Task UpdateDMonth(string text)
+        {
+            if (ActualDMonth != text)
+            {
+                var newText = (await LangSystem.GetLang($"clock.months.short.{text}")).ToUpper();
+                AnimateTextChange(DMonthText, ActualDMonth, newText, 0, -55, 55, 0);
+                ActualDMonth = text;
+            }
+        }
+
+        private async Task UpdateDYear(string text)
+        {
+            if (ActualDYear != text)
+            {
+                AnimateTextChange(DYearText, ActualDYear, text, 0, -55, 55, 0);
+                ActualDYear = text;
+            }
+        }
+
+        /*// Update the clock with animation
         private async Task UpdateH1(string text)
         {
             if (ActualH1 != text)
@@ -509,6 +661,6 @@ namespace WinDeskClock.Clocks
                     storyboard.Begin();
                 }
             }
-        }
+        }*/
     }
 }
