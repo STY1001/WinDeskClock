@@ -228,6 +228,29 @@ namespace WinDeskClock.Pages.Settings
                 CarouselDelayText.Text = await LangSystem.GetLang("settings.general.plugin.carouseldelay.secs", CarouselDelaySlider.Value.ToString("0"));
             };
 
+            MenuAutoCloseSlider.Value = ConfigManager.Variables.MenuCloseDelay;
+            if (MenuAutoCloseSlider.Value == 0)
+            {
+                MenuAutoCloseText.Text = LangSystem.GetLang("settings.general.menuautoclose.never").Result;
+            }
+            else
+            {
+                MenuAutoCloseText.Text = LangSystem.GetLang("settings.general.menuautoclose.secs", MenuAutoCloseSlider.Value.ToString("0")).Result;
+            }
+            MenuAutoCloseSlider.ValueChanged += async (s, e) =>
+            {
+                ConfigManager.NewVariables.RestartNeeded = true;
+                ConfigManager.NewVariables.MenuCloseDelay = (int)MenuAutoCloseSlider.Value;
+                if (MenuAutoCloseSlider.Value == 0)
+                {
+                    MenuAutoCloseText.Text = await LangSystem.GetLang("settings.general.menuautoclose.never");
+                }
+                else
+                {
+                    MenuAutoCloseText.Text = await LangSystem.GetLang("settings.general.menuautoclose.secs", MenuAutoCloseSlider.Value.ToString("0"));
+                }
+            };
+
             // Load settings
             Loaded += async (s, e) => await Load();
         }
@@ -251,6 +274,7 @@ namespace WinDeskClock.Pages.Settings
                 ScreenOnOffFade.Content = await LangSystem.GetLang("settings.general.screenonoff.type.fade");
                 ScreenOnOffCRT.Content = await LangSystem.GetLang("settings.general.screenonoff.type.crt");
                 ScreenWakeUpTitle.Text = await LangSystem.GetLang("settings.general.screenwakeup.name");
+                MenuAutoCloseTitle.Text = await LangSystem.GetLang("settings.general.menuautoclose.name");
 
                 ShowSecondsTitle.Text = await LangSystem.GetLang("settings.general.clock.showsec.name");
                 ShowSecondsDesc.Text = await LangSystem.GetLang("settings.general.clock.showsec.desc");
@@ -358,6 +382,30 @@ namespace WinDeskClock.Pages.Settings
 
             CarouselDelaySlider.Value = ConfigManager.Variables.CarouselDelay;
             CarouselDelayText.Text = await LangSystem.GetLang("settings.general.plugin.carouseldelay.secs", CarouselDelaySlider.Value.ToString("0"));
+
+            ScreenWakeUpToggleSwitch.IsChecked = ConfigManager.Variables.ScreenAutoWakeUp;
+            if (ConfigManager.Variables.ScreenAutoWakeUp)
+            {
+                ScreenWakeUpDelayHourNumberBox.IsEnabled = true;
+                ScreenWakeUpDelayMinuteNumberBox.IsEnabled = true;
+            }
+            else
+            {
+                ScreenWakeUpDelayHourNumberBox.IsEnabled = false;
+                ScreenWakeUpDelayMinuteNumberBox.IsEnabled = false;
+            }
+            ScreenWakeUpDelayHourNumberBox.Value = ConfigManager.Variables.ScreenAutoWakeUpTime.Hour;
+            ScreenWakeUpDelayMinuteNumberBox.Value = ConfigManager.Variables.ScreenAutoWakeUpTime.Minute;
+
+            MenuAutoCloseSlider.Value = ConfigManager.Variables.MenuCloseDelay;
+            if (MenuAutoCloseSlider.Value == 0)
+            {
+                MenuAutoCloseText.Text = LangSystem.GetLang("settings.general.menuautoclose.never").Result;
+            }
+            else
+            {
+                MenuAutoCloseText.Text = LangSystem.GetLang("settings.general.menuautoclose.secs", MenuAutoCloseSlider.Value.ToString("0")).Result;
+            }
         }
     }
 }

@@ -21,6 +21,7 @@ namespace WinDeskClock.Utils
                 { "DefaultAlarmSound", "C:\\Windows\\Media\\Alarm05.wav" },
                 { "AlarmTimeoutDelay", "1" },
                 { "CarouselDelay", "5" },
+                { "MenuCloseDelay", "10" },
                 { "ClockShowSecond", "true" },
                 { "ClockFbxStyle", "false" },
                 { "BlurEffect", "true" },
@@ -63,6 +64,7 @@ namespace WinDeskClock.Utils
             Variables.DefaultAlarmSound = await GetConfig("DefaultAlarmSound");
             Variables.AlarmTimeoutDelay = int.Parse(await GetConfig("AlarmTimeoutDelay"));
             Variables.CarouselDelay = int.Parse(await GetConfig("CarouselDelay"));
+            Variables.MenuCloseDelay = int.Parse(await GetConfig("MenuCloseDelay"));
             Variables.ClockShowSecond = bool.Parse(await GetConfig("ClockShowSecond"));
             Variables.ClockFbxStyle = bool.Parse(await GetConfig("ClockFbxStyle"));
             Variables.BlurEffect = bool.Parse(await GetConfig("BlurEffect"));
@@ -103,6 +105,7 @@ namespace WinDeskClock.Utils
             NewVariables.ClockShowSecond = Variables.ClockShowSecond;
             NewVariables.AlarmTimeoutDelay = Variables.AlarmTimeoutDelay;
             NewVariables.CarouselDelay = Variables.CarouselDelay;
+            NewVariables.MenuCloseDelay = Variables.MenuCloseDelay;
             NewVariables.ClockFbxStyle = Variables.ClockFbxStyle;
             NewVariables.BlurEffect = Variables.BlurEffect;
             NewVariables.ScreenAutoWakeUp = Variables.ScreenAutoWakeUp;
@@ -134,6 +137,7 @@ namespace WinDeskClock.Utils
             await SetConfig("ClockFbxStyle", NewVariables.ClockFbxStyle.ToString());
             await SetConfig("AlarmTimeoutDelay", NewVariables.AlarmTimeoutDelay.ToString());
             await SetConfig("CarouselDelay", NewVariables.CarouselDelay.ToString());
+            await SetConfig("MenuCloseDelay", NewVariables.MenuCloseDelay.ToString());
             await SetConfig("BlurEffect", NewVariables.BlurEffect.ToString());
             await SetConfig("ScreenAutoWakeUp", NewVariables.ScreenAutoWakeUp.ToString());
             await SetConfig("ScreenAutoWakeUpTime", NewVariables.ScreenAutoWakeUpTime.ToString("HH:mm"));
@@ -272,6 +276,7 @@ namespace WinDeskClock.Utils
             public static string ScreenOnOff;
             public static int AlarmTimeoutDelay;
             public static int CarouselDelay;
+            public static int MenuCloseDelay;
             public static bool ClockShowSecond;
             public static bool ClockFbxStyle;
             public static bool BlurEffect;
@@ -291,6 +296,7 @@ namespace WinDeskClock.Utils
             public static string ScreenOnOff;
             public static int AlarmTimeoutDelay;
             public static int CarouselDelay;
+            public static int MenuCloseDelay;
             public static bool ClockShowSecond;
             public static bool ClockFbxStyle;
             public static bool BlurEffect;

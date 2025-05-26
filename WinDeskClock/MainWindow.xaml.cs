@@ -60,7 +60,7 @@ namespace WinDeskClock
         [DllImport("user32.dll")]
         private static extern IntPtr RegisterPowerSettingNotification(IntPtr hRecipient, ref Guid PowerSettingGuid, uint Flags);
         [DllImport("user32.dll")]
-        private static extern bool UnregisterPowerSettingNotification(IntPtr Handle); 
+        private static extern bool UnregisterPowerSettingNotification(IntPtr Handle);
         [DllImport("user32.dll")]
         private static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, IntPtr dwExtraInfo);
         public int User32SendMessage(int hWnd, int hMsg, int wParam, int lParam)
@@ -95,6 +95,8 @@ namespace WinDeskClock
         private DispatcherTimer alarm;
         private DispatcherTimer carousel;
         private DispatcherTimer screenwakeup;
+        private DispatcherTimer menuautoclose;
+        private DispatcherTimer mousehide;
         private TimeSpan timer;
 
         private Dictionary<string, Page> SettingsTabs = new Dictionary<string, Page>();
@@ -109,20 +111,68 @@ namespace WinDeskClock
             DownMenuClockGrid.Visibility = Visibility.Visible;
             DownMenuPluginGrid.Visibility = Visibility.Visible;
 
-            // Prevent the window from being resized, minimized or windowed when FullScreenBtn mode is enabled
-            this.StateChanged += async (sender, e) =>
+            // Prevent the window from being resized
+            this.StateChanged += async (s, e) =>
             {
                 await Task.Delay(100);
                 if (FullScreenBtn.IsChecked == true && this.WindowState != WindowState.Maximized)
                 {
-                    WindowState = WindowState.Normal;
-                    WindowStyle = WindowStyle.None;
-                    WindowState = WindowState.Maximized;
+                    this.WindowState = WindowState.Normal;
+                    this.WindowStyle = WindowStyle.None;
+                    this.WindowState = WindowState.Maximized;
                 }
             };
 
-            // Hide cursor after 3 seconds of inactivity
-            this.MouseMove += MouseMoved;
+            // Auto layout for horizontal and vertical screen sizes
+            this.SizeChanged += async (s, e) =>
+            {
+                await Task.Delay(100);
+                if (FullScreenBtn.IsChecked == true && this.WindowState != WindowState.Maximized)
+                {
+                    this.WindowState = WindowState.Normal;
+                    this.WindowStyle = WindowStyle.None;
+                    this.WindowState = WindowState.Maximized;
+                }
+
+                if (this.ActualWidth >= this.ActualHeight)
+                {
+                    LeftGrid.SetValue(Grid.ColumnProperty, 0);
+                    LeftGrid.SetValue(Grid.ColumnSpanProperty, 1);
+                    LeftGrid.SetValue(Grid.RowProperty, 0);
+                    LeftGrid.SetValue(Grid.RowSpanProperty, 3);
+                    RightGrid.SetValue(Grid.ColumnProperty, 2);
+                    RightGrid.SetValue(Grid.ColumnSpanProperty, 1);
+                    RightGrid.SetValue(Grid.RowProperty, 0);
+                    RightGrid.SetValue(Grid.RowSpanProperty, 3);
+                    GlobalMenuSep.SetValue(Grid.ColumnProperty, 1);
+                    GlobalMenuSep.SetValue(Grid.ColumnSpanProperty, 1);
+                    GlobalMenuSep.SetValue(Grid.RowProperty, 0);
+                    GlobalMenuSep.SetValue(Grid.RowSpanProperty, 3);
+                    GlobalMenuBtn.SetValue(Grid.ColumnProperty, 1);
+                    GlobalMenuBtn.SetValue(Grid.ColumnSpanProperty, 1);
+                    GlobalMenuBtn.SetValue(Grid.RowProperty, 0);
+                    GlobalMenuBtn.SetValue(Grid.RowSpanProperty, 3);
+                }
+                else
+                {
+                    LeftGrid.SetValue(Grid.ColumnProperty, 0);
+                    LeftGrid.SetValue(Grid.ColumnSpanProperty, 3);
+                    LeftGrid.SetValue(Grid.RowProperty, 0);
+                    LeftGrid.SetValue(Grid.RowSpanProperty, 1);
+                    RightGrid.SetValue(Grid.ColumnProperty, 0);
+                    RightGrid.SetValue(Grid.ColumnSpanProperty, 3);
+                    RightGrid.SetValue(Grid.RowProperty, 2);
+                    RightGrid.SetValue(Grid.RowSpanProperty, 1);
+                    GlobalMenuSep.SetValue(Grid.ColumnProperty, 0);
+                    GlobalMenuSep.SetValue(Grid.ColumnSpanProperty, 3);
+                    GlobalMenuSep.SetValue(Grid.RowProperty, 1);
+                    GlobalMenuSep.SetValue(Grid.RowSpanProperty, 1);
+                    GlobalMenuBtn.SetValue(Grid.ColumnProperty, 0);
+                    GlobalMenuBtn.SetValue(Grid.ColumnSpanProperty, 3);
+                    GlobalMenuBtn.SetValue(Grid.RowProperty, 1);
+                    GlobalMenuBtn.SetValue(Grid.RowSpanProperty, 1);
+                }
+            };
 
             Loaded += MainWindow_Loaded;
         }
@@ -266,6 +316,8 @@ namespace WinDeskClock
                 TimeUpBlur.CacheMode = null;
                 SettingsBlur.CacheMode = null;
                 GlobalMenuBlur.CacheMode = null;
+
+                this.WindowBackdropType = WindowBackdropType.None;
             }
 
             // Lang apply
@@ -344,6 +396,22 @@ namespace WinDeskClock
             };
             screenwakeup.Tick += ScreenWakeUp_Tick;
             screenwakeup.Start();
+
+            // Create the timer for the mouse auto hide
+            mousehide = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(3)
+            };
+            mousehide.Tick += MouseHide_Tick;
+            mousehide.Start();
+
+            // Create the timer for the menu auto close
+            menuautoclose = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(ConfigManager.Variables.MenuCloseDelay)
+            };
+            menuautoclose.Tick += MenuAutoClose_Tick;
+            menuautoclose.Start();
         }
 
         private int TotalSplashStep = 10 + 1;
@@ -410,8 +478,14 @@ namespace WinDeskClock
                 WindowState = WindowState.Normal;
                 WindowStyle = WindowStyle.None;
                 WindowState = WindowState.Maximized;
+                this.Topmost = true;
                 RootTitleBar.ShowMaximize = false;
                 RootTitleBar.ShowMinimize = false;
+                RootTitleBar.Width = 50;
+                RootTitleBar.Padding = new Thickness(0, 0, 0, 0);
+                RootTitleBar.HorizontalAlignment = HorizontalAlignment.Right;
+                RootTitleBar.Title = "";
+                AppTitleText.Visibility = Visibility.Visible;
             }
             if (App.StartupOptions.KioskMode)
             {
@@ -421,9 +495,13 @@ namespace WinDeskClock
                 WindowState = WindowState.Normal;
                 WindowStyle = WindowStyle.None;
                 WindowState = WindowState.Maximized;
+                this.Topmost = true;
                 RootTitleBar.ShowMaximize = false;
                 RootTitleBar.ShowMinimize = false;
                 RootTitleBar.ShowClose = false;
+                RootTitleBar.Visibility = Visibility.Hidden;
+                AppTitleText.Visibility = Visibility.Visible;
+                RootTitleBar.Width = 0;
                 Process.Start("taskkill", "/f /im explorer.exe");
             }
 
@@ -593,18 +671,297 @@ namespace WinDeskClock
                 storyboard.Children.Add(translateAnimation);
                 storyboard.Begin();
             }
+
+            this.MouseMove += MouseMoved;
         }
 
-        private bool MouseMovedExecuted = false;
+        private async void MenuAutoClose_Tick(object sender, EventArgs e)
+        {
+            if (ConfigManager.Variables.MenuCloseDelay != 0)
+            {
+                if (GlobalMenuGrid.Visibility == Visibility.Visible)
+                {
+                    {
+                        var fadeAnimation = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        Storyboard.SetTarget(fadeAnimation, GlobalMenuGrid);
+                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(fadeAnimation);
+                        storyboard.Begin();
+                    }
+                    {
+                        var sizeAnimation1 = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        var sizeAnimation2 = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        Storyboard.SetTarget(sizeAnimation1, GlobalMenuBorder);
+                        Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                        Storyboard.SetTarget(sizeAnimation2, GlobalMenuBorder);
+                        Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(sizeAnimation1);
+                        storyboard.Children.Add(sizeAnimation2);
+                        storyboard.Begin();
+                    }
+                    await Task.Delay(150);
+                    {
+                        var fadeAnimation = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
+                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(fadeAnimation);
+                        storyboard.Begin();
+                    }
+                    {
+                        var sizeAnimation1 = new DoubleAnimation
+                        {
+                            From = 2,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        var sizeAnimation2 = new DoubleAnimation
+                        {
+                            From = 2,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
+                        Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                        Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
+                        Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(sizeAnimation1);
+                        storyboard.Children.Add(sizeAnimation2);
+                        storyboard.Begin();
+                    }
+                    await Task.Delay(300);
+                    GlobalMenuGrid.Visibility = Visibility.Hidden;
+                }
+                if (ClockGrid.Visibility != Visibility.Visible)
+                {
+                    {
+                        var fadeAnimation = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(fadespeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        var translateAnimation = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 100,
+                            Duration = TimeSpan.FromSeconds(zoomspeed),
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        Storyboard.SetTarget(fadeAnimation, MenuClockGrid);
+                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
+                        Storyboard.SetTarget(translateAnimation, MenuClockGrid);
+                        Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(fadeAnimation);
+                        storyboard.Children.Add(translateAnimation);
+                        storyboard.Begin();
+                    }
+
+                    {
+                        var fadeAnimation = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(fadespeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        var fadeAnimation2 = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(fadespeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        var zoomAnimation1 = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(zoomspeed),
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        var zoomAnimation2 = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(zoomspeed),
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        Storyboard.SetTarget(fadeAnimation, MiniClockBorder);
+                        Storyboard.SetTarget(fadeAnimation2, ExitDownMenuClockBtn);
+                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
+                        Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
+                        Storyboard.SetTarget(zoomAnimation1, MiniClockBorder);
+                        Storyboard.SetTarget(zoomAnimation2, MiniClockBorder);
+                        Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                        Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(fadeAnimation);
+                        storyboard.Children.Add(fadeAnimation2);
+                        storyboard.Children.Add(zoomAnimation1);
+                        storyboard.Children.Add(zoomAnimation2);
+                        storyboard.Begin();
+                    }
+
+                    await Task.Delay(400);
+
+                    MenuClockGrid.Visibility = Visibility.Hidden;
+                    MiniClockBorder.Visibility = Visibility.Hidden;
+                    ExitDownMenuClockBtn.Visibility = Visibility.Hidden;
+                    ClockGrid.Visibility = Visibility.Visible;
+
+                    {
+                        var fadeAnimation = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(fadespeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        var zoomAnimation1 = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(zoomspeed),
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        var zoomAnimation2 = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(zoomspeed),
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        Storyboard.SetTarget(fadeAnimation, ClockGrid);
+                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
+                        Storyboard.SetTarget(zoomAnimation1, ClockGrid);
+                        Storyboard.SetTarget(zoomAnimation2, ClockGrid);
+                        Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                        Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(fadeAnimation);
+                        storyboard.Children.Add(zoomAnimation1);
+                        storyboard.Children.Add(zoomAnimation2);
+                        storyboard.Begin();
+                    }
+                }
+                if (PluginGrid.Visibility != Visibility.Visible)
+                {
+                    {
+                        var translateAnimation = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 100,
+                            Duration = TimeSpan.FromSeconds(zoomspeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        var fadeAnimation = new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(fadespeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        Storyboard.SetTarget(translateAnimation, MenuPluginGrid);
+                        Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                        Storyboard.SetTarget(fadeAnimation, MenuPluginGrid);
+                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(translateAnimation);
+                        storyboard.Children.Add(fadeAnimation);
+                        storyboard.Begin();
+                    }
+
+                    await Task.Delay(400);
+
+                    MenuPluginGrid.Visibility = Visibility.Hidden;
+                    PluginGrid.Visibility = Visibility.Visible;
+
+                    if (CarouselPluginList.Count != 0)
+                    {
+                        MenuPluginFrame.Navigate(null);
+                        CarouselPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[0]].GetMain());
+                    }
+
+                    {
+                        var translateAnimation = new DoubleAnimation
+                        {
+                            From = -100,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(zoomspeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+                        var fadeAnimation = new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(fadespeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        };
+                        Storyboard.SetTarget(translateAnimation, PluginGrid);
+                        Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+                        Storyboard.SetTarget(fadeAnimation, PluginGrid);
+                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                        var storyboard = new Storyboard();
+                        storyboard.Children.Add(translateAnimation);
+                        storyboard.Children.Add(fadeAnimation);
+                        storyboard.Begin();
+                    }
+                }
+            }
+        }
+
         private async void MouseMoved(object sender, MouseEventArgs e)
         {
-            if (!MouseMovedExecuted && FullScreenBtn.IsChecked == true)
+            if (FullScreenBtn.IsChecked == true)
             {
-                MouseMovedExecuted = true;
                 this.Cursor = Cursors.Arrow;
-                await Task.Delay(3000);
+                mousehide.Interval = TimeSpan.FromSeconds(3);
+                mousehide.Start();
+            }
+
+            if (ConfigManager.Variables.MenuCloseDelay != 0)
+            {
+                menuautoclose.Interval = TimeSpan.FromSeconds(ConfigManager.Variables.MenuCloseDelay);
+                menuautoclose.Start();
+            }
+        }
+
+        private async void MouseHide_Tick(object sender, EventArgs e)
+        {
+            if (FullScreenBtn.IsChecked == true)
+            {
                 this.Cursor = Cursors.None;
-                MouseMovedExecuted = false;
             }
         }
 
@@ -5734,16 +6091,28 @@ namespace WinDeskClock
                 WindowState = WindowState.Normal;
                 WindowStyle = WindowStyle.None;
                 WindowState = WindowState.Maximized;
+                this.Topmost = true;
                 RootTitleBar.ShowMaximize = false;
                 RootTitleBar.ShowMinimize = false;
+                RootTitleBar.Width = 50;
+                RootTitleBar.Padding = new Thickness(0, 0, 0, 0);
+                RootTitleBar.HorizontalAlignment = HorizontalAlignment.Right;
+                RootTitleBar.Title = "";
+                AppTitleText.Visibility = Visibility.Visible;
             }
             else
             {
                 WindowState = WindowState.Normal;
                 WindowStyle = WindowStyle.SingleBorderWindow;
                 WindowState = WindowState.Maximized;
+                this.Topmost = false;
                 RootTitleBar.ShowMaximize = true;
                 RootTitleBar.ShowMinimize = true;
+                RootTitleBar.Width = double.NaN;
+                RootTitleBar.Padding = new Thickness(0, 0, 30, 0);
+                RootTitleBar.HorizontalAlignment = HorizontalAlignment.Stretch;
+                RootTitleBar.Title = "WinDeskClock";
+                AppTitleText.Visibility = Visibility.Hidden;
             }
         }
         private async void KioskModeBtn_Click(object sender, RoutedEventArgs e)
@@ -5755,9 +6124,13 @@ namespace WinDeskClock
                 WindowState = WindowState.Normal;
                 WindowStyle = WindowStyle.None;
                 WindowState = WindowState.Maximized;
+                this.Topmost = true;
                 RootTitleBar.ShowMaximize = false;
                 RootTitleBar.ShowMinimize = false;
                 RootTitleBar.ShowClose = false;
+                RootTitleBar.Visibility = Visibility.Hidden;
+                AppTitleText.Visibility = Visibility.Visible;
+                RootTitleBar.Width = 0;
                 Process.Start("taskkill", "/f /im explorer.exe");
             }
             else
@@ -5767,9 +6140,13 @@ namespace WinDeskClock
                 WindowState = WindowState.Normal;
                 WindowStyle = WindowStyle.SingleBorderWindow;
                 WindowState = WindowState.Maximized;
+                this.Topmost = false;
                 RootTitleBar.ShowMaximize = true;
                 RootTitleBar.ShowMinimize = true;
                 RootTitleBar.ShowClose = true;
+                RootTitleBar.Visibility = Visibility.Visible;
+                AppTitleText.Visibility = Visibility.Hidden;
+                RootTitleBar.Width = double.NaN;
                 Process.Start("explorer.exe");
             }
         }

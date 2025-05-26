@@ -38,7 +38,13 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
                 <Grid Grid.Column="0"
+                      Grid.RowSpan="3"
                       x:Name="LeftGrid">
                     <Grid x:Name="ClockGrid"
                           RenderTransformOrigin="0,0">
@@ -753,20 +759,24 @@
                     </Grid>
                 </Grid>
                 <Separator Grid.Column="1"
-                           Margin="10" />
+                           Grid.RowSpan="3"
+                           Margin="10"
+                           x:Name="GlobalMenuSep"/>
                 <ui:Button x:Name="GlobalMenuBtn"
                            Click="GlobalMenuBtn_Click"
                            Icon="{ui:ImageIcon '/Resources/icons/menu.png'}"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
                            Grid.Column="1"
-                           RenderTransformOrigin="0.5,0.5">
+                           RenderTransformOrigin="0.5,0.5"
+                           Grid.RowSpan="3">
                     <ui:Button.RenderTransform>
                         <ScaleTransform ScaleX="1"
                                         ScaleY="1" />
                     </ui:Button.RenderTransform>
                 </ui:Button>
                 <Grid Grid.Column="2"
+                      Grid.RowSpan="3"
                       x:Name="RightGrid">
                     <Grid x:Name="PluginGrid"
                           RenderTransformOrigin="0,0">
@@ -1349,6 +1359,16 @@
                     <TranslateTransform Y="0" />
                 </ui:TitleBar.RenderTransform>
             </ui:TitleBar>
+            <TextBlock x:Name="AppTitleText"
+                       Visibility="Hidden"
+                       Grid.Row="0"
+                       Text="WinDeskClock"
+                       FontSize="12"
+                       FontFamily="Segoe UI SemiBold"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       Margin="32,0,0,0" />
         </Grid>
         <Grid x:Name="OverlayGrid"
               Visibility="Hidden">

@@ -39,6 +39,11 @@
           "screenwakeup": {
             "name": "Screen auto wake-up"
           },
+          "menuautoclose": {
+            "name": "Menu auto-close after inactivity",
+            "never": "Never",
+            "secs": "%0 seconds"
+          },
           "clock": {
             "titlename": "Clock",
             "showsec": {
@@ -83,7 +88,6 @@
             "carouseldelay": {
               "name": "Carousel delay",
               "desc": "Delay between each plugin change (only when 2 or more plugins are pinned)",
-              "sec": "%0 second",
               "secs": "%0 seconds"
             }
           }
@@ -268,6 +272,11 @@
           "screenwakeup": {
             "name": "Réveil automatique de l'écran"
           },
+          "menuautoclose": {
+            "name": "Fermeture automatique des menus après inactivité",
+            "never": "Jamais",
+            "secs": "%0 secondes"
+          },
           "clock": {
             "titlename": "Horloge",
             "showsec": {
@@ -312,7 +321,6 @@
             "carouseldelay": {
               "name": "Délai du carrousel",
               "desc": "Délai entre chaque changement d'extention (seulement quand 2 ou plus d'extentions sont épinglées)",
-              "sec": "%0 seconde",
               "secs": "%0 secondes"
             }
           }
@@ -497,6 +505,11 @@
           "screenwakeup": {
             "name": "Ekranı otomatik uyandırma"
           },
+          "menuautoclose": {
+            "name": "Menülerin inaktiflik sonrası otomatik kapanması",
+            "never": "Asla",
+            "secs": "%0 saniye"
+          },
           "clock": {
             "titlename": "Saat",
             "showsec": {
@@ -541,7 +554,6 @@
             "carouseldelay": {
               "name": "Karusel gecikmesi",
               "desc": "Her eklenti değişimi arasındaki süre (2 veya daha fazla eklenti varsa)",
-              "sec": "%0 saniye",
               "secs": "%0 saniye"
             }
           }

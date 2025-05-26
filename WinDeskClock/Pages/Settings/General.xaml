@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:WinDeskClock.Pages.Settings"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d"
-      d:DesignHeight="1000"
+      d:DesignHeight="1500"
       d:DesignWidth="800"
       Title="General">
 
@@ -153,6 +153,36 @@
                                       ClearButtonEnabled="False"/>
                         <ui:ToggleSwitch x:Name="ScreenWakeUpToggleSwitch"
                                          Margin="15,0,0,0" />
+                    </StackPanel>
+                </ui:CardControl>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/dashboardtimeout.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Menu auto-close after inactivity"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="MenuAutoCloseTitle" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="x seconds"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   FontSize="12"
+                                   HorizontalAlignment="Right"
+                                   Margin="0,0,10,0"
+                                   x:Name="MenuAutoCloseText" />
+                        <Slider x:Name="MenuAutoCloseSlider"
+                                Minimum="0"
+                                Maximum="60"
+                                TickFrequency="10"
+                                IsSnapToTickEnabled="True" />
                     </StackPanel>
                 </ui:CardControl>
                 <Grid HorizontalAlignment="Stretch"
