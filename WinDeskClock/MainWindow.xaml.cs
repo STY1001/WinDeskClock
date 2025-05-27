@@ -1262,8 +1262,8 @@ namespace WinDeskClock
         private async void MiniTime_Tick(object sender, EventArgs e)
         {
             DateTime now = DateTime.Now;
-            await UpdateMiniClockHour(now.Hour.ToString("0"));  // Update the MiniClock Hour
-            await UpdateMiniClockMinute(now.Minute.ToString("00"));  // Update the MiniClock Minute
+            UpdateMiniClockHour(now.Hour.ToString("0"));  // Update the MiniClock Hour
+            UpdateMiniClockMinute(now.Minute.ToString("00"));  // Update the MiniClock Minute
 
             // Time variation fix
             int nextsecond = 60 - DateTime.Now.Second;
@@ -1279,7 +1279,64 @@ namespace WinDeskClock
         private string ActualMCHour = "17";
         // - Actual MiniClock Minute
         private string ActualMCMinute = "20";
-        // - Update MiniClock Hour
+        // - Update MiniClock animation
+        private async Task UpdateMiniClockTextBlock(System.Windows.Controls.TextBlock target, string actualText, string newText)
+        {
+            target.Text = actualText;
+
+            var slideUpAnimation = new DoubleAnimation
+            {
+                From = 0,
+                To = -180,
+                Duration = TimeSpan.FromSeconds(txtslidespeed),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+            };
+
+            Storyboard.SetTarget(slideUpAnimation, target);
+            Storyboard.SetTargetProperty(slideUpAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+
+            var slideUpStoryboard = new Storyboard();
+            slideUpStoryboard.Children.Add(slideUpAnimation);
+            slideUpStoryboard.Begin();
+
+            await Task.Delay(txtdelay);
+
+            target.Text = newText;
+
+            var slideDownAnimation = new DoubleAnimation
+            {
+                From = 180,
+                To = 0,
+                Duration = TimeSpan.FromSeconds(txtslidespeed),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+
+            Storyboard.SetTarget(slideDownAnimation, target);
+            Storyboard.SetTargetProperty(slideDownAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
+
+            var slideDownStoryboard = new Storyboard();
+            slideDownStoryboard.Children.Add(slideDownAnimation);
+            slideDownStoryboard.Begin();
+        }
+
+        private async Task UpdateMiniClockHour(string text)
+        {
+            if (ActualMCHour != text)
+            {
+                UpdateMiniClockTextBlock(MiniClockHour, ActualMCHour, text);
+                ActualMCHour = text;
+            }
+        }
+        private async Task UpdateMiniClockMinute(string text)
+        {
+            if (ActualMCMinute != text)
+            {
+                UpdateMiniClockTextBlock(MiniClockMinute, ActualMCMinute, text);
+                ActualMCMinute = text;
+            }
+        }
+
+        /*// - Update MiniClock Hour
         private async Task UpdateMiniClockHour(string text)
         {
             if (ActualMCHour != text)
@@ -1356,7 +1413,7 @@ namespace WinDeskClock
                     storyboard.Begin();
                 }
             }
-        }
+        }*/
 
         // Navigation functions
         // - Open Clock Menu
@@ -2282,7 +2339,112 @@ namespace WinDeskClock
             }
         }
 
-        // Stopwatch text update with animation
+        private async Task AnimateStopwatchText(System.Windows.Controls.TextBlock textBlock, string newText)
+        {
+            if (textBlock.RenderTransform is not TranslateTransform)
+                textBlock.RenderTransform = new TranslateTransform();
+            var transform = (TranslateTransform)textBlock.RenderTransform;
+            var upAnimation = new DoubleAnimation
+            {
+                From = 0,
+                To = -50,
+                Duration = TimeSpan.FromSeconds(swtxtslidespeed),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+            };
+            transform.BeginAnimation(TranslateTransform.YProperty, upAnimation);
+            await Task.Delay(swtxtdelay);
+            textBlock.Text = newText;
+            var downAnimation = new DoubleAnimation
+            {
+                From = 50,
+                To = 0,
+                Duration = TimeSpan.FromSeconds(swtxtslidespeed),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+            transform.BeginAnimation(TranslateTransform.YProperty, downAnimation);
+        }
+
+
+        private async Task UpdateStopwatchTextH1(string text)
+        {
+            if (ActualStopwatchH1 != text)
+            {
+                AnimateStopwatchText(StopwatchTextH1, text);
+                ActualStopwatchH1 = text;
+            }
+        }
+        private async Task UpdateStopwatchTextH2(string text)
+        {
+            if (ActualStopwatchH2 != text)
+            {
+                AnimateStopwatchText(StopwatchTextH2, text);
+                ActualStopwatchH2 = text;
+            }
+        }
+        private async Task UpdateStopwatchTextM1(string text)
+        {
+            if (ActualStopwatchM1 != text)
+            {
+                AnimateStopwatchText(StopwatchTextM1, text);
+                ActualStopwatchM1 = text;
+            }
+        }
+        private async Task UpdateStopwatchTextM2(string text)
+        {
+            if (ActualStopwatchM2 != text)
+            {
+                AnimateStopwatchText(StopwatchTextM2, text);
+                ActualStopwatchM2 = text;
+            }
+        }
+        private async Task UpdateStopwatchTextS1(string text)
+        {
+            if (ActualStopwatchS1 != text)
+            {
+                AnimateStopwatchText(StopwatchTextS1, text);
+                ActualStopwatchS1 = text;
+            }
+        }
+        private async Task UpdateStopwatchTextS2(string text)
+        {
+            if (ActualStopwatchS2 != text)
+            {
+                AnimateStopwatchText(StopwatchTextS2, text);
+                ActualStopwatchS2 = text;
+            }
+        }
+        private async Task UpdateStopwatchTextMS1(string text, bool reset)
+        {
+            if (ActualStopwatchMS1 != text)
+            {
+                if (reset)
+                {
+                    AnimateStopwatchText(StopwatchTextMS1, text);
+                }
+                else
+                {
+                    StopwatchTextMS1.Text = text;
+                }
+                ActualStopwatchMS1 = text;
+            }
+        }
+        private async Task UpdateStopwatchTextMS2(string text, bool reset)
+        {
+            if (ActualStopwatchMS2 != text)
+            {
+                if (reset)
+                {
+                    AnimateStopwatchText(StopwatchTextMS2, text);
+                }
+                else
+                {
+                    StopwatchTextMS2.Text = text;
+                }
+                ActualStopwatchMS2 = text;
+            }
+        }
+
+        /*// Stopwatch text update with animation
         private async Task UpdateStopwatchTextH1(string text)
         {
             if (ActualStopwatchH1 != text)
@@ -2596,7 +2758,7 @@ namespace WinDeskClock
                 StopwatchTextMS2.Text = text;
                 ActualStopwatchMS2 = text;
             }
-        }
+        }*/
         #endregion
 
         #region Timer
@@ -3367,7 +3529,100 @@ namespace WinDeskClock
             }
         }
 
-        // Timer text update with animation
+        // Timer text animation
+        private async Task UpdateTimerTextAsync(System.Windows.Controls.TextBlock textBlock, string actualValue, string newText, bool reset)
+        {
+            string direction = TimerGetDirection(actualValue, newText, reset);
+            if (direction == "none") return;
+            double offset = direction == "up" ? -50 : 50;
+            TimerAnimateTranslateYAsync(textBlock, 0, offset, EasingMode.EaseIn);
+            await Task.Delay(ttxtdelay);
+            textBlock.Text = newText;
+            TimerAnimateTranslateYAsync(textBlock, -offset, 0, EasingMode.EaseOut);
+        }
+        private string TimerGetDirection(string actual, string target, bool reset)
+        {
+            if ((target == "0" && actual == "9") || (target == "0" && actual == "5") || (target == "0" && actual == "3") && !reset)
+                return "up";
+            if ((target == "9" && actual == "0") || (target == "5" && actual == "0") || (target == "3" && actual == "0") && !reset)
+                return "down";
+            if (reset && target != actual)
+                return "up";
+            if (int.TryParse(target, out int t) && int.TryParse(actual, out int a))
+            {
+                if (t > a) return "up";
+                if (t < a) return "down";
+            }
+            return "none";
+        }
+        private void TimerAnimateTranslateYAsync(UIElement element, double from, double to, EasingMode easingMode)
+        {
+            var animation = new DoubleAnimation
+            {
+                From = from,
+                To = to,
+                Duration = TimeSpan.FromSeconds(ttxtslidespeed),
+                EasingFunction = new QuadraticEase { EasingMode = easingMode }
+            };
+            var transform = element.RenderTransform as TranslateTransform;
+            if (transform == null)
+            {
+                transform = new TranslateTransform();
+                element.RenderTransform = transform;
+            }
+            transform.BeginAnimation(TranslateTransform.YProperty, animation);
+        }
+
+        private async Task UpdateTimerTextH1(string text, bool reset)
+        {
+            if (text != ActualTimerH1)
+            {
+                UpdateTimerTextAsync(TimerH1Text, ActualTimerH1, text, reset);
+                ActualTimerH1 = text;
+            }
+        }
+        private async Task UpdateTimerTextH2(string text, bool reset)
+        {
+            if (text != ActualTimerH2)
+            {
+                UpdateTimerTextAsync(TimerH2Text, ActualTimerH2, text, reset);
+                ActualTimerH2 = text;
+            }
+        }
+        private async Task UpdateTimerTextM1(string text, bool reset)
+        {
+            if (text != ActualTimerM1)
+            {
+                UpdateTimerTextAsync(TimerM1Text, ActualTimerM1, text, reset);
+                ActualTimerM1 = text;
+            }
+        }
+        private async Task UpdateTimerTextM2(string text, bool reset)
+        {
+            if (text != ActualTimerM2)
+            {
+                UpdateTimerTextAsync(TimerM2Text, ActualTimerM2, text, reset);
+                ActualTimerM2 = text;
+            }
+        }
+        private async Task UpdateTimerTextS1(string text, bool reset)
+        {
+            if (text != ActualTimerS1)
+            {
+                UpdateTimerTextAsync(TimerS1Text, ActualTimerS1, text, reset);
+                ActualTimerS1 = text;
+            }
+        }
+        private async Task UpdateTimerTextS2(string text, bool reset)
+        {
+            if (text != ActualTimerS2)
+            {
+                UpdateTimerTextAsync(TimerS2Text, ActualTimerS2, text, reset);
+                ActualTimerS2 = text;
+            }
+        }
+
+        /*// Timer text update with animation
         private async Task UpdateTimerTextH1(string text, bool reset)
         {
             string direction = "none";
@@ -3951,7 +4206,7 @@ namespace WinDeskClock
                 }
             }
             ActualTimerS2 = text;
-        }
+        }*/
 
         // Timer progress ring update with animation
         private async Task UpdateTimerProgressRing(int value)
@@ -4098,7 +4353,7 @@ namespace WinDeskClock
                     await Task.Delay(100);
                     alerttime = alerttime.Add(TimeSpan.FromMilliseconds(100));
 
-                    if (alerttime.TotalMinutes >= timeout)
+                    if (alerttime.TotalMinutes >= timeout && timeout != 0)
                     {
                         break;
                     }
