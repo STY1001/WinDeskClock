@@ -754,14 +754,15 @@ namespace WinDeskClock.Clocks
 
         private async Task UpdateDName(string text)
         {
-            if (ActualDName != text)
+            string dayname = (await LangSystem.GetLang($"clock.days.short.{text}")).ToUpper();
+            if (ActualDName != dayname)
             {
-                ActualDName = text;
+                ActualDName = dayname;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = 0,
-                        To = -55*3,
+                        To = -55 * 3,
                         Duration = TimeSpan.FromSeconds(txtslidespeed),
                     };
                     Storyboard.SetTarget(translateAnimation, DNameStack);
@@ -772,7 +773,6 @@ namespace WinDeskClock.Clocks
                 }
                 await Task.Delay(txtdelay);
                 DNameStack.Children.Clear();
-                string dayname = (await LangSystem.GetLang($"clock.days.short.{text}")).ToUpper();
                 foreach (char c in dayname)
                 {
                     string letter = c.ToString().ToUpper();
@@ -855,14 +855,15 @@ namespace WinDeskClock.Clocks
 
         private async Task UpdateMonth(string text)
         {
-            if (ActualDMonth != text)
+            string monthname = (await LangSystem.GetLang($"clock.months.short.{text}")).ToUpper();
+            if (ActualDMonth != monthname)
             {
-                ActualDMonth = text;
+                ActualDMonth = monthname;
                 {
                     var translateAnimation = new DoubleAnimation
                     {
                         From = 0,
-                        To = 55*3,
+                        To = 55 * 3,
                         Duration = TimeSpan.FromSeconds(txtslidespeed),
                     };
                     Storyboard.SetTarget(translateAnimation, DMonthStack);
@@ -873,7 +874,6 @@ namespace WinDeskClock.Clocks
                 }
                 await Task.Delay(txtdelay);
                 DMonthStack.Children.Clear();
-                string monthname = (await LangSystem.GetLang($"clock.months.short.{text}")).ToUpper();
                 foreach (char c in monthname)
                 {
                     string letter = c.ToString().ToUpper();

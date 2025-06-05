@@ -241,11 +241,11 @@ namespace WinDeskClock.Clocks
 
         private async Task UpdateDName(string text)
         {
-            if (ActualDName != text)
+            var newText = (await LangSystem.GetLang($"clock.days.short.{text}")).ToUpper();
+            if (ActualDName != newText)
             {
-                var newText = (await LangSystem.GetLang($"clock.days.short.{text}")).ToUpper();
                 AnimateTextChange(DNameText, ActualDName, newText, 0, -55, 55, 0);
-                ActualDName = text;
+                ActualDName = newText;
             }
         }
 
@@ -260,11 +260,11 @@ namespace WinDeskClock.Clocks
 
         private async Task UpdateDMonth(string text)
         {
-            if (ActualDMonth != text)
+            var newText = (await LangSystem.GetLang($"clock.months.short.{text}")).ToUpper();
+            if (ActualDMonth != newText)
             {
-                var newText = (await LangSystem.GetLang($"clock.months.short.{text}")).ToUpper();
                 AnimateTextChange(DMonthText, ActualDMonth, newText, 0, -55, 55, 0);
-                ActualDMonth = text;
+                ActualDMonth = newText;
             }
         }
 
