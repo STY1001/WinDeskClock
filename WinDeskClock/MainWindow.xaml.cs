@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using WinDeskClock.Pages;
 using WinDeskClock.Utils;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Extensions;
@@ -301,21 +302,25 @@ namespace WinDeskClock
                 TimeUpBlur.Visibility = Visibility.Collapsed;
                 SettingsBlur.Visibility = Visibility.Collapsed;
                 GlobalMenuBlur.Visibility = Visibility.Collapsed;
+                MirrorBlur.Visibility = Visibility.Collapsed;
 
                 AlarmAlertBlur.Fill = new SolidColorBrush(Colors.Transparent);
                 TimeUpBlur.Fill = new SolidColorBrush(Colors.Transparent);
                 SettingsBlur.Fill = new SolidColorBrush(Colors.Transparent);
                 GlobalMenuBlur.Fill = new SolidColorBrush(Colors.Transparent);
+                MirrorBlur.Fill = new SolidColorBrush(Colors.Transparent);
 
                 AlarmAlertBlur.Effect = null;
                 TimeUpBlur.Effect = null;
                 SettingsBlur.Effect = null;
                 GlobalMenuBlur.Effect = null;
+                MirrorBlur.Effect = null;
 
                 AlarmAlertBlur.CacheMode = null;
                 TimeUpBlur.CacheMode = null;
                 SettingsBlur.CacheMode = null;
                 GlobalMenuBlur.CacheMode = null;
+                MirrorBlur.CacheMode = null;
 
                 this.WindowBackdropType = WindowBackdropType.None;
             }
@@ -6339,6 +6344,130 @@ namespace WinDeskClock
             }
             await TurnScreenOff();
         }
+        private async void MirrorBtn_Click(object sender, RoutedEventArgs e)
+        {
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeAnimation, GlobalMenuGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBorder);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBorder);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+            await Task.Delay(150);
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 2,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 2,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+            await Task.Delay(300);
+            GlobalMenuGrid.Visibility = Visibility.Hidden;
+            MirrorGrid.Visibility = Visibility.Visible;
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(fadeAnimation, MirrorGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 1.1,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 1.1,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(sizeAnimation1, MirrorBorder);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, MirrorBorder);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+
+            Page mirror = new Mirror();
+            MirrorFrame.Navigate(mirror);
+        }
         private async void FullScreenBtn_Click(object sender, RoutedEventArgs e)
         {
             if (FullScreenBtn.IsChecked == true)
@@ -6758,6 +6887,55 @@ namespace WinDeskClock
             {
                 await App.RestartApp();
             }
+        }
+        #endregion
+
+        #region Mirror
+        private async void MirrorBackBtn_Click(object sender, RoutedEventArgs e)
+        {
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(fadeAnimation, MirrorGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 1.1,
+                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 1.1,
+                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(sizeAnimation1, MirrorBorder);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, MirrorBorder);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+            await Task.Delay(300);
+            Page mirror = MirrorFrame.Content as Page;
+            MirrorFrame.Navigate(null);
+            mirror = null;
+            MirrorGrid.Visibility = Visibility.Hidden;
         }
         #endregion
 

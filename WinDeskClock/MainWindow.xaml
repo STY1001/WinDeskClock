@@ -865,137 +865,6 @@
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid x:Name="SettingsGrid"
-                  Visibility="Hidden"
-                  Grid.RowSpan="2"
-                  Background="#a0000000">
-                <Rectangle VerticalAlignment="Stretch"
-                           HorizontalAlignment="Stretch"
-                           x:Name="SettingsBlur">
-                    <Rectangle.Effect>
-                        <BlurEffect Radius="10" />
-                    </Rectangle.Effect>
-                    <Rectangle.Fill>
-                        <VisualBrush Visual="{Binding ElementName=AppGrid}"
-                                     Stretch="None" />
-                    </Rectangle.Fill>
-                    <Rectangle.CacheMode>
-                        <BitmapCache />
-                    </Rectangle.CacheMode>
-                </Rectangle>
-                <Border x:Name="SettingsBorder"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch"
-                        CornerRadius="8"
-                        Background="#161515"
-                        Padding="20"
-                        Margin="30,70,30,30"
-                        RenderTransformOrigin="0.5,0.5"
-                        ClipToBounds="True">
-                    <Border.RenderTransform>
-                        <ScaleTransform ScaleX="1"
-                                        ScaleY="1" />
-                    </Border.RenderTransform>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <ui:Button x:Name="SettingsBackBtn"
-                                   Click="SettingsBackBtn_Click"
-                                   Content="Back"
-                                   FontFamily="Segoe UI Variable Display Regular"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   Icon="{ui:ImageIcon '/Resources/icons/left.png'}"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Top"
-                                   Margin="0,0,0,10" />
-                        <TextBlock Text="Settings"
-                                   x:Name="SettingsTitleText"
-                                   FontSize="22"
-                                   FontFamily="Segoe UI Variable Display Regular"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
-                        <ui:Button x:Name="SettingsSaveBtn"
-                                   Click="SettingsSaveBtn_Click"
-                                   Content="Save"
-                                   FontFamily="Segoe UI Variable Display Regular"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   Icon="{ui:ImageIcon '/Resources/icons/checkmark.png'}"
-                                   HorizontalAlignment="Right"
-                                   VerticalAlignment="Top"
-                                   Appearance="Primary"
-                                   Margin="0,0,0,10" />
-                        <TabControl x:Name="SettingsTabControl"
-                                    Grid.Row="1">
-                            <TabItem x:Name="GeneralTabItem">
-                                <TabItem.Header>
-                                    <TextBlock Text="General"
-                                               x:Name="GeneralTabItemHeader" />
-                                </TabItem.Header>
-                                <Border ClipToBounds="True"
-                                        Background="#282828"
-                                        CornerRadius="0,8,8,8">
-                                    <Frame x:Name="GeneralFrame"
-                                           NavigationUIVisibility="Hidden"
-                                           HorizontalAlignment="Stretch"
-                                           VerticalAlignment="Stretch"
-                                           Loaded="GeneralFrame_Loaded"
-                                           RenderTransformOrigin="0.5,0.5">
-                                        <Frame.RenderTransform>
-                                            <ScaleTransform ScaleX="1"
-                                                            ScaleY="1" />
-                                        </Frame.RenderTransform>
-                                    </Frame>
-                                </Border>
-                            </TabItem>
-                            <TabItem x:Name="PMTabItem">
-                                <TabItem.Header>
-                                    <TextBlock Text="Plugin Manager"
-                                               x:Name="PMTabItemHeader" />
-                                </TabItem.Header>
-                                <Border ClipToBounds="True"
-                                        Background="#282828"
-                                        CornerRadius="8,8,8,8">
-                                    <Frame x:Name="PluginManagerFrame"
-                                           NavigationUIVisibility="Hidden"
-                                           HorizontalAlignment="Stretch"
-                                           VerticalAlignment="Stretch"
-                                           Loaded="PluginManagerFrame_Loaded"
-                                           RenderTransformOrigin="0.5,0.5">
-                                        <Frame.RenderTransform>
-                                            <ScaleTransform ScaleX="1"
-                                                            ScaleY="1" />
-                                        </Frame.RenderTransform>
-                                    </Frame>
-                                </Border>
-                            </TabItem>
-                            <TabItem x:Name="AboutTabItem">
-                                <TabItem.Header>
-                                    <TextBlock Text="About"
-                                               x:Name="AboutTabItemHeader" />
-                                </TabItem.Header>
-                                <Border ClipToBounds="True"
-                                        Background="#282828"
-                                        CornerRadius="8,8,8,8">
-                                    <Frame x:Name="AboutFrame"
-                                           NavigationUIVisibility="Hidden"
-                                           HorizontalAlignment="Stretch"
-                                           VerticalAlignment="Stretch"
-                                           Loaded="AboutFrame_Loaded"
-                                           RenderTransformOrigin="0.5,0.5">
-                                        <Frame.RenderTransform>
-                                            <ScaleTransform ScaleX="1"
-                                                            ScaleY="1" />
-                                        </Frame.RenderTransform>
-                                    </Frame>
-                                </Border>
-                            </TabItem>
-                        </TabControl>
-                    </Grid>
-                </Border>
-            </Grid>
             <Grid x:Name="TimeUpGrid"
                   Visibility="Hidden"
                   Grid.RowSpan="2"
@@ -1134,6 +1003,195 @@
                                Grid.Column="2" />
                 </Grid>
             </Grid>
+            <Grid x:Name="SettingsGrid"
+                  Visibility="Hidden"
+                  Grid.RowSpan="2"
+                  Background="#a0000000">
+                <Rectangle VerticalAlignment="Stretch"
+                           HorizontalAlignment="Stretch"
+                           x:Name="SettingsBlur">
+                    <Rectangle.Effect>
+                        <BlurEffect Radius="10" />
+                    </Rectangle.Effect>
+                    <Rectangle.Fill>
+                        <VisualBrush Visual="{Binding ElementName=AppGrid}"
+                                     Stretch="None" />
+                    </Rectangle.Fill>
+                    <Rectangle.CacheMode>
+                        <BitmapCache />
+                    </Rectangle.CacheMode>
+                </Rectangle>
+                <Border x:Name="SettingsBorder"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        CornerRadius="8"
+                        Background="#161515"
+                        Padding="20"
+                        Margin="30,70,30,30"
+                        RenderTransformOrigin="0.5,0.5"
+                        ClipToBounds="True">
+                    <Border.RenderTransform>
+                        <ScaleTransform ScaleX="1"
+                                        ScaleY="1" />
+                    </Border.RenderTransform>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <ui:Button x:Name="SettingsBackBtn"
+                                   Click="SettingsBackBtn_Click"
+                                   Content="Back"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Icon="{ui:ImageIcon '/Resources/icons/left.png'}"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Top"
+                                   Margin="0,0,0,10" />
+                        <TextBlock Text="Settings"
+                                   x:Name="SettingsTitleText"
+                                   FontSize="22"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                        <ui:Button x:Name="SettingsSaveBtn"
+                                   Click="SettingsSaveBtn_Click"
+                                   Content="Save"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Icon="{ui:ImageIcon '/Resources/icons/checkmark.png'}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Top"
+                                   Appearance="Primary"
+                                   Margin="0,0,0,10" />
+                        <TabControl x:Name="SettingsTabControl"
+                                    Grid.Row="1">
+                            <TabItem x:Name="GeneralTabItem">
+                                <TabItem.Header>
+                                    <TextBlock Text="General"
+                                               x:Name="GeneralTabItemHeader" />
+                                </TabItem.Header>
+                                <Border ClipToBounds="True"
+                                        Background="#282828"
+                                        CornerRadius="0,8,8,8">
+                                    <Frame x:Name="GeneralFrame"
+                                           NavigationUIVisibility="Hidden"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           Loaded="GeneralFrame_Loaded"
+                                           RenderTransformOrigin="0.5,0.5">
+                                        <Frame.RenderTransform>
+                                            <ScaleTransform ScaleX="1"
+                                                            ScaleY="1" />
+                                        </Frame.RenderTransform>
+                                    </Frame>
+                                </Border>
+                            </TabItem>
+                            <TabItem x:Name="PMTabItem">
+                                <TabItem.Header>
+                                    <TextBlock Text="Plugin Manager"
+                                               x:Name="PMTabItemHeader" />
+                                </TabItem.Header>
+                                <Border ClipToBounds="True"
+                                        Background="#282828"
+                                        CornerRadius="8,8,8,8">
+                                    <Frame x:Name="PluginManagerFrame"
+                                           NavigationUIVisibility="Hidden"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           Loaded="PluginManagerFrame_Loaded"
+                                           RenderTransformOrigin="0.5,0.5">
+                                        <Frame.RenderTransform>
+                                            <ScaleTransform ScaleX="1"
+                                                            ScaleY="1" />
+                                        </Frame.RenderTransform>
+                                    </Frame>
+                                </Border>
+                            </TabItem>
+                            <TabItem x:Name="AboutTabItem">
+                                <TabItem.Header>
+                                    <TextBlock Text="About"
+                                               x:Name="AboutTabItemHeader" />
+                                </TabItem.Header>
+                                <Border ClipToBounds="True"
+                                        Background="#282828"
+                                        CornerRadius="8,8,8,8">
+                                    <Frame x:Name="AboutFrame"
+                                           NavigationUIVisibility="Hidden"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           Loaded="AboutFrame_Loaded"
+                                           RenderTransformOrigin="0.5,0.5">
+                                        <Frame.RenderTransform>
+                                            <ScaleTransform ScaleX="1"
+                                                            ScaleY="1" />
+                                        </Frame.RenderTransform>
+                                    </Frame>
+                                </Border>
+                            </TabItem>
+                        </TabControl>
+                    </Grid>
+                </Border>
+            </Grid>
+            <Grid x:Name="MirrorGrid"
+                  Visibility="Hidden"
+                  Grid.RowSpan="2"
+                  Background="#a0000000">
+                <Rectangle VerticalAlignment="Stretch"
+                           HorizontalAlignment="Stretch"
+                           x:Name="MirrorBlur">
+                    <Rectangle.Effect>
+                        <BlurEffect Radius="10" />
+                    </Rectangle.Effect>
+                    <Rectangle.Fill>
+                        <VisualBrush Visual="{Binding ElementName=AppGrid}"
+                                     Stretch="None" />
+                    </Rectangle.Fill>
+                    <Rectangle.CacheMode>
+                        <BitmapCache />
+                    </Rectangle.CacheMode>
+                </Rectangle>
+                <Border x:Name="MirrorBorder"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        CornerRadius="8"
+                        Background="#161515"
+                        Padding="20"
+                        Margin="30,70,30,30"
+                        RenderTransformOrigin="0.5,0.5"
+                        ClipToBounds="True">
+                    <Border.RenderTransform>
+                        <ScaleTransform ScaleX="1"
+                                        ScaleY="1" />
+                    </Border.RenderTransform>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <ui:Button x:Name="MirrorBackBtn"
+                                   Click="MirrorBackBtn_Click"
+                                   Content="Back"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Icon="{ui:ImageIcon '/Resources/icons/left.png'}"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Top"
+                                   Margin="0,0,0,10" />
+                        <TextBlock Text="Mirror"
+                                   x:Name="MirrorTitleText"
+                                   FontSize="22"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                        <Frame x:Name="MirrorFrame"
+                                    Grid.Row="1">
+                        </Frame>
+                    </Grid>
+                </Border>
+            </Grid>
             <Grid x:Name="GlobalMenuGrid"
                   Grid.RowSpan="2"
                   Visibility="Hidden"
@@ -1176,6 +1234,8 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="10" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="10" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <ui:Button x:Name="BackBtn"
                                    Content="Back"
@@ -1199,12 +1259,22 @@
                                    Icon="{ui:ImageIcon '/Resources/icons/screenoff.png'}"
                                    Width="200"
                                    Grid.Row="2" />
+                        <ui:Button x:Name="MirrorBtn"
+                                   Content="Mirror"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   Click="MirrorBtn_Click"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Icon="{ui:ImageIcon '/Resources/icons/camera.png'}"
+                                   Width="200"
+                                   Grid.Row="4" />
                         <ToggleButton x:Name="FullScreenBtn"
                                       Click="FullScreenBtn_Click"
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
                                       Width="200"
-                                      Grid.Row="4">
+                                      Grid.Row="6">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -1231,7 +1301,7 @@
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
                                       Width="200"
-                                      Grid.Row="6">
+                                      Grid.Row="8">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -1262,7 +1332,7 @@
                                    VerticalAlignment="Center"
                                    Icon="{ui:ImageIcon '/Resources/icons/settings.png'}"
                                    Width="200"
-                                   Grid.Row="8" />
+                                   Grid.Row="10" />
                         <ui:Button x:Name="ExitAppBtn"
                                    Content="Exit"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -1272,7 +1342,7 @@
                                    VerticalAlignment="Center"
                                    Icon="{ui:ImageIcon '/Resources/icons/exit.png'}"
                                    Width="200"
-                                   Grid.Row="10" />
+                                   Grid.Row="12" />
 
                     </Grid>
                 </Border>
