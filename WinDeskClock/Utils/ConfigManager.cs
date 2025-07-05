@@ -34,6 +34,7 @@ namespace WinDeskClock.Utils
 
             if (!File.Exists(ConfigPath))
             {
+                Log.Warning("Config file not found, creating default config file...");
                 Directory.CreateDirectory(Path.GetDirectoryName(ConfigPath));
                 await File.WriteAllTextAsync(ConfigPath, "{}");
                 foreach (var defaultconfig in DefaultConfigList)
@@ -43,6 +44,7 @@ namespace WinDeskClock.Utils
             }
             if (!File.Exists(AlarmPath))
             {
+                Log.Warning("Alarm file not found, creating default alarm file...");
                 Directory.CreateDirectory(Path.GetDirectoryName(AlarmPath));
                 await File.WriteAllTextAsync(AlarmPath, "{}");
             }
@@ -51,6 +53,7 @@ namespace WinDeskClock.Utils
             {
                 if (await GetConfig(defaultconfig.Key) == null)
                 {
+                    Log.Warning($"Config key '{defaultconfig.Key}' not found, setting default value '{defaultconfig.Value}'...");
                     await SetConfig(defaultconfig.Key, defaultconfig.Value);
                 }
             }
@@ -59,18 +62,29 @@ namespace WinDeskClock.Utils
         public static async Task LoadSettings()
         {
             Variables.Language = await GetConfig("Language");
+            Log.Info($"Language: {Variables.Language}");
             Variables.ScreenOnOff = await GetConfig("ScreenOnOff");
+            Log.Info($"ScreenOnOff: {Variables.ScreenOnOff}");
             Variables.DefaultTimeUpSound = await GetConfig("DefaultTimeUpSound");
+            Log.Info($"DefaultTimeUpSound: {Variables.DefaultTimeUpSound}");
             Variables.DefaultAlarmSound = await GetConfig("DefaultAlarmSound");
+            Log.Info($"DefaultAlarmSound: {Variables.DefaultAlarmSound}");
             Variables.AlarmTimeoutDelay = int.Parse(await GetConfig("AlarmTimeoutDelay"));
+            Log.Info($"AlarmTimeoutDelay: {Variables.AlarmTimeoutDelay}");
             Variables.CarouselDelay = int.Parse(await GetConfig("CarouselDelay"));
+            Log.Info($"CarouselDelay: {Variables.CarouselDelay}");
             Variables.MenuCloseDelay = int.Parse(await GetConfig("MenuCloseDelay"));
+            Log.Info($"MenuCloseDelay: {Variables.MenuCloseDelay}");
             Variables.ClockShowSecond = bool.Parse(await GetConfig("ClockShowSecond"));
+            Log.Info($"ClockShowSecond: {Variables.ClockShowSecond}");
             Variables.ClockFbxStyle = bool.Parse(await GetConfig("ClockFbxStyle"));
+            Log.Info($"ClockFbxStyle: {Variables.ClockFbxStyle}");
             Variables.BlurEffect = bool.Parse(await GetConfig("BlurEffect"));
+            Log.Info($"BlurEffect: {Variables.BlurEffect}");
             Variables.ScreenAutoWakeUp = bool.Parse(await GetConfig("ScreenAutoWakeUp"));
+            Log.Info($"ScreenAutoWakeUp: {Variables.ScreenAutoWakeUp}");
             Variables.ScreenAutoWakeUpTime = TimeOnly.Parse(await GetConfig("ScreenAutoWakeUpTime"));
-
+            Log.Info($"ScreenAutoWakeUpTime: {Variables.ScreenAutoWakeUpTime}");
             if (await GetConfig("PinnedPlugin") != "")
             {
                 Variables.PinnedPlugin = (await GetConfig("PinnedPlugin")).Split(',').ToList();
@@ -79,7 +93,7 @@ namespace WinDeskClock.Utils
             {
                 Variables.PinnedPlugin = new List<string>();
             }
-
+            Log.Info($"PinnedPlugin: {string.Join(", ", Variables.PinnedPlugin)}");
             if (await GetConfig("PluginOrder") != "")
             {
                 Variables.PluginOrder = (await GetConfig("PluginOrder")).Split(',').ToList();
@@ -88,7 +102,7 @@ namespace WinDeskClock.Utils
             {
                 Variables.PluginOrder = new List<string>();
             }
-
+            Log.Info($"PluginOrder: {string.Join(", ", Variables.PluginOrder)}");
             if (await GetConfig("DisabledPlugin") != "")
             {
                 Variables.DisabledPlugin = (await GetConfig("DisabledPlugin")).Split(',').ToList();
@@ -97,7 +111,12 @@ namespace WinDeskClock.Utils
             {
                 Variables.DisabledPlugin = new List<string>();
             }
+            Log.Info($"DisabledPlugin: {string.Join(", ", Variables.DisabledPlugin)}");
 
+            Log.Info("Settings loaded successfully.");
+
+            // Copy current settings to new variables
+            Log.Info("Copying current settings to new variables...");
             NewVariables.Language = Variables.Language;
             NewVariables.ScreenOnOff = Variables.ScreenOnOff;
             NewVariables.DefaultTimeUpSound = Variables.DefaultTimeUpSound;
@@ -129,22 +148,38 @@ namespace WinDeskClock.Utils
 
         public static async Task SaveNewSettings()
         {
+            Log.Info("Saving new settings...");
+            Log.Info($"Language: {NewVariables.Language}");
             await SetConfig("Language", NewVariables.Language);
+            Log.Info($"ScreenOnOff: {NewVariables.ScreenOnOff}");
             await SetConfig("ScreenOnOff", NewVariables.ScreenOnOff);
+            Log.Info($"DefaultTimeUpSound: {NewVariables.DefaultTimeUpSound}");
             await SetConfig("DefaultTimeUpSound", NewVariables.DefaultTimeUpSound);
+            Log.Info($"DefaultAlarmSound: {NewVariables.DefaultAlarmSound}");
             await SetConfig("DefaultAlarmSound", NewVariables.DefaultAlarmSound);
+            Log.Info($"ClockShowSecond: {NewVariables.ClockShowSecond}");
             await SetConfig("ClockShowSecond", NewVariables.ClockShowSecond.ToString());
+            Log.Info($"ClockFbxStyle: {NewVariables.ClockFbxStyle}");
             await SetConfig("ClockFbxStyle", NewVariables.ClockFbxStyle.ToString());
+            Log.Info($"AlarmTimeoutDelay: {NewVariables.AlarmTimeoutDelay}");
             await SetConfig("AlarmTimeoutDelay", NewVariables.AlarmTimeoutDelay.ToString());
+            Log.Info($"CarouselDelay: {NewVariables.CarouselDelay}");
             await SetConfig("CarouselDelay", NewVariables.CarouselDelay.ToString());
+            Log.Info($"MenuCloseDelay: {NewVariables.MenuCloseDelay}");
             await SetConfig("MenuCloseDelay", NewVariables.MenuCloseDelay.ToString());
+            Log.Info($"BlurEffect: {NewVariables.BlurEffect}");
             await SetConfig("BlurEffect", NewVariables.BlurEffect.ToString());
+            Log.Info($"ScreenAutoWakeUp: {NewVariables.ScreenAutoWakeUp}");
             await SetConfig("ScreenAutoWakeUp", NewVariables.ScreenAutoWakeUp.ToString());
+            Log.Info($"ScreenAutoWakeUpTime: {NewVariables.ScreenAutoWakeUpTime}");
             await SetConfig("ScreenAutoWakeUpTime", NewVariables.ScreenAutoWakeUpTime.ToString("HH:mm"));
+            Log.Info($"PinnedPlugin: {string.Join(", ", NewVariables.PinnedPlugin)}");
             await SetConfig("PinnedPlugin", string.Join(',', NewVariables.PinnedPlugin));
+            Log.Info($"PluginOrder: {string.Join(", ", NewVariables.PluginOrder)}");
             await SetConfig("PluginOrder", string.Join(',', NewVariables.PluginOrder));
+            Log.Info($"DisabledPlugin: {string.Join(", ", NewVariables.DisabledPlugin)}");
             await SetConfig("DisabledPlugin", string.Join(',', NewVariables.DisabledPlugin));
-
+            Log.Info("New settings saved successfully. Reloading settings...");
             await LoadSettings();
         }
 

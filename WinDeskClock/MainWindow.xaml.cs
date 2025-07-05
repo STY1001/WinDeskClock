@@ -127,9 +127,11 @@ namespace WinDeskClock
             // Auto layout for horizontal and vertical screen sizes
             this.SizeChanged += async (s, e) =>
             {
+                Log.Info("Window size changed");
                 await Task.Delay(100);
                 if (FullScreenBtn.IsChecked == true && this.WindowState != WindowState.Maximized)
                 {
+                    Log.Info("FullScreenBtn is checked, maximizing window...");
                     this.WindowState = WindowState.Normal;
                     this.WindowStyle = WindowStyle.None;
                     this.WindowState = WindowState.Maximized;
@@ -137,6 +139,7 @@ namespace WinDeskClock
 
                 if (this.ActualWidth >= this.ActualHeight)
                 {
+                    Log.Info("Window is in horizontal mode, updating layout...");
                     LeftGrid.SetValue(Grid.ColumnProperty, 0);
                     LeftGrid.SetValue(Grid.ColumnSpanProperty, 1);
                     LeftGrid.SetValue(Grid.RowProperty, 0);
@@ -156,6 +159,7 @@ namespace WinDeskClock
                 }
                 else
                 {
+                    Log.Info("Window is in vertical mode, updating layout...");
                     LeftGrid.SetValue(Grid.ColumnProperty, 0);
                     LeftGrid.SetValue(Grid.ColumnSpanProperty, 3);
                     LeftGrid.SetValue(Grid.RowProperty, 0);
@@ -187,6 +191,7 @@ namespace WinDeskClock
                 var powerSetting = (User32.PowerBroadcastSetting)Marshal.PtrToStructure(lParam, typeof(User32.PowerBroadcastSetting));
                 if (powerSetting.PowerSetting == user32dll.User32CONSOLE_DISPLAY_STATE && powerSetting.Data == 1)
                 {
+                    Log.Info("System screen turned on");
                     TurnScreenOn();
                 }
             }
@@ -198,28 +203,34 @@ namespace WinDeskClock
         {
             if (ConfigManager.Variables.ClockFbxStyle)
             {
+                Log.Info("Using Freebox clock style");
                 ClockPage = new Clocks.FbxClock();
             }
             else
             {
+                Log.Info("Using Fluent clock style");
                 ClockPage = new Clocks.FluentClock();
             }
             ClockFrame.Navigate(ClockPage);
 
             if (PluginLoader.PluginModules.Count != 0)
             {
+                Log.Info("Loading plugins list...");
                 foreach (string id in PluginLoader.PluginModules.Keys)
                 {
+                    Log.Info($"Adding plugin {id} to the list");
                     PluginList.Add(id);
                 }
             }
 
             if (ConfigManager.Variables.PinnedPlugin.Count != 0)
             {
+                Log.Info("Loading pinned plugins list...");
                 foreach (string id in ConfigManager.Variables.PinnedPlugin)
                 {
                     if (PluginList.Contains(id))
                     {
+                        Log.Info($"Adding pinned plugin {id} to the carousel list");
                         CarouselPluginList.Add(id);
                     }
                 }
@@ -227,6 +238,7 @@ namespace WinDeskClock
 
             if (PluginList.Count == 0)
             {
+                Log.Warning("No plugin in the plugin list");
                 Grid grid = new Grid
                 {
                     HorizontalAlignment = HorizontalAlignment.Center,
@@ -260,6 +272,7 @@ namespace WinDeskClock
             }
             else if (CarouselPluginList.Count == 0)
             {
+                Log.Warning("No pinned plugin in the carousel list");
                 Grid grid = new Grid
                 {
                     HorizontalAlignment = HorizontalAlignment.Center,
@@ -293,11 +306,13 @@ namespace WinDeskClock
 
             if (CarouselPluginList.Count != 0)
             {
+                Log.Info("Showing the first plugin in the carousel");
                 CarouselPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[0]].GetMain());
             }
 
             if (!ConfigManager.Variables.BlurEffect)
             {
+                Log.Info("Disabling blur effect");
                 AlarmAlertBlur.Visibility = Visibility.Collapsed;
                 TimeUpBlur.Visibility = Visibility.Collapsed;
                 SettingsBlur.Visibility = Visibility.Collapsed;
@@ -326,6 +341,7 @@ namespace WinDeskClock
             }
 
             // Lang apply
+            Log.Info("Applying language to UI elements");
             BackBtn.Content = await LangSystem.GetLang("mainmenu.back");
             ScreenOffBtn.Content = await LangSystem.GetLang("mainmenu.screenoff");
             FullScreenBtnText.Text = await LangSystem.GetLang("mainmenu.fullscreen");
@@ -350,11 +366,15 @@ namespace WinDeskClock
             StartStopwatchBtn.Content = await LangSystem.GetLang("stopwatch.start");
             AddAlarmBtn.Content = await LangSystem.GetLang("alarm.add");
             NoAlarmText.Text = await LangSystem.GetLang("alarm.noalarm");
+            MirrorTitleText.Text = await LangSystem.GetLang("mirror.titlename");
+            MirrorBtn.Content = await LangSystem.GetLang("mirror.titlename");
+            MirrorBackBtn.Content = await LangSystem.GetLang("mirror.back");
         }
 
         // Create all timer of the app
         private async Task CreateTimers()
         {
+            Log.Info("Creating timers...");
             // Create a timer to update the mini clock every minutes
             minitime = new DispatcherTimer
             {
@@ -424,6 +444,7 @@ namespace WinDeskClock
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // Splash start
+            Log.Info("MainWindow loaded, showing splash screen...");
             RootTitleBar.Visibility = Visibility.Hidden;
             MainGrid.Visibility = Visibility.Hidden;
             SplashLoadingText.Text = "Hi !";
@@ -472,110 +493,100 @@ namespace WinDeskClock
 
             await Task.Delay(700);
 
+            // Specific startup options
             CurrentSplashStep++;
             SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
             SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
             SplashLoadingText.Text = "Applying arguments...";
-            // Specific startup options
+            Log.Info("Applying startup arguments...");
             if (App.StartupOptions.FullScreen)
             {
+                Log.Info("FullScreen enabled, applying...");
                 FullScreenBtn.IsChecked = true;
-                WindowState = WindowState.Normal;
-                WindowStyle = WindowStyle.None;
-                WindowState = WindowState.Maximized;
-                this.Topmost = true;
-                RootTitleBar.ShowMaximize = false;
-                RootTitleBar.ShowMinimize = false;
-                RootTitleBar.Width = 50;
-                RootTitleBar.Padding = new Thickness(0, 0, 0, 0);
-                RootTitleBar.HorizontalAlignment = HorizontalAlignment.Right;
-                RootTitleBar.Title = "";
-                AppTitleText.Visibility = Visibility.Visible;
+                FullScreenBtn.RaiseEvent(new RoutedEventArgs(ToggleButton.CheckedEvent, FullScreenBtn));
+
             }
             if (App.StartupOptions.KioskMode)
             {
+                Log.Info("KioskMode enabled, applying...");
                 KioskModeBtn.IsChecked = true;
-                FullScreenBtn.IsChecked = true;
-                FullScreenBtn.IsEnabled = false;
-                WindowState = WindowState.Normal;
-                WindowStyle = WindowStyle.None;
-                WindowState = WindowState.Maximized;
-                this.Topmost = true;
-                RootTitleBar.ShowMaximize = false;
-                RootTitleBar.ShowMinimize = false;
-                RootTitleBar.ShowClose = false;
-                RootTitleBar.Visibility = Visibility.Hidden;
-                AppTitleText.Visibility = Visibility.Visible;
-                RootTitleBar.Width = 0;
-                Process.Start("taskkill", "/f /im explorer.exe");
+                KioskModeBtn.RaiseEvent(new RoutedEventArgs(ToggleButton.CheckedEvent, KioskModeBtn));
             }
 
+            // Check and create the config files
             CurrentSplashStep++;
             SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
             SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
             SplashLoadingText.Text = "Checking files...";
-            // Check and create the config files
+            Log.Info("Checking and creating config files...");
             await ConfigManager.CheckAndCreateConfigs();
 
-
+            // Load settings
             CurrentSplashStep++;
             SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
             SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
             SplashLoadingText.Text = "Loading settings...";
-            // Load settings
+            Log.Info("Loading settings...");
             await ConfigManager.LoadSettings();
 
+            // Init language
             CurrentSplashStep++;
             SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
             SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
             SplashLoadingText.Text = "Loading language...";
-            // Init language
+            Log.Info("Initializing language system...");
             await LangSystem.InitLang();
 
+            // Add the grids to the list
             CurrentSplashStep++;
             SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
             SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
             SplashLoadingText.Text = "Loading UI (ClockMenu)...";
-            // Add the grids to the list
+            Log.Info("Loading clock menu pages...");
             MenuClockGrids.Add(AlarmGrid);
             MenuClockGrids.Add(StopwatchGrid);
             MenuClockGrids.Add(TimerGrid);
 
+            // Load the settings tabs
             CurrentSplashStep++;
             SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
             SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
             SplashLoadingText.Text = "Loading UI (Settings)...";
-            // Load the settings tabs
+            Log.Info("Loading settings pages...");
             SettingsTabs.Add("General", new Pages.Settings.General());
             SettingsTabs.Add("PluginManager", new Pages.Settings.PluginManager());
             SettingsTabs.Add("About", new Pages.Settings.About());
 
+            // Load the alarms
             CurrentSplashStep++;
             SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
             SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
             SplashLoadingText.Text = "Loading alarms...";
-            // Load the alarms
+            Log.Info("Loading alarms...");
             await AlarmCardRestore();
 
+            // Load plugins
             CurrentSplashStep++;
             SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
             SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
             SplashLoadingText.Text = "Loading plugins...";
-            // Load plugins
+            Log.Info("Loading plugins...");
             await PluginLoader.LoadPlugins();
 
+            // Change UI depending on the settings
             CurrentSplashStep++;
             SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
             SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
             SplashLoadingText.Text = "Loading UI...";
-            // Change UI depending on the settings
+
             await UIUpdate();
 
+            // Create every timers of the app
             CurrentSplashStep++;
             SplashProgressBar.Value = (CurrentSplashStep * 100) / TotalSplashStep;
             SplashPercentageText.Text = ((CurrentSplashStep * 100) / TotalSplashStep) + "%";
             SplashLoadingText.Text = "Creating timers...";
-            // Create every timers of the app
+
             await CreateTimers();
 
             // Splash end
@@ -684,6 +695,7 @@ namespace WinDeskClock
         {
             if (ConfigManager.Variables.MenuCloseDelay != 0)
             {
+                Log.Info("Menu timout reached, closing menu...");
                 if (GlobalMenuGrid.Visibility == Visibility.Visible)
                 {
                     {
@@ -1000,6 +1012,7 @@ namespace WinDeskClock
         private IntPtr PowerNotifHandle;
         private async Task TurnScreenOff()
         {
+            Log.Info("Turning screen off...");
             Guid powerSettingGuid = user32dll.User32CONSOLE_DISPLAY_STATE;
             var hwnd = new WindowInteropHelper(this).Handle;
             HwndSource.FromHwnd(hwnd).AddHook(new HwndSourceHook(WndProc));
@@ -1024,10 +1037,12 @@ namespace WinDeskClock
             };
             */
 
+            // Waiting for the signal to turn the screen on
             while (!TurnOnSignal)
             {
                 await Task.Delay(100);
             }
+            Log.Info("Turning screen on...");
 
             user32dll.User32SendMessage(0xFFFF, (int)user32dll.User32WM_SYSCOMMAND, (int)user32dll.User32SC_MONITORPOWER, user32dll.User32MONITOR_ON);
             if (PowerNotifHandle != IntPtr.Zero)
@@ -1874,6 +1889,7 @@ namespace WinDeskClock
         // - Start
         private async void StartStopwatchBtn_Click(object sender, RoutedEventArgs e)
         {
+            Log.Info("Stopwatch start");
             stopwatch.Start();
             stopwatchTimer.Start();
 
@@ -2014,6 +2030,7 @@ namespace WinDeskClock
         // - Pause
         private async void PauseStopwatchBtn_Click(object sender, RoutedEventArgs e)
         {
+            Log.Info("Stopwatch pause");
             stopwatch.Stop();
             stopwatchTimer.Stop();
 
@@ -2077,6 +2094,7 @@ namespace WinDeskClock
         // - Reset
         private async void ResetStopwatchBtn_Click(object sender, RoutedEventArgs e)
         {
+            Log.Info("Stopwatch reset");
             stopwatch.Reset();
             stopwatchTimer.Stop();
 
@@ -2238,6 +2256,7 @@ namespace WinDeskClock
         // - New lap
         private async void LapStopwatchBtn_Click(object sender, RoutedEventArgs e)
         {
+            Log.Info("Stopwatch lap: " + (LapIndex + 1).ToString());
             LapIndex++;
 
             if (!StopwatchLapDeployed)
@@ -2815,6 +2834,7 @@ namespace WinDeskClock
         // - Start
         private async void StartTimerBtn_Click(object sender, RoutedEventArgs e)
         {
+            Log.Info("Timer start: " + ActualTimerH1 + ActualTimerH2 + ":" + ActualTimerM1 + ActualTimerM2 + ":" + ActualTimerS1 + ActualTimerS2);
             if (!TimerIsRunning)
             {
                 TimerProgressRing.Progress = 100;
@@ -3009,6 +3029,7 @@ namespace WinDeskClock
         // - Pause
         private async void PauseTimerBtn_Click(object sender, RoutedEventArgs e)
         {
+            Log.Info("Timer pause");
             timerTimer.Stop();
             {
                 var fadeAnimation1 = new DoubleAnimation
@@ -3076,6 +3097,7 @@ namespace WinDeskClock
         // - Reset
         private async void ResetTimerBtn_Click(object sender, RoutedEventArgs e)
         {
+            Log.Info("Timer reset");
             timerTimer.Stop();
             timer = TimeSpan.Zero;
             UpdateTimerTextH1((timerSet.Hours / 10).ToString(), true);
@@ -3224,10 +3246,18 @@ namespace WinDeskClock
         // Time up function
         private async Task TimeUpShow()
         {
+            Log.Info("Timer time up");
             TurnScreenOn();
-            TimeUpSoundPlayer = new SoundPlayer(ConfigManager.Variables.DefaultTimeUpSound);
-            TimeUpSoundPlayer.Load();
-            TimeUpSoundPlayer.PlayLooping();
+            try
+            {
+                TimeUpSoundPlayer = new SoundPlayer(ConfigManager.Variables.DefaultTimeUpSound);
+                TimeUpSoundPlayer.Load();
+                TimeUpSoundPlayer.PlayLooping();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to play time up sound: " + ex.Message, ex);
+            }
             TimeUpGrid.Visibility = Visibility.Visible;
             {
                 var fadeAnimation1 = new DoubleAnimation
@@ -3267,6 +3297,7 @@ namespace WinDeskClock
             {
                 await Task.Delay(100);
             }
+            Log.Info("Timer time up stop");
             {
                 var fadeAnimation1 = new DoubleAnimation
                 {
@@ -4298,6 +4329,7 @@ namespace WinDeskClock
         {
             if (!AlarmAlert)
             {
+                Log.Info($"Alarm alert: {uid}");
                 AlarmAlert = true;
                 TurnScreenOn();
                 AlarmAlertUID = uid;
@@ -4310,9 +4342,16 @@ namespace WinDeskClock
                 if (!sound.Contains("none"))
                 {
                     if (sound.Contains("default")) sound = ConfigManager.Variables.DefaultAlarmSound;
-                    AlarmSoundPlayer = new SoundPlayer(sound);
-                    AlarmSoundPlayer.Load();
-                    AlarmSoundPlayer.PlayLooping();
+                    try
+                    {
+                        AlarmSoundPlayer = new SoundPlayer(sound);
+                        AlarmSoundPlayer.Load();
+                        AlarmSoundPlayer.PlayLooping();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"Failed to play alarm sound: {ex.Message}", ex);
+                    }
                 }
                 AlarmAlertGrid.Visibility = Visibility.Visible;
                 {
@@ -4360,9 +4399,11 @@ namespace WinDeskClock
 
                     if (alerttime.TotalMinutes >= timeout && timeout != 0)
                     {
+                        Log.Warning($"Alarm alert timeout reached: {uid}");
                         break;
                     }
                 }
+                Log.Info($"Alarm alert ended: {uid}");
                 {
                     var fadeAnimation1 = new DoubleAnimation
                     {
@@ -4422,11 +4463,16 @@ namespace WinDeskClock
 
                 AlarmAlertGrid.Visibility = Visibility.Hidden;
             }
+            else
+            {
+                Log.Info($"Alarm alert already active: {uid}");
+            }
         }
 
         // Update alarm card ETA
         private async Task AlarmCardETAUpdate()
         {
+            Log.Info("Updating alarm card ETA...");
             foreach (CardAction card in AlarmStack.Children)
             {
                 string uid = card.Tag.ToString().Replace("_AlarmCard", "");
@@ -4496,6 +4542,7 @@ namespace WinDeskClock
             List<string> alarmsUID = new List<string>();
             foreach (var alarm in alarms)
             {
+                Log.Info($"Restoring alarm: {alarm.Key} - {alarm.Value["name"]}");
                 alarmsUID.Add(alarm.Key);
             }
             foreach (string uid in alarmsUID)
@@ -4555,6 +4602,7 @@ namespace WinDeskClock
         // Sort alarm cards by time and ETA/Days
         private async Task SortAlarmCards()
         {
+            Log.Info("Sorting alarm cards...");
             StackPanel stackPanel = AlarmStack;
 
             var items = stackPanel.Children.OfType<CardAction>().ToList();
@@ -4637,6 +4685,7 @@ namespace WinDeskClock
         // Create alarm card with a UID
         private async Task CreateAlarmCard(string uid)
         {
+            Log.Info($"Creating alarm card: {uid}");
             CardAction AlarmCard = new CardAction();
             AlarmCard.Tag = $"{uid}_AlarmCard";
             AlarmCard.IsChevronVisible = false;
@@ -5423,6 +5472,7 @@ namespace WinDeskClock
         // Alarm enable/disable
         private async Task AlarmCardToggle(string uid)
         {
+            Log.Info($"Alarm toggle: {uid}");
             FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
             FrameworkElement AlarmCardToggleSmall = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleSmall");
             FrameworkElement AlarmCardToggleBig = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardToggleBig");
@@ -5443,6 +5493,7 @@ namespace WinDeskClock
         // - Save
         private async Task AlarmCardSave(string uid)
         {
+            Log.Info($"Saving Alarm {uid}");
             FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
             FrameworkElement AlarmCardEditHourText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditHourText");
             FrameworkElement AlarmCardEditMinuteText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditMinuteText");
@@ -5548,6 +5599,7 @@ namespace WinDeskClock
         // - Cancel
         private async Task AlarmCardCancel(string uid)
         {
+            Log.Info($"Canceling Alarm changes {uid}");
             FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
             FrameworkElement AlarmCardEditHourText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditHourText");
             FrameworkElement AlarmCardEditMinuteText = await TagSearch.FindFrameworkElementwithTag(AlarmCard, $"{uid}_AlarmCardEditMinuteText");
@@ -5646,6 +5698,7 @@ namespace WinDeskClock
         // - Delete
         private async Task AlarmCardDelete(string uid)
         {
+            Log.Info($"Deleting Alarm {uid}");
             await ConfigManager.DelAlarm(uid);
             FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
             {
@@ -5861,6 +5914,7 @@ namespace WinDeskClock
         // Alarm card open
         private async Task AlarmCardOpen(object sender, MouseButtonEventArgs e, string uid)
         {
+            Log.Info($"Alarm card {uid} open");
             if ((e.Source is CardAction || e.Source is System.Windows.Controls.TextBlock) && !CardDeployed)
             {
                 CardDeployed = true;
@@ -5932,12 +5986,16 @@ namespace WinDeskClock
 
                 await Task.Delay(150);
             }
+            else
+            {
+                Log.Warning($"Alarm card {uid} open failed, already deployed or not a card action");
+            }
         }
 
         // Alarm card close
         private async Task AlarmCardClose(string uid)
         {
-
+            Log.Info($"Alarm card {uid} close");
             foreach (CardAction card in AlarmStack.Children)
             {
                 card.Visibility = Visibility.Visible;
@@ -6020,6 +6078,7 @@ namespace WinDeskClock
         // Add alarm
         private async void AddAlarmBtn_Click(object sender, RoutedEventArgs e)
         {
+            Log.Info("Adding alarm button");
             if (!CardDeployed)
             {
 
@@ -6126,6 +6185,10 @@ namespace WinDeskClock
                 }
                 await Task.Delay(150);
             }
+            else
+            {
+                Log.Warning("Alarm card already deployed, cannot add new alarm");
+            }
         }
 
         // Stop alarm alert
@@ -6139,7 +6202,6 @@ namespace WinDeskClock
         private double animspeedzoomgm = 0.2;
         private async void GlobalMenuBtn_Click(object sender, RoutedEventArgs e)
         {
-
             {
                 var sizeAnimation1 = new DoubleAnimation
                 {
@@ -6470,8 +6532,10 @@ namespace WinDeskClock
         }
         private async void FullScreenBtn_Click(object sender, RoutedEventArgs e)
         {
+            Log.Info("Toggling full screen mode");
             if (FullScreenBtn.IsChecked == true)
             {
+                Log.Info("Enabling full screen mode");
                 WindowState = WindowState.Normal;
                 WindowStyle = WindowStyle.None;
                 WindowState = WindowState.Maximized;
@@ -6486,6 +6550,7 @@ namespace WinDeskClock
             }
             else
             {
+                Log.Info("Disabling full screen mode");
                 WindowState = WindowState.Normal;
                 WindowStyle = WindowStyle.SingleBorderWindow;
                 WindowState = WindowState.Maximized;
@@ -6501,8 +6566,10 @@ namespace WinDeskClock
         }
         private async void KioskModeBtn_Click(object sender, RoutedEventArgs e)
         {
+            Log.Info("Toggling kiosk mode");
             if (KioskModeBtn.IsChecked == true)
             {
+                Log.Info("Enabling kiosk mode");
                 FullScreenBtn.IsChecked = true;
                 FullScreenBtn.IsEnabled = false;
                 WindowState = WindowState.Normal;
@@ -6519,6 +6586,7 @@ namespace WinDeskClock
             }
             else
             {
+                Log.Info("Disabling kiosk mode");
                 FullScreenBtn.IsChecked = false;
                 FullScreenBtn.IsEnabled = true;
                 WindowState = WindowState.Normal;
@@ -6885,6 +6953,7 @@ namespace WinDeskClock
 
             if (ConfigManager.NewVariables.RestartNeeded)
             {
+                Log.Warning("Restart needed after settings change, restarting app...");
                 await App.RestartApp();
             }
         }

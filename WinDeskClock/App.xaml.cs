@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Markup;
+using WinDeskClock.Utils;
 
 namespace WinDeskClock
 {
@@ -28,8 +29,13 @@ namespace WinDeskClock
 
         public static async Task RestartApp()
         {
+            Log.Info("Restarting WinDeskClock...");
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             string args = "";
+            if (ConsoleLaunched)
+            {
+                args += " -console";
+            }
             if (/*(StartupOptions.FullScreen && !StartupOptions.KioskMode) ||*/ ((mainWindow.FullScreenBtn.IsChecked == true) && (mainWindow.KioskModeBtn.IsChecked == false)))
             {
                 args += " -fullscreen";
@@ -40,6 +46,7 @@ namespace WinDeskClock
                 args += " -kiosk";
             }
 
+            Log.Info("Command line arguments for restart: " + args.Trim());
             Process.Start(Environment.ProcessPath, args);
             Application.Current.Shutdown();
         }
@@ -52,10 +59,11 @@ namespace WinDeskClock
             Console.WriteLine();
         }
 
-        private bool ConsoleLaunched = false;
+        private static bool ConsoleLaunched = false;
         private async Task LaunchConsole()
         {
-            if(!ConsoleLaunched)
+            Log.Info("Launching console...");
+            if (!ConsoleLaunched)
             {
                 [DllImport("kernel32.dll")]
                 static extern bool AllocConsole();
@@ -63,11 +71,19 @@ namespace WinDeskClock
                 ConsoleLaunched = true;
                 await PrintVersion();
             }
+            else
+            {
+                Log.Warning("Console already launched, skipping...");
+            }
         }
 
         private async void OnStartup(object sender, StartupEventArgs e)
         {
+            Log.Write2File(""); // Create a useless line to separate logs from different runs
+            Log.Info("Starting WinDeskClock...");
+            Log.Info("WinDeskClock version " + AppVersion);
             string[] args = e.Args;
+            Log.Info("Command line arguments: " + string.Join(" ", args));
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -97,6 +113,7 @@ namespace WinDeskClock
                 }
             }
 
+            Log.Info("Launching the main window...");
             var mainWindow = new MainWindow();
             mainWindow.Show();
         }

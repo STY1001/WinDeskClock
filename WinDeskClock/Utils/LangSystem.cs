@@ -23,6 +23,7 @@ namespace WinDeskClock.Utils
 
             foreach (var lang in LangData)
             {
+                Log.Info($"Adding language: {lang.Value["id"]} - {lang.Value["name"]}");
                 LangList.Add(lang.Value["id"].ToString(), lang.Value["name"].ToString());
             }
         }
@@ -39,7 +40,7 @@ namespace WinDeskClock.Utils
             }
             if (value == null)
             {
-                throw new Exception($"Lang not found: {id}");
+                throw new Exception($"Language string '{id}' not found in '{ConfigManager.Variables.Language}'");
             }
             string valueStr = value.ToString();
             foreach (var item in replace)
