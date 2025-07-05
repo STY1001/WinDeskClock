@@ -11,6 +11,16 @@ namespace WinDeskClockPlugin
     {
         private static readonly PluginInfo pluginInfo = new PluginInfo();
 
+        static Plugin()
+        {
+            //Intialize logging for the plugin
+            IPluginLog.Init(pluginInfo.ID);
+            // If you want to use logging (I recommend it), you can use the IPluginLog class to log messages
+            // Example: IPluginLog.Error("This is an error message");
+            // There is also other methods, IPluginLog.Info and IPluginLog.Warning
+            // Plugin specific logging will be saved in the "plugins_log" folder in the "plugins" folder
+        }
+
         // Plugin variables
         // - You must use PluginDataPath (folder) to store the plugin data, you need to manage only the folder content, the folder is created automatically by the main program
         public static string PluginDataPath => Path.Combine((string)AppDomain.CurrentDomain.GetData("PluginFolderPath"), "plugins_data", pluginInfo.ID);
