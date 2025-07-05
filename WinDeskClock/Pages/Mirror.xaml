@@ -19,14 +19,15 @@
 
             <StackPanel Orientation="Horizontal"
                         Margin="0 0 0 10">
-                <Label Content="Caméra :"
-                       VerticalAlignment="Center" />
+                <Label Content="Camera :"
+                       VerticalAlignment="Center"
+                       x:Name="CameraLab"/>
                 <ComboBox x:Name="CameraComboBox"
                           Width="300"
                           Margin="5 0"
                           SelectionChanged="CameraComboBox_SelectionChanged" />
                 <CheckBox x:Name="MirrorCheckBox"
-                          Content="Mode miroir"
+                          Content="Mirror mode"
                           VerticalAlignment="Center"
                           Margin="10 0" />
             </StackPanel>

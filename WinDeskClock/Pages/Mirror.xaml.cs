@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using DirectShowLib;
+using WinDeskClock.Utils;
 
 namespace WinDeskClock.Pages
 {
@@ -23,15 +24,24 @@ namespace WinDeskClock.Pages
             InitializeComponent();
             LoadCameras();
             this.Unloaded += Mirror_Unloaded;
+            this.Initialized += Mirror_Init;
+        }
+
+        private async void Mirror_Init(object sender, EventArgs e)
+        {
+            CameraLab.Content = await LangSystem.GetLang("mirror.camera");
+            MirrorCheckBox.Content = await LangSystem.GetLang("mirror.mirrormode");
         }
 
         private async void Mirror_Unloaded(object sender, RoutedEventArgs e)
         {
+            Log.Info("Unloading Mirror page, stopping camera capture...");
             StopCamera();
         }
 
-        private void LoadCameras()
+        private async Task LoadCameras()
         {
+            Log.Info("Loading available cameras...");
             CameraComboBox.Items.Clear();
             cameraIndices.Clear();
 
@@ -42,20 +52,36 @@ namespace WinDeskClock.Pages
                 var cam = systemCameras[i];
                 cameraIndices.Add(i);
                 CameraComboBox.Items.Add($"{i} - {cam.Name}");
+                Log.Info($"Found camera: {i} - {cam.Name}");
             }
 
             if (CameraComboBox.Items.Count > 0)
                 CameraComboBox.SelectedIndex = 0;
             else
-                CameraComboBox.Text = "No camera found";
+                CameraComboBox.Text = await LangSystem.GetLang("mirror.nocamera");
+            if (CameraComboBox.Items.Count == 0)
+            {
+                Log.Warning("No cameras found !");
+                CameraComboBox.IsEnabled = false;
+                MirrorCheckBox.IsEnabled = false;
+                LoadingIndicator.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                CameraComboBox.IsEnabled = true;
+                MirrorCheckBox.IsEnabled = true;
+                LoadingIndicator.Visibility = Visibility.Collapsed;
+            }
         }
 
         private async void CameraComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            Log.Info("Camera selection changed, starting camera capture with: " + CameraComboBox.SelectedItem);
             if (CameraComboBox.SelectedIndex < 0)
                 return;
 
             CameraComboBox.IsEnabled = false;
+            MirrorCheckBox.IsEnabled = false;
             LoadingIndicator.Visibility = Visibility.Visible;
 
             try
@@ -69,6 +95,7 @@ namespace WinDeskClock.Pages
             finally
             {
                 CameraComboBox.IsEnabled = true;
+                MirrorCheckBox.IsEnabled = true;
                 LoadingIndicator.Visibility = Visibility.Collapsed;
             }
         }
@@ -97,12 +124,17 @@ namespace WinDeskClock.Pages
 
         private async Task StopCamera()
         {
+            Log.Info("Stopping existing camera capture...");
             if (cts != null)
             {
                 cts.Cancel();
                 await Task.Delay(100);
                 cts.Dispose();
                 cts = null;
+            }
+            else
+            {
+                Log.Warning("No camera capture to stop, cts is null.");
             }
 
             capture?.Release();

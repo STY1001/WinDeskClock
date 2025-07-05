@@ -13,6 +13,13 @@
         "exit": "Exit",
         "exiting": "Exiting..."
       },
+      "mirror": {
+        "titlename": "Mirror",
+        "back": "Back",
+        "mirrormode": "Mirror mode",
+        "camera": "Camera",
+        "nocamera": "No camera detected"
+      },
       "settings": {
         "titlename": "Settings",
         "save": "Save",
@@ -246,6 +253,13 @@
         "exit": "Fermer",
         "exiting": "Fermeture..."
       },
+      "mirror": {
+        "titlename": "Miroir",
+        "back": "Retour",
+        "mirrormode": "Mode miroir",
+        "camera": "Caméra",
+        "nocamera": "Aucune caméra détectée"
+      },
       "settings": {
         "titlename": "Paramètres",
         "save": "Enregistrer",
@@ -478,6 +492,13 @@
         "settings": "Ayarlar",
         "exit": "Çıkış",
         "exiting": "Çıkılıyor..."
+      },
+      "mirror": {
+        "titlename": "Aynalama",
+        "back": "Geri",
+        "mirrormode": "Aynalama modu",
+        "camera": "Kamera",
+        "nocamera": "Kamera algılanamadı"
       },
       "settings": {
         "titlename": "Ayarlar",
