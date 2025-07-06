@@ -445,6 +445,7 @@ namespace WinDeskClock
         {
             // Splash start
             Log.Info("MainWindow loaded, showing splash screen...");
+            this.WindowState = WindowState.Maximized;
             RootTitleBar.Visibility = Visibility.Hidden;
             MainGrid.Visibility = Visibility.Hidden;
             SplashLoadingText.Text = "Hi !";
@@ -503,14 +504,14 @@ namespace WinDeskClock
             {
                 Log.Info("FullScreen enabled, applying...");
                 FullScreenBtn.IsChecked = true;
-                FullScreenBtn.RaiseEvent(new RoutedEventArgs(ToggleButton.CheckedEvent, FullScreenBtn));
+                FullScreenBtn.RaiseEvent(new RoutedEventArgs(ToggleButton.ClickEvent, FullScreenBtn));
 
             }
             if (App.StartupOptions.KioskMode)
             {
                 Log.Info("KioskMode enabled, applying...");
                 KioskModeBtn.IsChecked = true;
-                KioskModeBtn.RaiseEvent(new RoutedEventArgs(ToggleButton.CheckedEvent, KioskModeBtn));
+                KioskModeBtn.RaiseEvent(new RoutedEventArgs(ToggleButton.ClickEvent, KioskModeBtn));
             }
 
             // Check and create the config files

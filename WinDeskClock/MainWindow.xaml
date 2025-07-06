@@ -13,8 +13,7 @@
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Mica"
                  WindowCornerPreference="Round"
-                 WindowStartupLocation="CenterScreen"
-                 WindowState="Maximized">
+                 WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid x:Name="AppGrid"
               RenderTransformOrigin="0.5,0.5"
