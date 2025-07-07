@@ -120,23 +120,30 @@ namespace WinDeskClock
 
         private async void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            e.Handled = true;
-            Exception exp = e.Exception;
-            MessageBoxResult result = System.Windows.MessageBox.Show($"WinDeskClock has crashed.\n\n\nReason:\n{exp.Message}\n\n\n - Yes: Restart WinDeskClock\n\n - No: Close WinDeskClock\n\n - Cancel: Try to continue (can be unstable)", "WinDeskClock crash handler", MessageBoxButton.YesNoCancel, MessageBoxImage.Error);
-            if (result == MessageBoxResult.Yes)
+            // When debugged, don't handle the exception, let Visual Studio catch it
+            if (Debugger.IsAttached)
             {
-                RestartApp();
-
+                return;
             }
-            else if (result == MessageBoxResult.No)
+            else
             {
-                Application.Current.Shutdown();
-            }
-            else if (result == MessageBoxResult.Cancel)
-            {
+                e.Handled = true;
+                Exception exp = e.Exception;
+                MessageBoxResult result = System.Windows.MessageBox.Show($"WinDeskClock has crashed.\n\n\nReason:\n{exp.Message}\n\n\n - Yes: Restart WinDeskClock\n\n - No: Close WinDeskClock\n\n - Cancel: Try to continue (can be unstable)", "WinDeskClock crash handler", MessageBoxButton.YesNoCancel, MessageBoxImage.Error);
+                if (result == MessageBoxResult.Yes)
+                {
+                    RestartApp();
 
+                }
+                else if (result == MessageBoxResult.No)
+                {
+                    Application.Current.Shutdown();
+                }
+                else if (result == MessageBoxResult.Cancel)
+                {
+
+                }
             }
         }
     }
-
 }
