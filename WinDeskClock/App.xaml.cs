@@ -133,7 +133,6 @@ namespace WinDeskClock
                 if (result == MessageBoxResult.Yes)
                 {
                     RestartApp();
-
                 }
                 else if (result == MessageBoxResult.No)
                 {
