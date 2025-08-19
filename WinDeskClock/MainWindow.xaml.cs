@@ -3,7 +3,9 @@ using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Media;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,68 +27,13 @@ namespace WinDeskClock
     /// Interaction logic for MainWindow.xaml
     /// </summary>
 
-    public class User32
-    {
-        private const int HWND_BROADCAST = 0xFFFF;
-        private const uint WM_SYSCOMMAND = 0x0112;
-        private const uint SC_MONITORPOWER = 0xF170;
-        private const int MONITOR_OFF = 2;
-        private const int MONITOR_ON = -1;
-        private const int WM_POWERBROADCAST = 0x0218;
-        private const int PBT_POWERSETTINGCHANGE = 0x8013;
-        private Guid CONSOLE_DISPLAY_STATE = new Guid("6FE69556-704A-47A0-8F24-C28D936FDA47");
-        private const uint MOUSE_EVENTF_MOVE = 0x0001;
-
-        public int User32HWND_BROADCAST { get { return HWND_BROADCAST; } }
-        public uint User32WM_SYSCOMMAND { get { return WM_SYSCOMMAND; } }
-        public uint User32SC_MONITORPOWER { get { return SC_MONITORPOWER; } }
-        public int User32MONITOR_OFF { get { return MONITOR_OFF; } }
-        public int User32MONITOR_ON { get { return MONITOR_ON; } }
-        public int User32WM_POWERBROADCAST { get { return WM_POWERBROADCAST; } }
-        public int User32PBT_POWERSETTINGCHANGE { get { return PBT_POWERSETTINGCHANGE; } }
-        public Guid User32CONSOLE_DISPLAY_STATE { get { return CONSOLE_DISPLAY_STATE; } }
-        public uint User32MOUSE_EVENTF_MOVE { get { return MOUSE_EVENTF_MOVE; } }
-
-
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
-        public struct PowerBroadcastSetting
-        {
-            public Guid PowerSetting;
-            public uint DataLength;
-            public byte Data;
-        }
-
-        [DllImport("user32.dll")]
-        private static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);
-        [DllImport("user32.dll")]
-        private static extern IntPtr RegisterPowerSettingNotification(IntPtr hRecipient, ref Guid PowerSettingGuid, uint Flags);
-        [DllImport("user32.dll")]
-        private static extern bool UnregisterPowerSettingNotification(IntPtr Handle);
-        [DllImport("user32.dll")]
-        private static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, IntPtr dwExtraInfo);
-        public int User32SendMessage(int hWnd, int hMsg, int wParam, int lParam)
-        {
-            return SendMessage(hWnd, hMsg, wParam, lParam);
-        }
-        public IntPtr User32RegisterPowerSettingNotification(IntPtr hRecipient, ref Guid PowerSettingGuid, uint Flags)
-        {
-            return RegisterPowerSettingNotification(hRecipient, ref PowerSettingGuid, Flags);
-        }
-        public bool User32UnregisterPowerSettingNotification(IntPtr Handle)
-        {
-            return UnregisterPowerSettingNotification(Handle);
-        }
-        public void User32MouseEvent(uint dwFlags, int dx, int dy, uint dwData, IntPtr dwExtraInfo)
-        {
-            mouse_event(dwFlags, dx, dy, dwData, dwExtraInfo);
-        }
-    }
 
     public partial class MainWindow : FluentWindow
     {
-        public User32 user32dll = new User32();
-
         private Page ClockPage;
+
+        bool FullScreenEnabled = false;
+        bool KioskModeEnabled = false;
 
         private List<Grid> MenuClockGrids = new List<Grid>();
         private DispatcherTimer minitime;
@@ -185,11 +132,11 @@ namespace WinDeskClock
         // WndProc for intercepting system messages (like screen off/on)
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (msg == user32dll.User32WM_POWERBROADCAST && wParam.ToInt32() == user32dll.User32PBT_POWERSETTINGCHANGE)
+            if (msg == WindowsAPI.User32.WM_POWERBROADCAST && wParam.ToInt32() == WindowsAPI.User32.PBT_POWERSETTINGCHANGE)
             {
                 // Handle screen on/off events
-                var powerSetting = (User32.PowerBroadcastSetting)Marshal.PtrToStructure(lParam, typeof(User32.PowerBroadcastSetting));
-                if (powerSetting.PowerSetting == user32dll.User32CONSOLE_DISPLAY_STATE && powerSetting.Data == 1)
+                var powerSetting = (WindowsAPI.User32.PowerBroadcastSetting)Marshal.PtrToStructure(lParam, typeof(WindowsAPI.User32.PowerBroadcastSetting));
+                if (powerSetting.PowerSetting == WindowsAPI.User32.CONSOLE_DISPLAY_STATE && powerSetting.Data == 1)
                 {
                     Log.Info("System screen turned on");
                     TurnScreenOn();
@@ -503,15 +450,19 @@ namespace WinDeskClock
             if (App.StartupOptions.FullScreen)
             {
                 Log.Info("FullScreen enabled, applying...");
-                FullScreenBtn.IsChecked = true;
-                FullScreenBtn.RaiseEvent(new RoutedEventArgs(ToggleButton.ClickEvent, FullScreenBtn));
+                FullScreenBtn.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
+                {
+                    RoutedEvent = PreviewMouseUpEvent
+                });
 
             }
             if (App.StartupOptions.KioskMode)
             {
                 Log.Info("KioskMode enabled, applying...");
-                KioskModeBtn.IsChecked = true;
-                KioskModeBtn.RaiseEvent(new RoutedEventArgs(ToggleButton.ClickEvent, KioskModeBtn));
+                KioskModeBtn.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
+                {
+                    RoutedEvent = PreviewMouseUpEvent
+                });
             }
 
             // Check and create the config files
@@ -699,85 +650,10 @@ namespace WinDeskClock
                 Log.Info("Menu timout reached, closing menu...");
                 if (GlobalMenuGrid.Visibility == Visibility.Visible)
                 {
+                    BackBtn.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
                     {
-                        var fadeAnimation = new DoubleAnimation
-                        {
-                            From = 1,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        Storyboard.SetTarget(fadeAnimation, GlobalMenuGrid);
-                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(fadeAnimation);
-                        storyboard.Begin();
-                    }
-                    {
-                        var sizeAnimation1 = new DoubleAnimation
-                        {
-                            From = 1,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                        };
-                        var sizeAnimation2 = new DoubleAnimation
-                        {
-                            From = 1,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                        };
-                        Storyboard.SetTarget(sizeAnimation1, GlobalMenuBorder);
-                        Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                        Storyboard.SetTarget(sizeAnimation2, GlobalMenuBorder);
-                        Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(sizeAnimation1);
-                        storyboard.Children.Add(sizeAnimation2);
-                        storyboard.Begin();
-                    }
-                    await Task.Delay(150);
-                    {
-                        var fadeAnimation = new DoubleAnimation
-                        {
-                            From = 0,
-                            To = 1,
-                            Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
-                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(fadeAnimation);
-                        storyboard.Begin();
-                    }
-                    {
-                        var sizeAnimation1 = new DoubleAnimation
-                        {
-                            From = 2,
-                            To = 1,
-                            Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        var sizeAnimation2 = new DoubleAnimation
-                        {
-                            From = 2,
-                            To = 1,
-                            Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
-                        Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                        Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
-                        Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(sizeAnimation1);
-                        storyboard.Children.Add(sizeAnimation2);
-                        storyboard.Begin();
-                    }
-                    await Task.Delay(300);
-                    GlobalMenuGrid.Visibility = Visibility.Hidden;
+                        RoutedEvent = PreviewMouseUpEvent
+                    });
                 }
                 if (ClockGrid.Visibility != Visibility.Visible)
                 {
@@ -983,6 +859,212 @@ namespace WinDeskClock
             }
         }
 
+        #region Fullscreen/Kiosk Mode
+        private async Task FullScreenEnable()
+        {
+            Log.Info("Enabling full screen mode");
+            if (!FullScreenEnabled)
+            {
+                FullScreenEnabled = true;
+                WindowState = WindowState.Normal;
+                WindowStyle = WindowStyle.None;
+                WindowState = WindowState.Maximized;
+                this.Topmost = true;
+                RootTitleBar.ShowMaximize = false;
+                RootTitleBar.ShowMinimize = false;
+                RootTitleBar.Width = 50;
+                RootTitleBar.Padding = new Thickness(0, 0, 0, 0);
+                RootTitleBar.HorizontalAlignment = HorizontalAlignment.Right;
+                RootTitleBar.Title = "";
+                AppTitleText.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Log.Warning("Full screen mode is already enabled");
+            }
+        }
+        private async Task FullScreenDisable()
+        {
+            Log.Info("Disabling full screen mode");
+            if (FullScreenEnabled)
+            {
+                FullScreenEnabled = false;
+                WindowState = WindowState.Normal;
+                WindowStyle = WindowStyle.SingleBorderWindow;
+                WindowState = WindowState.Maximized;
+                this.Topmost = false;
+                RootTitleBar.ShowMaximize = true;
+                RootTitleBar.ShowMinimize = true;
+                RootTitleBar.Width = double.NaN;
+                RootTitleBar.Padding = new Thickness(0, 0, 30, 0);
+                RootTitleBar.HorizontalAlignment = HorizontalAlignment.Stretch;
+                RootTitleBar.Title = "WinDeskClock";
+                AppTitleText.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                Log.Warning("Full screen mode is already disabled");
+            }
+        }
+
+        private async Task KioskModeEnable()
+        {
+            Log.Info("Enabling kiosk mode");
+            if (!KioskModeEnabled)
+            {
+                KioskModeEnabled = true;
+                FullScreenBtn.IsChecked = true;
+                FullScreenBtn.IsEnabled = false;
+                WindowState = WindowState.Normal;
+                WindowStyle = WindowStyle.None;
+                WindowState = WindowState.Maximized;
+                this.Topmost = true;
+                RootTitleBar.ShowMaximize = false;
+                RootTitleBar.ShowMinimize = false;
+                RootTitleBar.ShowClose = false;
+                RootTitleBar.Visibility = Visibility.Hidden;
+                AppTitleText.Visibility = Visibility.Visible;
+                RootTitleBar.Width = 0;
+                await WindowsKioskEnable();
+            }
+            else
+            {
+                Log.Warning("Kiosk mode is already enabled");
+            }
+        }
+        private async Task KioskModeDisable()
+        {
+            Log.Info("Disabling kiosk mode");
+            if (KioskModeEnabled)
+            {
+                KioskModeEnabled = false;
+                FullScreenBtn.IsChecked = false;
+                FullScreenBtn.IsEnabled = true;
+                WindowState = WindowState.Normal;
+                WindowStyle = WindowStyle.SingleBorderWindow;
+                WindowState = WindowState.Maximized;
+                this.Topmost = false;
+                RootTitleBar.ShowMaximize = true;
+                RootTitleBar.ShowMinimize = true;
+                RootTitleBar.ShowClose = true;
+                RootTitleBar.Visibility = Visibility.Visible;
+                AppTitleText.Visibility = Visibility.Hidden;
+                RootTitleBar.Width = double.NaN;
+                await WindowsKioskDisable();
+            }
+            else
+            {
+                Log.Warning("Kiosk mode is already disabled");
+            }
+        }
+
+        private async void PreventKioskEscape(object sender, EventArgs e)
+        {
+            Log.Warning("Window deactivated, preventing escape from kiosk mode");
+            this.Topmost = false;
+            await Task.Delay(25);
+            this.Activate();
+            this.Focus();
+            await Task.Delay(25);
+            this.Topmost = true;
+        }
+
+        private async Task WindowsKioskEnable()
+        { 
+            Log.Info("Enabling Windows kiosk mode");
+
+            // Taskbar hide
+            IntPtr taskbarWnd = WindowsAPI.User32.FindWindow("Shell_TrayWnd", null);
+            if (taskbarWnd != IntPtr.Zero)
+            {
+                Log.Info("Hiding taskbar");
+                WindowsAPI.User32.ShowWindow(taskbarWnd, WindowsAPI.User32.SW_HIDE);
+            }
+            else
+            {
+                Log.Warning("Taskbar not found, cannot hide it");
+            }
+
+            // Desktop icons hide (keep wallpaper)
+            IntPtr desktopWnd = WindowsAPI.User32.FindWindow("Progman", null);
+            if (desktopWnd != IntPtr.Zero)
+            {
+                IntPtr shellViewWnd = WindowsAPI.User32.FindWindowEx(desktopWnd, IntPtr.Zero, "SHELLDLL_DefView", null);
+                if (shellViewWnd != IntPtr.Zero)
+                {
+                    IntPtr sysListView32Wnd = WindowsAPI.User32.FindWindowEx(shellViewWnd, IntPtr.Zero, "SysListView32", null);
+                    if (sysListView32Wnd != IntPtr.Zero)
+                    {
+                        Log.Info("Hiding desktop icons");
+                        WindowsAPI.User32.ShowWindow(sysListView32Wnd, WindowsAPI.User32.SW_HIDE);
+                    }
+                    else
+                    {
+                        Log.Warning("SysListView32 not found, cannot hide desktop icons");
+                    }
+                }
+                else
+                {
+                    Log.Warning("Shell view not found, cannot hide desktop icons");
+                }
+            }
+            else
+            {
+                Log.Warning("Desktop not found, cannot hide desktop icons");
+            }
+
+            // Prevent escaping kiosk mode
+            this.Deactivated += PreventKioskEscape;
+        }
+        private async Task WindowsKioskDisable()
+        {
+            Log.Info("Disabling Windows kiosk mode");
+
+            // Taskbar show
+            IntPtr taskbarWnd = WindowsAPI.User32.FindWindow("Shell_TrayWnd", null);
+            if (taskbarWnd != IntPtr.Zero)
+            {
+                Log.Info("Showing taskbar");
+                WindowsAPI.User32.ShowWindow(taskbarWnd, WindowsAPI.User32.SW_SHOW);
+            }
+            else
+            {
+                Log.Warning("Taskbar not found, cannot show it");
+            }
+
+            // Desktop icons show (keep wallpaper)
+            IntPtr desktopWnd = WindowsAPI.User32.FindWindow("Progman", null);
+            if (desktopWnd != IntPtr.Zero)
+            {
+                IntPtr shellViewWnd = WindowsAPI.User32.FindWindowEx(desktopWnd, IntPtr.Zero, "SHELLDLL_DefView", null);
+                if (shellViewWnd != IntPtr.Zero)
+                {
+                    IntPtr sysListView32Wnd = WindowsAPI.User32.FindWindowEx(shellViewWnd, IntPtr.Zero, "SysListView32", null);
+                    if (sysListView32Wnd != IntPtr.Zero)
+                    {
+                        Log.Info("Showing desktop icons");
+                        WindowsAPI.User32.ShowWindow(sysListView32Wnd, WindowsAPI.User32.SW_SHOW);
+                    }
+                    else
+                    {
+                        Log.Warning("SysListView32 not found, cannot show desktop icons");
+                    }
+                }
+                else
+                {
+                    Log.Warning("Shell view not found, cannot show desktop icons");
+                }
+            }
+            else
+            {
+                Log.Warning("Desktop not found, cannot show desktop icons");
+            }
+
+            // Remove the deactivated event handler
+            this.Deactivated -= PreventKioskEscape;
+        }
+        #endregion
+
         #region Screen Off/On
 
         /*private const int GWL_WNDPROC = -4;
@@ -1014,13 +1096,13 @@ namespace WinDeskClock
         private async Task TurnScreenOff()
         {
             Log.Info("Turning screen off...");
-            Guid powerSettingGuid = user32dll.User32CONSOLE_DISPLAY_STATE;
+            Guid powerSettingGuid = WindowsAPI.User32.CONSOLE_DISPLAY_STATE;
             var hwnd = new WindowInteropHelper(this).Handle;
             HwndSource.FromHwnd(hwnd).AddHook(new HwndSourceHook(WndProc));
-            PowerNotifHandle = user32dll.User32RegisterPowerSettingNotification(hwnd, ref powerSettingGuid, 0);
+            PowerNotifHandle = WindowsAPI.User32.RegisterPowerSettingNotification(hwnd, ref powerSettingGuid, 0);
             await ScreenOffAnimation(ConfigManager.Variables.ScreenOnOff);
             await Task.Delay(200);
-            user32dll.User32SendMessage(0xFFFF, (int)user32dll.User32WM_SYSCOMMAND, (int)user32dll.User32SC_MONITORPOWER, user32dll.User32MONITOR_OFF);
+            WindowsAPI.User32.SendMessage(0xFFFF, (int)WindowsAPI.User32.WM_SYSCOMMAND, (int)WindowsAPI.User32.SC_MONITORPOWER, WindowsAPI.User32.MONITOR_OFF);
             TurnOnSignal = false;
 
             /*
@@ -1045,10 +1127,10 @@ namespace WinDeskClock
             }
             Log.Info("Turning screen on...");
 
-            user32dll.User32SendMessage(0xFFFF, (int)user32dll.User32WM_SYSCOMMAND, (int)user32dll.User32SC_MONITORPOWER, user32dll.User32MONITOR_ON);
+            WindowsAPI.User32.SendMessage(0xFFFF, (int)WindowsAPI.User32.WM_SYSCOMMAND, (int)WindowsAPI.User32.SC_MONITORPOWER, WindowsAPI.User32.MONITOR_ON);
             if (PowerNotifHandle != IntPtr.Zero)
             {
-                user32dll.User32UnregisterPowerSettingNotification(PowerNotifHandle);
+                WindowsAPI.User32.UnregisterPowerSettingNotification(PowerNotifHandle);
                 PowerNotifHandle = IntPtr.Zero;
             }
 
@@ -1080,9 +1162,9 @@ namespace WinDeskClock
 
         private async Task TurnScreenOn()
         {
-            user32dll.User32MouseEvent(user32dll.User32MOUSE_EVENTF_MOVE, 1, 1, 0, IntPtr.Zero);
-            user32dll.User32MouseEvent(user32dll.User32MOUSE_EVENTF_MOVE, -1, -1, 0, IntPtr.Zero);
-            user32dll.User32SendMessage(0xFFFF, (int)user32dll.User32WM_SYSCOMMAND, (int)user32dll.User32SC_MONITORPOWER, user32dll.User32MONITOR_ON);
+            WindowsAPI.User32.MouseEvent(WindowsAPI.User32.MOUSE_EVENTF_MOVE, 1, 1, 0, IntPtr.Zero);
+            WindowsAPI.User32.MouseEvent(WindowsAPI.User32.MOUSE_EVENTF_MOVE, -1, -1, 0, IntPtr.Zero);
+            WindowsAPI.User32.SendMessage(0xFFFF, (int)WindowsAPI.User32.WM_SYSCOMMAND, (int)WindowsAPI.User32.SC_MONITORPOWER, WindowsAPI.User32.MONITOR_ON);
             TurnOnSignal = true;
         }
 
@@ -6201,88 +6283,10 @@ namespace WinDeskClock
 
         #region Global Menu
         private double animspeedzoomgm = 0.2;
-        private async void GlobalMenuBtn_Click(object sender, RoutedEventArgs e)
-        {
-            {
-                var sizeAnimation1 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 2,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var sizeAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 2,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation1);
-                storyboard.Children.Add(sizeAnimation2);
-                storyboard.Begin();
-            }
-            {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
-            await Task.Delay(150);
-            GlobalMenuGrid.Visibility = Visibility.Visible;
-            {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(fadeAnimation, GlobalMenuGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
-            {
-                var sizeAnimation1 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var sizeAnimation2 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBorder);
-                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBorder);
-                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation1);
-                storyboard.Children.Add(sizeAnimation2);
-                storyboard.Begin();
-            }
-        }
-        private async void BackBtn_Click(object sender, RoutedEventArgs e)
+        private double animzoomspeeds = 0.3;
+
+        // Global menu tactile navigation 
+        private async void BackBtn_MouseUp(object sender, MouseButtonEventArgs e)
         {
             {
                 var fadeAnimation = new DoubleAnimation
@@ -6323,6 +6327,8 @@ namespace WinDeskClock
                 storyboard.Begin();
             }
             await Task.Delay(150);
+            GlobalMenuGrid.Visibility = Visibility.Hidden;
+            GlobalMenuBtn.Visibility = Visibility.Visible;
             {
                 var fadeAnimation = new DoubleAnimation
                 {
@@ -6362,132 +6368,25 @@ namespace WinDeskClock
                 storyboard.Begin();
             }
             await Task.Delay(300);
-            GlobalMenuGrid.Visibility = Visibility.Hidden;
         }
-        private async void ScreenOffBtn_Click(object sender, RoutedEventArgs e)
+
+        private async void ScreenOffBtn_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            GlobalMenuGrid.Visibility = Visibility.Hidden;
+            BackBtn.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
             {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(0.3),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
-            {
-                var sizeAnimation1 = new DoubleAnimation
-                {
-                    From = 2,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(0.3),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var sizeAnimation2 = new DoubleAnimation
-                {
-                    From = 2,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(0.3),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation1);
-                storyboard.Children.Add(sizeAnimation2);
-                storyboard.Begin();
-            }
+                RoutedEvent = PreviewMouseUpEvent
+            });
+            await Task.Delay(150);
             await TurnScreenOff();
         }
-        private async void MirrorBtn_Click(object sender, RoutedEventArgs e)
+
+        private async void MirrorBtn_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            BackBtn.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
             {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeAnimation, GlobalMenuGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
-            {
-                var sizeAnimation1 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var sizeAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBorder);
-                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBorder);
-                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation1);
-                storyboard.Children.Add(sizeAnimation2);
-                storyboard.Begin();
-            }
+                RoutedEvent = PreviewMouseUpEvent
+            });
             await Task.Delay(150);
-            {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
-            {
-                var sizeAnimation1 = new DoubleAnimation
-                {
-                    From = 2,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var sizeAnimation2 = new DoubleAnimation
-                {
-                    From = 2,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation1);
-                storyboard.Children.Add(sizeAnimation2);
-                storyboard.Begin();
-            }
-            await Task.Delay(300);
-            GlobalMenuGrid.Visibility = Visibility.Hidden;
             MirrorGrid.Visibility = Visibility.Visible;
             {
                 var fadeAnimation = new DoubleAnimation
@@ -6531,161 +6430,45 @@ namespace WinDeskClock
             Page mirror = new Mirror();
             MirrorFrame.Navigate(mirror);
         }
-        private async void FullScreenBtn_Click(object sender, RoutedEventArgs e)
+
+
+        private async void FullScreenBtn_MouseUp(object sender, MouseButtonEventArgs e)
         {
             Log.Info("Toggling full screen mode");
+            await Task.Delay(10);
+            FullScreenBtn.IsChecked = !FullScreenEnabled;
             if (FullScreenBtn.IsChecked == true)
             {
-                Log.Info("Enabling full screen mode");
-                WindowState = WindowState.Normal;
-                WindowStyle = WindowStyle.None;
-                WindowState = WindowState.Maximized;
-                this.Topmost = true;
-                RootTitleBar.ShowMaximize = false;
-                RootTitleBar.ShowMinimize = false;
-                RootTitleBar.Width = 50;
-                RootTitleBar.Padding = new Thickness(0, 0, 0, 0);
-                RootTitleBar.HorizontalAlignment = HorizontalAlignment.Right;
-                RootTitleBar.Title = "";
-                AppTitleText.Visibility = Visibility.Visible;
+                await FullScreenEnable();
             }
             else
             {
-                Log.Info("Disabling full screen mode");
-                WindowState = WindowState.Normal;
-                WindowStyle = WindowStyle.SingleBorderWindow;
-                WindowState = WindowState.Maximized;
-                this.Topmost = false;
-                RootTitleBar.ShowMaximize = true;
-                RootTitleBar.ShowMinimize = true;
-                RootTitleBar.Width = double.NaN;
-                RootTitleBar.Padding = new Thickness(0, 0, 30, 0);
-                RootTitleBar.HorizontalAlignment = HorizontalAlignment.Stretch;
-                RootTitleBar.Title = "WinDeskClock";
-                AppTitleText.Visibility = Visibility.Hidden;
-            }
-        }
-        private async void KioskModeBtn_Click(object sender, RoutedEventArgs e)
-        {
-            Log.Info("Toggling kiosk mode");
-            if (KioskModeBtn.IsChecked == true)
-            {
-                Log.Info("Enabling kiosk mode");
-                FullScreenBtn.IsChecked = true;
-                FullScreenBtn.IsEnabled = false;
-                WindowState = WindowState.Normal;
-                WindowStyle = WindowStyle.None;
-                WindowState = WindowState.Maximized;
-                this.Topmost = true;
-                RootTitleBar.ShowMaximize = false;
-                RootTitleBar.ShowMinimize = false;
-                RootTitleBar.ShowClose = false;
-                RootTitleBar.Visibility = Visibility.Hidden;
-                AppTitleText.Visibility = Visibility.Visible;
-                RootTitleBar.Width = 0;
-                Process.Start("taskkill", "/f /im explorer.exe");
-            }
-            else
-            {
-                Log.Info("Disabling kiosk mode");
-                FullScreenBtn.IsChecked = false;
-                FullScreenBtn.IsEnabled = true;
-                WindowState = WindowState.Normal;
-                WindowStyle = WindowStyle.SingleBorderWindow;
-                WindowState = WindowState.Maximized;
-                this.Topmost = false;
-                RootTitleBar.ShowMaximize = true;
-                RootTitleBar.ShowMinimize = true;
-                RootTitleBar.ShowClose = true;
-                RootTitleBar.Visibility = Visibility.Visible;
-                AppTitleText.Visibility = Visibility.Hidden;
-                RootTitleBar.Width = double.NaN;
-                Process.Start("explorer.exe");
+                await FullScreenDisable();
             }
         }
 
-        private double animzoomspeeds = 0.3;
-        private async void SettingsBtn_Click(object sender, RoutedEventArgs e)
+        private async void KioskModeBtn_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            Log.Info("Toggling kiosk mode");
+            await Task.Delay(10);
+            KioskModeBtn.IsChecked = !KioskModeEnabled;
+            if (KioskModeBtn.IsChecked == true)
             {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeAnimation, GlobalMenuGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
+                await KioskModeEnable();
             }
+            else
             {
-                var sizeAnimation1 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var sizeAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBorder);
-                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBorder);
-                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation1);
-                storyboard.Children.Add(sizeAnimation2);
-                storyboard.Begin();
+                await KioskModeDisable();
             }
+        }
+
+        private async void SettingsBtn_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            BackBtn.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
+            {
+                RoutedEvent = PreviewMouseUpEvent
+            });
             await Task.Delay(150);
-            {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
-            {
-                var sizeAnimation1 = new DoubleAnimation
-                {
-                    From = 2,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var sizeAnimation2 = new DoubleAnimation
-                {
-                    From = 2,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation1);
-                storyboard.Children.Add(sizeAnimation2);
-                storyboard.Begin();
-            }
-            await Task.Delay(300);
-            GlobalMenuGrid.Visibility = Visibility.Hidden;
             SettingsGrid.Visibility = Visibility.Visible;
             {
                 var fadeAnimation = new DoubleAnimation
@@ -6762,15 +6545,99 @@ namespace WinDeskClock
                 storyboard.Begin();
             }
         }
-        private async void ExitAppBtn_Click(object sender, RoutedEventArgs e)
+
+        private async void ExitAppBtn_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            Log.Info("Exiting application");
             ExitAppBtn.Content = await LangSystem.GetLang("mainmenu.exiting");
-            if (Process.GetProcessesByName("explorer").Length == 0)
-            {
-                Process.Start("explorer.exe");
-            }
-            await Task.Delay(1000);
+            await WindowsKioskDisable();
             Application.Current.Shutdown();
+        }
+
+        private async void GlobalMenuGrid_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+        }
+        private async void GlobalMenuBtn_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 2,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 2,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            await Task.Delay(150);
+            GlobalMenuGrid.Visibility = Visibility.Visible;
+            GlobalMenuBtn.Visibility = Visibility.Collapsed;
+            {
+                var fadeAnimation = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                Storyboard.SetTarget(fadeAnimation, GlobalMenuGrid);
+                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(fadeAnimation);
+                storyboard.Begin();
+            }
+            {
+                var sizeAnimation1 = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                var sizeAnimation2 = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBorder);
+                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
+                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBorder);
+                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
+                var storyboard = new Storyboard();
+                storyboard.Children.Add(sizeAnimation1);
+                storyboard.Children.Add(sizeAnimation2);
+                storyboard.Begin();
+            }
         }
         #endregion
 
