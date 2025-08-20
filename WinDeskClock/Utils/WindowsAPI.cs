@@ -25,20 +25,7 @@ namespace WinDeskClock.Utils
         private static extern bool UnregisterPowerSettingNotification(IntPtr Handle);
         [DllImport("user32.dll")]
         private static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, IntPtr dwExtraInfo);
-        [DllImport("user32.dll")]
-        private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
-        [DllImport("user32.dll")]
-        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
-        [DllImport("user32.dll")]
-        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
-        [DllImport("user32.dll")]
-        private static extern bool IsWindowVisible(IntPtr hWnd);
-        [DllImport("user32.dll")]
-        private static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
-        [DllImport("user32.dll")]
-        private static extern uint SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
 
-        private const int HWND_BROADCAST = 0xFFFF;
         private const uint WM_SYSCOMMAND = 0x0112;
         private const uint SC_MONITORPOWER = 0xF170;
         private const int MONITOR_OFF = 2;
@@ -49,13 +36,8 @@ namespace WinDeskClock.Utils
         private static Guid CONSOLE_DISPLAY_STATE = new Guid("6FE69556-704A-47A0-8F24-C28D936FDA47");
         private const int SW_HIDE = 0;
         private const int SW_SHOW = 5;
-        private const int GWL_STYLE = -16;
-        private const uint WS_VISIBLE = 0x10000000;
         public static class User32
         {
-            
-
-            public static int HWND_BROADCAST { get { return WindowsAPI.HWND_BROADCAST; } }
             public static uint WM_SYSCOMMAND { get { return WindowsAPI.WM_SYSCOMMAND; } }
             public static uint SC_MONITORPOWER { get { return WindowsAPI.SC_MONITORPOWER; } }
             public static int MONITOR_OFF { get { return WindowsAPI.MONITOR_OFF; } }
@@ -66,8 +48,6 @@ namespace WinDeskClock.Utils
             public static Guid CONSOLE_DISPLAY_STATE { get { return WindowsAPI.CONSOLE_DISPLAY_STATE; } }
             public static int SW_HIDE { get { return WindowsAPI.SW_HIDE; } }
             public static int SW_SHOW { get { return WindowsAPI.SW_SHOW; } }
-            public static int GWL_STYLE { get { return WindowsAPI.GWL_STYLE; } }
-            public static uint WS_VISIBLE { get { return WindowsAPI.WS_VISIBLE; } }
 
             [StructLayout(LayoutKind.Sequential, Pack = 4)]
             public struct PowerBroadcastSetting
@@ -104,30 +84,6 @@ namespace WinDeskClock.Utils
             public static void MouseEvent(uint dwFlags, int dx, int dy, uint dwData, IntPtr dwExtraInfo)
             {
                 WindowsAPI.mouse_event(dwFlags, dx, dy, dwData, dwExtraInfo);
-            }
-            public static bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam)
-            {
-                return WindowsAPI.EnumWindows(lpEnumFunc, lParam);
-            }
-            public static int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount)
-            {
-                return WindowsAPI.GetClassName(hWnd, lpClassName, nMaxCount);
-            }
-            public static uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId)
-            {
-                return WindowsAPI.GetWindowThreadProcessId(hWnd, out lpdwProcessId);
-            }
-            public static bool IsWindowVisible(IntPtr hWnd)
-            {
-                return WindowsAPI.IsWindowVisible(hWnd);
-            }
-            public static uint GetWindowLong(IntPtr hWnd, int nIndex)
-            {
-                return WindowsAPI.GetWindowLong(hWnd, nIndex);
-            }
-            public static uint SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong)
-            {
-                return WindowsAPI.SetWindowLong(hWnd, nIndex, dwNewLong);
             }
         }
     }
