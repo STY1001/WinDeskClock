@@ -961,7 +961,11 @@ namespace WinDeskClock
         private async void PreventKioskEscape(object sender, EventArgs e)
         {
             Log.Warning("Window deactivated, preventing escape from kiosk mode");
-            await Task.Delay(2500);
+            await Task.Delay(100);
+
+            WindowsAPI.User32.KeybdEvent(WindowsAPI.User32.VK_ESC, 0, 0, UIntPtr.Zero);
+            WindowsAPI.User32.KeybdEvent(WindowsAPI.User32.VK_ESC, 0, WindowsAPI.User32.KEYEVENTF_KEYUP, UIntPtr.Zero);
+
             this.Activate();
         }
 
