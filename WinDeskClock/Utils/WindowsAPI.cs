@@ -25,6 +25,8 @@ namespace WinDeskClock.Utils
         private static extern bool UnregisterPowerSettingNotification(IntPtr Handle);
         [DllImport("user32.dll")]
         private static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, IntPtr dwExtraInfo);
+        [DllImport("user32.dll")]
+        private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
 
         private const uint WM_SYSCOMMAND = 0x0112;
         private const uint SC_MONITORPOWER = 0xF170;
@@ -36,6 +38,8 @@ namespace WinDeskClock.Utils
         private static Guid CONSOLE_DISPLAY_STATE = new Guid("6FE69556-704A-47A0-8F24-C28D936FDA47");
         private const int SW_HIDE = 0;
         private const int SW_SHOW = 5;
+        private const byte VK_ESC = 0x1B;
+        private const uint KEYEVENTF_KEYUP = 0x0002;
         public static class User32
         {
             public static uint WM_SYSCOMMAND { get { return WindowsAPI.WM_SYSCOMMAND; } }
@@ -48,6 +52,9 @@ namespace WinDeskClock.Utils
             public static Guid CONSOLE_DISPLAY_STATE { get { return WindowsAPI.CONSOLE_DISPLAY_STATE; } }
             public static int SW_HIDE { get { return WindowsAPI.SW_HIDE; } }
             public static int SW_SHOW { get { return WindowsAPI.SW_SHOW; } }
+            public static byte VK_ESC { get { return WindowsAPI.VK_ESC; } }
+            public static uint KEYEVENTF_KEYUP { get { return WindowsAPI.KEYEVENTF_KEYUP; } }
+
 
             [StructLayout(LayoutKind.Sequential, Pack = 4)]
             public struct PowerBroadcastSetting
@@ -84,6 +91,10 @@ namespace WinDeskClock.Utils
             public static void MouseEvent(uint dwFlags, int dx, int dy, uint dwData, IntPtr dwExtraInfo)
             {
                 WindowsAPI.mouse_event(dwFlags, dx, dy, dwData, dwExtraInfo);
+            }
+            public static void KeybdEvent(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo)
+            {
+                WindowsAPI.keybd_event(bVk, bScan, dwFlags, dwExtraInfo);
             }
         }
     }
