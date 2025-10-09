@@ -450,19 +450,22 @@ namespace WinDeskClock
             if (App.StartupOptions.FullScreen)
             {
                 Log.Info("FullScreen enabled, applying...");
+                globalmenublocked = false;
                 FullScreenBtn.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
                 {
                     RoutedEvent = PreviewMouseUpEvent
                 });
-
+                globalmenublocked = true;
             }
             if (App.StartupOptions.KioskMode)
             {
                 Log.Info("KioskMode enabled, applying...");
+                globalmenublocked = false;
                 KioskModeBtn.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
                 {
                     RoutedEvent = PreviewMouseUpEvent
                 });
+                globalmenublocked = true;
             }
 
             // Check and create the config files
