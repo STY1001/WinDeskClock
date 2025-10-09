@@ -18,7 +18,7 @@ namespace WinDeskClock
         // App version
         // - [major].[minor].[build number]
         // - If build number is 0, it is a release version
-        public static string AppVersion = "0.1.2508201846";
+        public static string AppVersion = "0.1.09102509252";
         public static string AppSlogan = "Transform your Windows Tablet (or PC) into a Smart Clock";
 
         public static class StartupOptions
