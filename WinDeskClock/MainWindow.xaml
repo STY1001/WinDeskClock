@@ -126,6 +126,7 @@
                                 </Grid>
                             </Border>
                             <ui:Button Grid.Row="1"
+                                       Padding="10"
                                        x:Name="ExitDownMenuClockBtn"
                                        Click="ExitDownMenuClockBtn_Click"
                                        Icon="{ui:ImageIcon '/Resources/icons/up.png'}"
@@ -1248,6 +1249,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <ui:Button x:Name="BackBtn"
+                                   Padding="10"
                                    Content="Back"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                    FontFamily="Segoe UI Variable Display Regular"
@@ -1260,6 +1262,7 @@
                         <Separator Grid.Row="1"
                                    VerticalAlignment="Center" />
                         <ui:Button x:Name="ScreenOffBtn"
+                                   Padding="10"
                                    Content="Turn screen off"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                    FontFamily="Segoe UI Variable Display Regular"
@@ -1270,6 +1273,7 @@
                                    Width="200"
                                    Grid.Row="2" />
                         <ui:Button x:Name="MirrorBtn"
+                                   Padding="10"
                                    Content="Mirror"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                    FontFamily="Segoe UI Variable Display Regular"
@@ -1280,6 +1284,7 @@
                                    Width="200"
                                    Grid.Row="4" />
                         <ToggleButton x:Name="FullScreenBtn"
+                                      Padding="10"
                                       PreviewMouseUp="FullScreenBtn_MouseUp"
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
@@ -1307,6 +1312,7 @@
                             </Grid>
                         </ToggleButton>
                         <ToggleButton x:Name="KioskModeBtn"
+                                      Padding="10"
                                       PreviewMouseUp="KioskModeBtn_MouseUp"
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
@@ -1334,6 +1340,7 @@
                             </Grid>
                         </ToggleButton>
                         <ui:Button x:Name="SettingsBtn"
+                                   Padding="10"
                                    Content="Settings"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                    FontFamily="Segoe UI Variable Display Regular"
@@ -1344,6 +1351,7 @@
                                    Width="200"
                                    Grid.Row="10" />
                         <ui:Button x:Name="ExitAppBtn"
+                                   Padding="10"
                                    Content="Exit"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                    FontFamily="Segoe UI Variable Display Regular"
