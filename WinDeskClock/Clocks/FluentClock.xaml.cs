@@ -101,9 +101,7 @@ namespace WinDeskClock.Clocks
 
         // Animation variables
         // - Slide speed
-        private double txtslidespeed = 0.15;
-        // - Delay between slides
-        private int txtdelay = 150;
+        private double txtslidespeed = 0.25;
 
         // Tick event
         private async void Time_Tick(object sender, EventArgs e)
@@ -161,12 +159,11 @@ namespace WinDeskClock.Clocks
                 From = from1,
                 To = to1,
                 Duration = TimeSpan.FromSeconds(txtslidespeed),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseIn }
             };
 
             animOut.Completed += async (s, e) =>
             {
-                await Task.Delay(txtdelay);
                 textBlock.Text = newText;
 
                 var animIn = new DoubleAnimation
@@ -174,7 +171,7 @@ namespace WinDeskClock.Clocks
                     From = from2,
                     To = to2,
                     Duration = TimeSpan.FromSeconds(txtslidespeed * 2),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
                 };
 
                 transform.BeginAnimation(targetProp, animIn);
