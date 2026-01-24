@@ -193,11 +193,11 @@ namespace WinDeskClock.Utils
                 {
                     if (productAttribute?.Product != "WinDeskClock")
                     {
-                        Log.Warning($"Skipping {Path.GetFileName(file)}, Product attribute does not match 'WinDeskClock'");
+                        Log.Warning($"Skipping {Path.GetFileName(file)}, product attribute does not match 'WinDeskClock'");
                     }
                     if (!assembly.GetName().Name.StartsWith("WDC."))
                     {
-                        Log.Warning($"Skipping {Path.GetFileName(file)}, Assembly name does not start with 'WDC.'");
+                        Log.Warning($"Skipping {Path.GetFileName(file)}, assembly name does not start with 'WDC.'");
                     }
                     context.Unload();
                     GC.Collect();
@@ -213,7 +213,7 @@ namespace WinDeskClock.Utils
                 }
                 catch (ReflectionTypeLoadException ex)
                 {
-                    Log.Warning($"Failed to load types from {Path.GetFileName(file)}, skipping... Exception: {ex.Message}");
+                    Log.Warning($"Failed to load types from {Path.GetFileName(file)}, skipping..., exception: {ex.Message}");
                     types = ex.Types.Where(t => t != null).ToArray();
                 }
 
@@ -230,7 +230,7 @@ namespace WinDeskClock.Utils
                 }
                 catch (Exception ex)
                 {
-                    Log.Warning($"Failed to create instance of plugin info for {Path.GetFileName(file)}, Exception: {ex.Message}");
+                    Log.Warning($"Failed to create instance of plugin info for {Path.GetFileName(file)}, exception: {ex.Message}");
                 }
 
                 if (pluginInfo == null || !pluginInfo.ID.StartsWith("WDC.") || Path.GetFileNameWithoutExtension(file) != pluginInfo.ID)
