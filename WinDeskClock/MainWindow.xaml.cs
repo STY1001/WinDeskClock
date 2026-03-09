@@ -610,7 +610,7 @@ namespace WinDeskClock
         {
             if (ConfigManager.Variables.MenuCloseDelay != 0)
             {
-                if (GlobalMenuGrid.Visibility == Visibility.Visible || ClockGrid.Visibility != Visibility.Visible || PluginGrid.Visibility != Visibility.Visible) Log.Info("Menu timout reached, closing menu...");
+                if (GlobalMenuGrid.Visibility == Visibility.Visible || (ClockGrid.Visibility != Visibility.Visible && !(MenuClockIndex == 1 && StopwatchIsRunning) && !(MenuClockIndex == 2 && TimerIsRunning)) || PluginGrid.Visibility != Visibility.Visible) Log.Info("Menu timout reached, closing menu...");
                 if (GlobalMenuGrid.Visibility == Visibility.Visible)
                 {
                     BackBtn.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
@@ -618,7 +618,7 @@ namespace WinDeskClock
                         RoutedEvent = PreviewMouseUpEvent
                     });
                 }
-                if (ClockGrid.Visibility != Visibility.Visible)
+                if (ClockGrid.Visibility != Visibility.Visible && !(MenuClockIndex == 1 && StopwatchIsRunning) && !(MenuClockIndex == 2 && TimerIsRunning))
                 {
                     ExitDownMenuClockBtn.RaiseEvent(new RoutedEventArgs(Wpf.Ui.Controls.Button.ClickEvent));
                 }
@@ -1303,6 +1303,7 @@ namespace WinDeskClock
         // - Open Clock Menu
         private async void EnterDownMenuClockBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (MenuClockIndex == 0) { AlarmCardETAUpdate(); };
             {
                 var fadeAnimation = new DoubleAnimation
                 {
@@ -1465,6 +1466,7 @@ namespace WinDeskClock
             RightMenuClockBtn.IsEnabled = true;
             if (MenuClockIndex == 0)
             {
+                AlarmCardETAUpdate();
                 LeftMenuClockBtn.IsEnabled = false;
             }
 
@@ -3681,7 +3683,6 @@ namespace WinDeskClock
         private async void Alarm_Tick(object sender, EventArgs e)
         {
             DateTime now = DateTime.Now;
-            AlarmCardETAUpdate();
 
             string nowdaynumber = "0";
             string nowday = now.DayOfWeek.ToString();
