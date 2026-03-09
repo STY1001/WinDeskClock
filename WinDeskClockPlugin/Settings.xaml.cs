@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace WinDeskClockPlugin
+namespace WinDeskClock.Plugin
 {
     /// <summary>
     /// Interaction logic for Main.xaml

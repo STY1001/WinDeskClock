@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35309.182
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11408.102 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinDeskClock", "WinDeskClock\WinDeskClock.csproj", "{C92CB787-870B-4DCA-B118-1829DBDF6F30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinDeskClockPlugin", "WinDeskClockPlugin\WinDeskClockPlugin.csproj", "{5154A0FE-9E68-44B7-A4F0-D00C540D3A9A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinDeskClock.Plugin", "WinDeskClockPlugin\WinDeskClock.Plugin.csproj", "{5154A0FE-9E68-44B7-A4F0-D00C540D3A9A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -5,7 +5,7 @@ using System.Windows.Navigation;
 using WinDeskClock.Interfaces;
 using WinDeskClock.Utils;
 
-namespace WinDeskClockPlugin
+namespace WinDeskClock.Plugin
 {
     public static class Plugin
     {

@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
-		<AssemblyName>WDC.WinDeskClockPlugin</AssemblyName>
+		<AssemblyName>WDC.WinDeskClock.Plugin</AssemblyName>
 		<Company>STY Inc. (STY1001)</Company>
 		<Product>WinDeskClock</Product>
 		<Description>A plugin for WinDeskClock</Description>

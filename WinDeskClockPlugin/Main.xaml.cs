@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using WinDeskClock.Interfaces;
 
-namespace WinDeskClockPlugin
+namespace WinDeskClock.Plugin
 {
     /// <summary>
     /// Interaction logic for Main.xaml
