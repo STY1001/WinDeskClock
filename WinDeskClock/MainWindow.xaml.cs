@@ -405,38 +405,25 @@ namespace WinDeskClock
             SplashGrid.Visibility = Visibility.Visible;
 
             {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(0.2),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var zoomAnimation1 = new DoubleAnimation
-                {
-                    From = 0.9,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(0.5),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var zoomAnimation2 = new DoubleAnimation
+                SplashGrid.BeginAnimation(
+                    UIElement.OpacityProperty,
+                    new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(0.2),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    });
+                var zoomAnim = new DoubleAnimation
                 {
                     From = 0.9,
                     To = 1,
                     Duration = TimeSpan.FromSeconds(0.5),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
                 };
-                Storyboard.SetTarget(fadeAnimation, SplashGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(zoomAnimation1, SplashGrid);
-                Storyboard.SetTarget(zoomAnimation2, SplashGrid);
-                Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(zoomAnimation1);
-                storyboard.Children.Add(zoomAnimation2);
-                storyboard.Begin();
+                var scale = (ScaleTransform)SplashGrid.RenderTransform;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnim);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnim);
             }
 
             await Task.Delay(700);
@@ -553,94 +540,67 @@ namespace WinDeskClock
             await Task.Delay(700);
 
             {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(0.2),
-                    BeginTime = TimeSpan.FromSeconds(0.1),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var zoomAnimation1 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 1.1,
-                    Duration = TimeSpan.FromSeconds(0.3),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var zoomAnimation2 = new DoubleAnimation
+                SplashGrid.BeginAnimation(UIElement.OpacityProperty,
+                    new DoubleAnimation
+                    {
+                        From = 1,
+                        To = 0,
+                        Duration = TimeSpan.FromSeconds(0.2),
+                        BeginTime = TimeSpan.FromSeconds(0.3),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    });
+
+                var zoomAnim = new DoubleAnimation
                 {
                     From = 1,
                     To = 1.1,
-                    Duration = TimeSpan.FromSeconds(0.3),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    Duration = TimeSpan.FromSeconds(0.5),
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseIn }
                 };
-                Storyboard.SetTarget(fadeAnimation, SplashGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(zoomAnimation1, SplashGrid);
-                Storyboard.SetTarget(zoomAnimation2, SplashGrid);
-                Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(zoomAnimation1);
-                storyboard.Children.Add(zoomAnimation2);
-                storyboard.Begin();
+
+                var splashScale = (ScaleTransform)SplashGrid.RenderTransform;
+                splashScale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnim);
+                splashScale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnim);
             }
 
-            await Task.Delay(300);
+            await Task.Delay(500);
 
             SplashGrid.Visibility = Visibility.Hidden;
             RootTitleBar.Visibility = Visibility.Visible;
             MainGrid.Visibility = Visibility.Visible;
 
             {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(0.2),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var zoomAnimation1 = new DoubleAnimation
-                {
-                    From = 0.9,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(0.5),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var zoomAnimation2 = new DoubleAnimation
+                MainGrid.BeginAnimation(UIElement.OpacityProperty,
+                    new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(0.2),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    });
+
+                var zoomAnim = new DoubleAnimation
                 {
                     From = 0.9,
                     To = 1,
-                    Duration = TimeSpan.FromSeconds(0.5),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    Duration = TimeSpan.FromSeconds(1),
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
                 };
-                Storyboard.SetTarget(fadeAnimation, MainGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(zoomAnimation1, MainGrid);
-                Storyboard.SetTarget(zoomAnimation2, MainGrid);
-                Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(zoomAnimation1);
-                storyboard.Children.Add(zoomAnimation2);
-                storyboard.Begin();
+
+                var mainScale = (ScaleTransform)MainGrid.RenderTransform;
+                mainScale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnim);
+                mainScale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnim);
             }
             {
-                var translateAnimation = new DoubleAnimation
-                {
-                    From = -100,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(0.5),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(translateAnimation, RootTitleBar);
-                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(translateAnimation);
-                storyboard.Begin();
+                ((TranslateTransform)RootTitleBar.RenderTransform)
+                    .BeginAnimation(TranslateTransform.YProperty,
+                        new DoubleAnimation
+                        {
+                            From = -100,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
+                        });
             }
 
             this.MouseMove += MouseMoved;
@@ -650,7 +610,7 @@ namespace WinDeskClock
         {
             if (ConfigManager.Variables.MenuCloseDelay != 0)
             {
-                Log.Info("Menu timout reached, closing menu...");
+                if (GlobalMenuGrid.Visibility == Visibility.Visible || ClockGrid.Visibility != Visibility.Visible || PluginGrid.Visibility != Visibility.Visible) Log.Info("Menu timout reached, closing menu...");
                 if (GlobalMenuGrid.Visibility == Visibility.Visible)
                 {
                     BackBtn.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
@@ -660,180 +620,11 @@ namespace WinDeskClock
                 }
                 if (ClockGrid.Visibility != Visibility.Visible)
                 {
-                    {
-                        var fadeAnimation = new DoubleAnimation
-                        {
-                            From = 1,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(fadespeed),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        var translateAnimation = new DoubleAnimation
-                        {
-                            From = 0,
-                            To = 100,
-                            Duration = TimeSpan.FromSeconds(zoomspeed),
-                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
-                        };
-                        Storyboard.SetTarget(fadeAnimation, MenuClockGrid);
-                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                        Storyboard.SetTarget(translateAnimation, MenuClockGrid);
-                        Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(fadeAnimation);
-                        storyboard.Children.Add(translateAnimation);
-                        storyboard.Begin();
-                    }
-
-                    {
-                        var fadeAnimation = new DoubleAnimation
-                        {
-                            From = 1,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(fadespeed),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        var fadeAnimation2 = new DoubleAnimation
-                        {
-                            From = 1,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(fadespeed),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        var zoomAnimation1 = new DoubleAnimation
-                        {
-                            From = 1,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(zoomspeed),
-                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
-                        };
-                        var zoomAnimation2 = new DoubleAnimation
-                        {
-                            From = 1,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(zoomspeed),
-                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
-                        };
-                        Storyboard.SetTarget(fadeAnimation, MiniClockBorder);
-                        Storyboard.SetTarget(fadeAnimation2, ExitDownMenuClockBtn);
-                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                        Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
-                        Storyboard.SetTarget(zoomAnimation1, MiniClockBorder);
-                        Storyboard.SetTarget(zoomAnimation2, MiniClockBorder);
-                        Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                        Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(fadeAnimation);
-                        storyboard.Children.Add(fadeAnimation2);
-                        storyboard.Children.Add(zoomAnimation1);
-                        storyboard.Children.Add(zoomAnimation2);
-                        storyboard.Begin();
-                    }
-
-                    await Task.Delay(400);
-
-                    MenuClockGrid.Visibility = Visibility.Hidden;
-                    MiniClockBorder.Visibility = Visibility.Hidden;
-                    ExitDownMenuClockBtn.Visibility = Visibility.Hidden;
-                    ClockGrid.Visibility = Visibility.Visible;
-
-                    {
-                        var fadeAnimation = new DoubleAnimation
-                        {
-                            From = 0,
-                            To = 1,
-                            Duration = TimeSpan.FromSeconds(fadespeed),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                        };
-                        var zoomAnimation1 = new DoubleAnimation
-                        {
-                            From = 0,
-                            To = 1,
-                            Duration = TimeSpan.FromSeconds(zoomspeed),
-                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        var zoomAnimation2 = new DoubleAnimation
-                        {
-                            From = 0,
-                            To = 1,
-                            Duration = TimeSpan.FromSeconds(zoomspeed),
-                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        Storyboard.SetTarget(fadeAnimation, ClockGrid);
-                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                        Storyboard.SetTarget(zoomAnimation1, ClockGrid);
-                        Storyboard.SetTarget(zoomAnimation2, ClockGrid);
-                        Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                        Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(fadeAnimation);
-                        storyboard.Children.Add(zoomAnimation1);
-                        storyboard.Children.Add(zoomAnimation2);
-                        storyboard.Begin();
-                    }
+                    ExitDownMenuClockBtn.RaiseEvent(new RoutedEventArgs(Wpf.Ui.Controls.Button.ClickEvent));
                 }
                 if (PluginGrid.Visibility != Visibility.Visible)
                 {
-                    {
-                        var translateAnimation = new DoubleAnimation
-                        {
-                            From = 0,
-                            To = 100,
-                            Duration = TimeSpan.FromSeconds(zoomspeed),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                        };
-                        var fadeAnimation = new DoubleAnimation
-                        {
-                            From = 1,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(fadespeed),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        Storyboard.SetTarget(translateAnimation, MenuPluginGrid);
-                        Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                        Storyboard.SetTarget(fadeAnimation, MenuPluginGrid);
-                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(translateAnimation);
-                        storyboard.Children.Add(fadeAnimation);
-                        storyboard.Begin();
-                    }
-
-                    await Task.Delay(400);
-
-                    MenuPluginGrid.Visibility = Visibility.Hidden;
-                    PluginGrid.Visibility = Visibility.Visible;
-
-                    if (CarouselPluginList.Count != 0)
-                    {
-                        MenuPluginFrame.Navigate(null);
-                        CarouselPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[0]].GetMain());
-                    }
-
-                    {
-                        var translateAnimation = new DoubleAnimation
-                        {
-                            From = -100,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(zoomspeed),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        var fadeAnimation = new DoubleAnimation
-                        {
-                            From = 0,
-                            To = 1,
-                            Duration = TimeSpan.FromSeconds(fadespeed),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                        };
-                        Storyboard.SetTarget(translateAnimation, PluginGrid);
-                        Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                        Storyboard.SetTarget(fadeAnimation, PluginGrid);
-                        Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(translateAnimation);
-                        storyboard.Children.Add(fadeAnimation);
-                        storyboard.Begin();
-                    }
+                    ExitDownMenuPluginBtn.RaiseEvent(new RoutedEventArgs(Wpf.Ui.Controls.Button.ClickEvent));
                 }
             }
         }
@@ -1357,10 +1148,10 @@ namespace WinDeskClock
         #region Clock Menu
         // Animation variables
         // - Fade speed
-        private double fadespeed = 0.30;
+        private double fadespeed = 0.2;
         // - Zoom speed
-        private double zoomspeed = 0.35;
-
+        private double zoomspeed = 0.4;
+        private int animDelay = 400;
         // Current ClockMenu page index
         private int MenuClockIndex = 0;
 
@@ -1378,9 +1169,7 @@ namespace WinDeskClock
 
         // MiniClock Update
         // - Slide speed
-        private double txtslidespeed = 0.15;
-        // - Delay between slides
-        private int txtdelay = 150;
+        private double txtslidespeed = 0.25;
         // - Actual MiniClock Hour
         private string ActualMCHour = "17";
         // - Actual MiniClock Minute
@@ -1390,39 +1179,28 @@ namespace WinDeskClock
         {
             target.Text = actualText;
 
-            var slideUpAnimation = new DoubleAnimation
-            {
-                From = 0,
-                To = -180,
-                Duration = TimeSpan.FromSeconds(txtslidespeed),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-            };
-
-            Storyboard.SetTarget(slideUpAnimation, target);
-            Storyboard.SetTargetProperty(slideUpAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-
-            var slideUpStoryboard = new Storyboard();
-            slideUpStoryboard.Children.Add(slideUpAnimation);
-            slideUpStoryboard.Begin();
-
-            await Task.Delay(txtdelay);
+            ((TranslateTransform)target.RenderTransform).BeginAnimation(
+                TranslateTransform.YProperty,
+                new DoubleAnimation
+                {
+                    From = 0,
+                    To = -180,
+                    Duration = TimeSpan.FromSeconds(txtslidespeed),
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseIn }
+                });
 
             target.Text = newText;
+            await Task.Delay(25);
 
-            var slideDownAnimation = new DoubleAnimation
-            {
-                From = 180,
-                To = 0,
-                Duration = TimeSpan.FromSeconds(txtslidespeed),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-            };
-
-            Storyboard.SetTarget(slideDownAnimation, target);
-            Storyboard.SetTargetProperty(slideDownAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-
-            var slideDownStoryboard = new Storyboard();
-            slideDownStoryboard.Children.Add(slideDownAnimation);
-            slideDownStoryboard.Begin();
+            ((TranslateTransform)target.RenderTransform).BeginAnimation(
+                TranslateTransform.YProperty,
+                new DoubleAnimation
+                {
+                    From = 180,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(txtslidespeed),
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
+                });
         }
 
         private async Task UpdateMiniClockHour(string text)
@@ -1531,36 +1309,24 @@ namespace WinDeskClock
                     From = 1,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(fadespeed),
+                    BeginTime = TimeSpan.FromSeconds(zoomspeed - fadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
-                var zoomAnimation1 = new DoubleAnimation
+                var zoomAnimation = new DoubleAnimation
                 {
                     From = 1,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseIn }
                 };
-                var zoomAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(fadeAnimation, ClockGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(zoomAnimation1, ClockGrid);
-                Storyboard.SetTarget(zoomAnimation2, ClockGrid);
-                Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(zoomAnimation1);
-                storyboard.Children.Add(zoomAnimation2);
-                storyboard.Begin();
+
+                ClockGrid.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                var scale = (ScaleTransform)ClockGrid.RenderTransform;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnimation);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnimation.Clone());
             }
 
-            await Task.Delay(400);
+            await Task.Delay(animDelay);
 
             ClockGrid.Visibility = Visibility.Hidden;
             MenuClockGrid.Visibility = Visibility.Visible;
@@ -1578,16 +1344,11 @@ namespace WinDeskClock
                     From = 100,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
                 };
-                Storyboard.SetTarget(fadeAnimation, MenuClockGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(translateAnimation, MenuClockGrid);
-                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(translateAnimation);
-                storyboard.Begin();
+
+                MenuClockGrid.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                ((TranslateTransform)MenuClockGrid.RenderTransform).BeginAnimation(TranslateTransform.YProperty, translateAnimation);
             }
 
             MiniClockBorder.Visibility = Visibility.Visible;
@@ -1601,41 +1362,19 @@ namespace WinDeskClock
                     Duration = TimeSpan.FromSeconds(fadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                 };
-                var fadeAnimation2 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(fadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var zoomAnimation1 = new DoubleAnimation
+                var zoomAnimation = new DoubleAnimation
                 {
                     From = 0,
                     To = 1,
                     Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
                 };
-                var zoomAnimation2 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeAnimation, MiniClockBorder);
-                Storyboard.SetTarget(fadeAnimation2, ExitDownMenuClockBtn);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(zoomAnimation1, MiniClockBorder);
-                Storyboard.SetTarget(zoomAnimation2, MiniClockBorder);
-                Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(fadeAnimation2);
-                storyboard.Children.Add(zoomAnimation1);
-                storyboard.Children.Add(zoomAnimation2);
-                storyboard.Begin();
+
+                MiniClockBorder.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                ExitDownMenuClockBtn.BeginAnimation(UIElement.OpacityProperty, fadeAnimation.Clone());
+                var scale = (ScaleTransform)MiniClockBorder.RenderTransform;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnimation);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnimation.Clone());
             }
         }
         // - Close Clock Menu
@@ -1647,6 +1386,7 @@ namespace WinDeskClock
                     From = 1,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(fadespeed),
+                    BeginTime = TimeSpan.FromSeconds(zoomspeed - fadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
                 var translateAnimation = new DoubleAnimation
@@ -1654,16 +1394,11 @@ namespace WinDeskClock
                     From = 0,
                     To = 100,
                     Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseIn }
                 };
-                Storyboard.SetTarget(fadeAnimation, MenuClockGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(translateAnimation, MenuClockGrid);
-                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(translateAnimation);
-                storyboard.Begin();
+
+                MenuClockGrid.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                ((TranslateTransform)MenuClockGrid.RenderTransform).BeginAnimation(TranslateTransform.YProperty, translateAnimation);
             }
 
             {
@@ -1672,46 +1407,26 @@ namespace WinDeskClock
                     From = 1,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(fadespeed),
+                    BeginTime = TimeSpan.FromSeconds(zoomspeed - fadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
-                var fadeAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(fadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var zoomAnimation1 = new DoubleAnimation
+                var zoomAnimation = new DoubleAnimation
                 {
                     From = 1,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseIn }
                 };
-                var zoomAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(fadeAnimation, MiniClockBorder);
-                Storyboard.SetTarget(fadeAnimation2, ExitDownMenuClockBtn);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(zoomAnimation1, MiniClockBorder);
-                Storyboard.SetTarget(zoomAnimation2, MiniClockBorder);
-                Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(fadeAnimation2);
-                storyboard.Children.Add(zoomAnimation1);
-                storyboard.Children.Add(zoomAnimation2);
-                storyboard.Begin();
+
+                MiniClockBorder.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                ExitDownMenuClockBtn.BeginAnimation(UIElement.OpacityProperty, fadeAnimation.Clone());
+                var scale = (ScaleTransform)MiniClockBorder.RenderTransform;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnimation);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnimation.Clone());
             }
 
-            await Task.Delay(400);
+
+            await Task.Delay(animDelay);
 
             MenuClockGrid.Visibility = Visibility.Hidden;
             MiniClockBorder.Visibility = Visibility.Hidden;
@@ -1726,32 +1441,21 @@ namespace WinDeskClock
                     Duration = TimeSpan.FromSeconds(fadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                 };
-                var zoomAnimation1 = new DoubleAnimation
+                var zoomAnimation = new DoubleAnimation
                 {
                     From = 0,
                     To = 1,
                     Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
                 };
-                var zoomAnimation2 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeAnimation, ClockGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(zoomAnimation1, ClockGrid);
-                Storyboard.SetTarget(zoomAnimation2, ClockGrid);
-                Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(zoomAnimation1);
-                storyboard.Children.Add(zoomAnimation2);
-                storyboard.Begin();
+
+                ClockGrid.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+
+                var scale = (ScaleTransform)ClockGrid.RenderTransform;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnimation);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnimation.Clone());
             }
+
         }
         // - Go to the left page (in Clock Menu)
         private async void LeftMenuClockBtn_Click(object sender, RoutedEventArgs e)
@@ -1771,6 +1475,7 @@ namespace WinDeskClock
                     From = 1,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(fadespeed),
+                    BeginTime = TimeSpan.FromSeconds(zoomspeed - fadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
                 var translateAnimation = new DoubleAnimation
@@ -1778,19 +1483,14 @@ namespace WinDeskClock
                     From = 0,
                     To = 100,
                     Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseIn }
                 };
-                Storyboard.SetTarget(fadeAnimation, PrevGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(translateAnimation, PrevGrid);
-                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(translateAnimation);
-                storyboard.Begin();
+
+                PrevGrid.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                ((TranslateTransform)PrevGrid.RenderTransform).BeginAnimation(TranslateTransform.XProperty, translateAnimation);
             }
 
-            await Task.Delay(300);
+            await Task.Delay(animDelay);
             PrevGrid.Visibility = Visibility.Hidden;
 
             Grid NextGrid = MenuClockGrids[MenuClockIndex];
@@ -1808,17 +1508,13 @@ namespace WinDeskClock
                     From = -100,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
                 };
-                Storyboard.SetTarget(fadeAnimation, NextGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(translateAnimation, NextGrid);
-                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(translateAnimation);
-                storyboard.Begin();
+
+                NextGrid.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                ((TranslateTransform)NextGrid.RenderTransform).BeginAnimation(TranslateTransform.XProperty, translateAnimation);
             }
+
         }
         // - Go to the right page (in Clock Menu)
         private async void RightMenuClockBtn_Click(object sender, RoutedEventArgs e)
@@ -1838,6 +1534,7 @@ namespace WinDeskClock
                     From = 1,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(fadespeed),
+                    BeginTime = TimeSpan.FromSeconds(zoomspeed - fadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
                 var translateAnimation = new DoubleAnimation
@@ -1845,19 +1542,14 @@ namespace WinDeskClock
                     From = 0,
                     To = -100,
                     Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseIn }
                 };
-                Storyboard.SetTarget(fadeAnimation, PrevGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(translateAnimation, PrevGrid);
-                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(translateAnimation);
-                storyboard.Begin();
+
+                PrevGrid.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                ((TranslateTransform)PrevGrid.RenderTransform).BeginAnimation(TranslateTransform.XProperty, translateAnimation);
             }
 
-            await Task.Delay(300);
+            await Task.Delay(animDelay);
             PrevGrid.Visibility = Visibility.Hidden;
 
             Grid NextGrid = MenuClockGrids[MenuClockIndex];
@@ -1875,16 +1567,11 @@ namespace WinDeskClock
                     From = 100,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
                 };
-                Storyboard.SetTarget(fadeAnimation, NextGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(translateAnimation, NextGrid);
-                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Children.Add(translateAnimation);
-                storyboard.Begin();
+
+                NextGrid.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                ((TranslateTransform)NextGrid.RenderTransform).BeginAnimation(TranslateTransform.XProperty, translateAnimation);
             }
         }
         #endregion
@@ -1914,8 +1601,10 @@ namespace WinDeskClock
         // Animation variables
         // - Fade speed
         private double swfadespeed = 0.15;
+        private int swfadedelay = 150;
         // - Zoom speed
         private double swzoomspeed = 0.30;
+        private int swzoomdelay = 300;
         // - Slide speed
         private double swtxtslidespeed = 0.15;
         // - Delay between slides
@@ -1987,98 +1676,56 @@ namespace WinDeskClock
                 LapStopwatchBtn.Visibility = Visibility.Visible;
 
                 {
-                    var changeAnimation1 = new DoubleAnimation
+                    var widthAnimation = new DoubleAnimation
                     {
                         From = 200,
                         To = 100,
                         Duration = TimeSpan.FromSeconds(swzoomspeed),
                         EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    var changeAnimation2 = new DoubleAnimation
-                    {
-                        From = 200,
-                        To = 100,
-                        Duration = TimeSpan.FromSeconds(swzoomspeed),
-                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(changeAnimation1, StartStopwatchBtn);
-                    Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                    Storyboard.SetTarget(changeAnimation2, PauseStopwatchBtn);
-                    Storyboard.SetTargetProperty(changeAnimation2, new PropertyPath(WidthProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(changeAnimation1);
-                    storyboard.Children.Add(changeAnimation2);
-                    storyboard.Begin();
-                }
 
-                {
-                    var changeAnimation1 = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 100,
-                        Duration = TimeSpan.FromSeconds(swzoomspeed),
-                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    var changeAnimation2 = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 100,
-                        Duration = TimeSpan.FromSeconds(swzoomspeed),
-                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(changeAnimation1, ResetStopwatchBtn);
-                    Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                    Storyboard.SetTarget(changeAnimation2, LapStopwatchBtn);
-                    Storyboard.SetTargetProperty(changeAnimation2, new PropertyPath(WidthProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(changeAnimation1);
-                    storyboard.Children.Add(changeAnimation2);
-                    storyboard.Begin();
+                    StartStopwatchBtn.BeginAnimation(WidthProperty, widthAnimation);
+                    PauseStopwatchBtn.BeginAnimation(WidthProperty, widthAnimation.Clone());
                 }
-
                 {
-                    var changeAnimation1 = new DoubleAnimation
+                    var widthAnimation = new DoubleAnimation
                     {
                         From = 0,
-                        To = 20,
+                        To = 100,
                         Duration = TimeSpan.FromSeconds(swzoomspeed),
                         EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    Storyboard.SetTarget(changeAnimation1, SWButtonSep);
-                    Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(changeAnimation1);
-                    storyboard.Begin();
+
+                    ResetStopwatchBtn.BeginAnimation(WidthProperty, widthAnimation);
+                    LapStopwatchBtn.BeginAnimation(WidthProperty, widthAnimation.Clone());
+                }
+                {
+                    SWButtonSep.BeginAnimation(WidthProperty,
+                        new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 20,
+                            Duration = TimeSpan.FromSeconds(swzoomspeed),
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                        });
                 }
             }
             else
             {
                 {
-                    var fadeAnimation1 = new DoubleAnimation
+                    var fadeAnimation = new DoubleAnimation
                     {
                         From = 1,
                         To = 0,
                         Duration = TimeSpan.FromSeconds(swfadespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
                     };
-                    var fadeAnimation2 = new DoubleAnimation
-                    {
-                        From = 1,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(swfadespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-                    };
-                    Storyboard.SetTarget(fadeAnimation1, StartStopwatchBtn);
-                    Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(UIElement.OpacityProperty));
-                    Storyboard.SetTarget(fadeAnimation2, ResetStopwatchBtn);
-                    Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(fadeAnimation1);
-                    storyboard.Children.Add(fadeAnimation2);
-                    storyboard.Begin();
+
+                    StartStopwatchBtn.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                    ResetStopwatchBtn.BeginAnimation(UIElement.OpacityProperty, fadeAnimation.Clone());
                 }
 
-                await Task.Delay(150);
+                await Task.Delay(swfadedelay);
 
                 StartStopwatchBtn.Visibility = Visibility.Hidden;
                 PauseStopwatchBtn.Visibility = Visibility.Visible;
@@ -2086,28 +1733,16 @@ namespace WinDeskClock
                 LapStopwatchBtn.Visibility = Visibility.Visible;
 
                 {
-                    var fadeAnimation1 = new DoubleAnimation
+                    var fadeAnimation = new DoubleAnimation
                     {
                         From = 0,
                         To = 1,
                         Duration = TimeSpan.FromSeconds(swfadespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
                     };
-                    var fadeAnimation2 = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(swfadespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-                    };
-                    Storyboard.SetTarget(fadeAnimation1, PauseStopwatchBtn);
-                    Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(UIElement.OpacityProperty));
-                    Storyboard.SetTarget(fadeAnimation2, LapStopwatchBtn);
-                    Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(fadeAnimation1);
-                    storyboard.Children.Add(fadeAnimation2);
-                    storyboard.Begin();
+
+                    PauseStopwatchBtn.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                    LapStopwatchBtn.BeginAnimation(UIElement.OpacityProperty, fadeAnimation.Clone());
                 }
             }
 
@@ -2121,31 +1756,19 @@ namespace WinDeskClock
             stopwatchTimer.Stop();
 
             {
-                var fadeAnimation1 = new DoubleAnimation
+                var fadeAnimation = new DoubleAnimation
                 {
                     From = 1,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(swfadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
                 };
-                var fadeAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(swfadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-                };
-                Storyboard.SetTarget(fadeAnimation1, PauseStopwatchBtn);
-                Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(fadeAnimation2, LapStopwatchBtn);
-                Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation1);
-                storyboard.Children.Add(fadeAnimation2);
-                storyboard.Begin();
+
+                PauseStopwatchBtn.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                LapStopwatchBtn.BeginAnimation(UIElement.OpacityProperty, fadeAnimation.Clone());
             }
 
-            await Task.Delay(150);
+            await Task.Delay(swfadedelay);
 
             StartStopwatchBtn.Visibility = Visibility.Visible;
             PauseStopwatchBtn.Visibility = Visibility.Hidden;
@@ -2153,28 +1776,16 @@ namespace WinDeskClock
             LapStopwatchBtn.Visibility = Visibility.Hidden;
 
             {
-                var fadeAnimation1 = new DoubleAnimation
+                var fadeAnimation = new DoubleAnimation
                 {
                     From = 0,
                     To = 1,
                     Duration = TimeSpan.FromSeconds(swfadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
                 };
-                var fadeAnimation2 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(swfadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-                };
-                Storyboard.SetTarget(fadeAnimation1, StartStopwatchBtn);
-                Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(fadeAnimation2, ResetStopwatchBtn);
-                Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation1);
-                storyboard.Children.Add(fadeAnimation2);
-                storyboard.Begin();
+
+                StartStopwatchBtn.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                ResetStopwatchBtn.BeginAnimation(UIElement.OpacityProperty, fadeAnimation.Clone());
             }
         }
         // - Reset
@@ -2184,50 +1795,39 @@ namespace WinDeskClock
             stopwatch.Reset();
             stopwatchTimer.Stop();
 
-            foreach (Card lap in LapStopwatchStack.Children)
-            {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(0.3),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeAnimation, lap);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(UIElement.OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
-
-            await Task.Delay(300);
-
-            LapStopwatchStack.Children.Clear();
-            LapIndex = 0;
 
             if (StopwatchLapDeployed)
             {
+                foreach (Card lap in LapStopwatchStack.Children)
+                {
+                    lap.BeginAnimation(UIElement.OpacityProperty,
+                        new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(swfadespeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        });
+                }
+
+                await Task.Delay(swfadedelay);
+
+                LapStopwatchStack.Children.Clear();
+                LapIndex = 0;
+
                 StopwatchLapDeployed = false;
                 StopwatchLapRow.Height = new GridLength(1, GridUnitType.Auto);
 
                 double oldRowLapHeight = StopwatchSubGrid.ActualHeight;
                 oldRowLapHeight *= 0.6;
-                {
-                    var sizeAnimation = new DoubleAnimation
+                StopwatchLapScrollView.BeginAnimation(HeightProperty,
+                    new DoubleAnimation
                     {
                         From = oldRowLapHeight,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(0.3),
-                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(sizeAnimation, StopwatchLapScrollView);
-                    Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(sizeAnimation);
-                    storyboard.Begin();
-                }
-
-                await Task.Delay(300);
+                        Duration = TimeSpan.FromSeconds(swzoomspeed),
+                        EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
+                    });
 
                 StopwatchLapScrollView.Height = double.NaN;
             }
@@ -2243,69 +1843,39 @@ namespace WinDeskClock
             StopwatchProgressBar.Value = 0;
 
             {
-                var changeAnimation1 = new DoubleAnimation
+                var changeAnimation = new DoubleAnimation
                 {
                     From = 100,
                     To = 200,
                     Duration = TimeSpan.FromSeconds(swzoomspeed),
                     EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                 };
-                var changeAnimation2 = new DoubleAnimation
-                {
-                    From = 100,
-                    To = 200,
-                    Duration = TimeSpan.FromSeconds(swzoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(changeAnimation1, StartStopwatchBtn);
-                Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                Storyboard.SetTarget(changeAnimation2, PauseStopwatchBtn);
-                Storyboard.SetTargetProperty(changeAnimation2, new PropertyPath(WidthProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(changeAnimation1);
-                storyboard.Children.Add(changeAnimation2);
-                storyboard.Begin();
+
+                StartStopwatchBtn.BeginAnimation(WidthProperty, changeAnimation);
+                PauseStopwatchBtn.BeginAnimation(WidthProperty, changeAnimation.Clone());
             }
             {
-                var changeAnimation1 = new DoubleAnimation
+                var widthAnimation = new DoubleAnimation
                 {
                     From = 100,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(swzoomspeed),
                     EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                 };
-                var changeAnimation2 = new DoubleAnimation
-                {
-                    From = 100,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(swzoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(changeAnimation1, ResetStopwatchBtn);
-                Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                Storyboard.SetTarget(changeAnimation2, LapStopwatchBtn);
-                Storyboard.SetTargetProperty(changeAnimation2, new PropertyPath(WidthProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(changeAnimation1);
-                storyboard.Children.Add(changeAnimation2);
-                storyboard.Begin();
+
+                ResetStopwatchBtn.BeginAnimation(WidthProperty, widthAnimation);
+                LapStopwatchBtn.BeginAnimation(WidthProperty, widthAnimation.Clone());
             }
-            {
-                var changeAnimation1 = new DoubleAnimation
+            SWButtonSep.BeginAnimation(WidthProperty,
+                new DoubleAnimation
                 {
                     From = 20,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(swzoomspeed),
                     EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(changeAnimation1, SWButtonSep);
-                Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(changeAnimation1);
-                storyboard.Begin();
-            }
+                });
 
-            await Task.Delay(150);
+            await Task.Delay(swzoomdelay);
 
             StartStopwatchBtn.Visibility = Visibility.Visible;
             PauseStopwatchBtn.Visibility = Visibility.Hidden;
@@ -2313,28 +1883,16 @@ namespace WinDeskClock
             LapStopwatchBtn.Visibility = Visibility.Hidden;
 
             {
-                var fadeAnimation1 = new DoubleAnimation
+                var fadeAnimation = new DoubleAnimation
                 {
                     From = 0,
                     To = 1,
                     Duration = TimeSpan.FromSeconds(swfadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
                 };
-                var fadeAnimation2 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(swfadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-                };
-                Storyboard.SetTarget(fadeAnimation1, PauseStopwatchBtn);
-                Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(fadeAnimation2, LapStopwatchBtn);
-                Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation1);
-                storyboard.Children.Add(fadeAnimation2);
-                storyboard.Begin();
+
+                PauseStopwatchBtn.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                LapStopwatchBtn.BeginAnimation(UIElement.OpacityProperty, fadeAnimation.Clone());
             }
 
             StopwatchIsRunning = false;
@@ -2351,22 +1909,16 @@ namespace WinDeskClock
 
                 double newRowLapHeight = StopwatchSubGrid.ActualHeight;
                 newRowLapHeight *= 0.6;
-                {
-                    var sizeAnimation = new DoubleAnimation
+                StopwatchLapScrollView.BeginAnimation(HeightProperty,
+                    new DoubleAnimation
                     {
                         From = 0,
                         To = newRowLapHeight,
-                        Duration = TimeSpan.FromSeconds(0.3),
-                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(sizeAnimation, StopwatchLapScrollView);
-                    Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(sizeAnimation);
-                    storyboard.Begin();
-                }
+                        Duration = TimeSpan.FromSeconds(swzoomspeed),
+                        EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
+                    });
 
-                await Task.Delay(300);
+                await Task.Delay(swzoomdelay);
 
                 StopwatchLapRow.Height = new GridLength(0.6, GridUnitType.Star);
                 StopwatchLapScrollView.Height = double.NaN;
@@ -2416,29 +1968,23 @@ namespace WinDeskClock
             double newCardHeight = 58;
             LapCard.Opacity = 0;
 
-            {
-                var sizeAnimation = new DoubleAnimation
+            LapCard.BeginAnimation(HeightProperty,
+                new DoubleAnimation
                 {
                     From = 0,
                     To = newCardHeight,
-                    Duration = TimeSpan.FromSeconds(0.3),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(sizeAnimation, LapCard);
-                Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation);
-                storyboard.Begin();
-            }
+                    Duration = TimeSpan.FromSeconds(swzoomspeed),
+                    EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
+                });
 
-            await Task.Delay(300);
+            await Task.Delay(swzoomdelay);
 
             {
                 var fadeAnimation = new DoubleAnimation
                 {
                     From = 0,
                     To = 1,
-                    Duration = TimeSpan.FromSeconds(0.3),
+                    Duration = TimeSpan.FromSeconds(swfadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
                 Storyboard.SetTarget(fadeAnimation, LapCard);
@@ -2451,15 +1997,13 @@ namespace WinDeskClock
 
         private async Task AnimateStopwatchText(System.Windows.Controls.TextBlock textBlock, string newText)
         {
-            if (textBlock.RenderTransform is not TranslateTransform)
-                textBlock.RenderTransform = new TranslateTransform();
             var transform = (TranslateTransform)textBlock.RenderTransform;
             var upAnimation = new DoubleAnimation
             {
                 From = 0,
                 To = -50,
                 Duration = TimeSpan.FromSeconds(swtxtslidespeed),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseIn }
             };
             transform.BeginAnimation(TranslateTransform.YProperty, upAnimation);
             await Task.Delay(swtxtdelay);
@@ -2469,7 +2013,7 @@ namespace WinDeskClock
                 From = 50,
                 To = 0,
                 Duration = TimeSpan.FromSeconds(swtxtslidespeed),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                EasingFunction = new QuinticEase { EasingMode = EasingMode.EaseOut }
             };
             transform.BeginAnimation(TranslateTransform.YProperty, downAnimation);
         }
@@ -2906,8 +2450,10 @@ namespace WinDeskClock
         // Animation variables
         // - Fade speed
         private double tfadespeed = 0.30;
+        private int tfadedelay = 300;
         // - Zoom speed
         private double tzoomspeed = 0.30;
+        private int tzoomdelay = 300;
         // - Text slide speed
         private double ttxtslidespeed = 0.15;
         // - Text slide delay
@@ -2938,107 +2484,70 @@ namespace WinDeskClock
                     ResetTimerBtn.Visibility = Visibility.Visible;
                     PauseTimerBtn.Opacity = 1;
                     {
-                        var changeAnimation1 = new DoubleAnimation
+                        var widthAnimation = new DoubleAnimation
                         {
                             From = 200,
                             To = 100,
                             Duration = TimeSpan.FromSeconds(tzoomspeed),
                             EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                         };
-                        var changeAnimation2 = new DoubleAnimation
-                        {
-                            From = 200,
-                            To = 100,
-                            Duration = TimeSpan.FromSeconds(tzoomspeed),
-                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        Storyboard.SetTarget(changeAnimation1, StartTimerBtn);
-                        Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                        Storyboard.SetTarget(changeAnimation2, PauseTimerBtn);
-                        Storyboard.SetTargetProperty(changeAnimation2, new PropertyPath(WidthProperty));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(changeAnimation1);
-                        storyboard.Children.Add(changeAnimation2);
-                        storyboard.Begin();
+
+                        StartTimerBtn.BeginAnimation(WidthProperty, widthAnimation);
+                        PauseTimerBtn.BeginAnimation(WidthProperty, widthAnimation.Clone());
                     }
-                    {
-                        var changeAnimation1 = new DoubleAnimation
+                    ResetTimerBtn.BeginAnimation(WidthProperty,
+                        new DoubleAnimation
                         {
                             From = 0,
                             To = 100,
                             Duration = TimeSpan.FromSeconds(tzoomspeed),
                             EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        Storyboard.SetTarget(changeAnimation1, ResetTimerBtn);
-                        Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(changeAnimation1);
-                        storyboard.Begin();
-                    }
-                    {
-                        var changeAnimation1 = new DoubleAnimation
+                        });
+                    TButtonSep.BeginAnimation(WidthProperty,
+                        new DoubleAnimation
                         {
                             From = 0,
                             To = 20,
                             Duration = TimeSpan.FromSeconds(tzoomspeed),
                             EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        Storyboard.SetTarget(changeAnimation1, TButtonSep);
-                        Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(changeAnimation1);
-                        storyboard.Begin();
-                    }
+                        });
                     {
-                        var zommAnimation1 = new DoubleAnimation
+                        var zoomAnimation = new DoubleAnimation
                         {
                             From = 0,
                             To = 1,
                             Duration = TimeSpan.FromSeconds(tzoomspeed),
                             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                         };
-                        var zommAnimation2 = new DoubleAnimation
-                        {
-                            From = 0,
-                            To = 1,
-                            Duration = TimeSpan.FromSeconds(tzoomspeed),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        var fadeAnimation1 = new DoubleAnimation
+
+                        var fadeAnimation = new DoubleAnimation
                         {
                             From = 0,
                             To = 1,
                             Duration = TimeSpan.FromSeconds(tfadespeed),
                             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                         };
-                        Storyboard.SetTarget(zommAnimation1, TimerProgressRing);
-                        Storyboard.SetTargetProperty(zommAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                        Storyboard.SetTarget(zommAnimation2, TimerProgressRing);
-                        Storyboard.SetTargetProperty(zommAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                        Storyboard.SetTarget(fadeAnimation1, TimerProgressRing);
-                        Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(OpacityProperty));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(zommAnimation1);
-                        storyboard.Children.Add(zommAnimation2);
-                        storyboard.Children.Add(fadeAnimation1);
-                        storyboard.Begin();
+
+                        var scale = (ScaleTransform)TimerProgressRing.RenderTransform;
+
+                        scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnimation);
+                        scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnimation.Clone());
+
+                        TimerProgressRing.BeginAnimation(OpacityProperty, fadeAnimation);
                     }
-                    foreach (UIElement element in TimerwBtnGrid.Children)
+
+                    foreach (UIElement element in TimerBtnGrid.Children)
                     {
                         if (element is System.Windows.Controls.Button)
                         {
-                            var zoomAnimation1 = new DoubleAnimation
-                            {
-                                From = 31,
-                                To = 0,
-                                Duration = TimeSpan.FromSeconds(tzoomspeed),
-                                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                            };
-                            Storyboard.SetTarget(zoomAnimation1, element);
-                            Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath(HeightProperty));
-                            var storyboard = new Storyboard();
-                            storyboard.Children.Add(zoomAnimation1);
-                            storyboard.Begin();
+                            element.BeginAnimation(HeightProperty,
+                                new DoubleAnimation
+                                {
+                                    From = 31,
+                                    To = 0,
+                                    Duration = TimeSpan.FromSeconds(tzoomspeed),
+                                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                                });
                         }
                     }
                     TimerIsRunning = true;
@@ -3048,66 +2557,31 @@ namespace WinDeskClock
             {
                 timerTimer.Start();
                 {
-                    var fadeAnimation1 = new DoubleAnimation
+                    var fadeAnimation = new DoubleAnimation
                     {
                         From = 1,
                         To = 0,
                         Duration = TimeSpan.FromSeconds(tfadespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
                     };
-                    var fadeAnimation2 = new DoubleAnimation
-                    {
-                        From = 1,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(tfadespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-                    };
-                    Storyboard.SetTarget(fadeAnimation1, StartTimerBtn);
-                    Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(UIElement.OpacityProperty));
-                    Storyboard.SetTarget(fadeAnimation2, ResetTimerBtn);
-                    Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(fadeAnimation1);
-                    storyboard.Children.Add(fadeAnimation2);
-                    storyboard.Begin();
+                    StartTimerBtn.BeginAnimation(OpacityProperty, fadeAnimation);
+                    ResetTimerBtn.BeginAnimation(OpacityProperty, fadeAnimation.Clone());
                 }
-                await Task.Delay(150);
+                await Task.Delay(tfadedelay);
                 StartTimerBtn.Visibility = Visibility.Hidden;
                 PauseTimerBtn.Visibility = Visibility.Visible;
                 ResetTimerBtn.Visibility = Visibility.Visible;
                 {
-                    var fadeAnimation1 = new DoubleAnimation
+                    var fadeAnimation = new DoubleAnimation
                     {
                         From = 0,
                         To = 1,
                         Duration = TimeSpan.FromSeconds(tfadespeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
                     };
-                    var fadeAnimation2 = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(tfadespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-                    };
-                    var fadeAnimation3 = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(tfadespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-                    };
-                    Storyboard.SetTarget(fadeAnimation1, PauseTimerBtn);
-                    Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(UIElement.OpacityProperty));
-                    Storyboard.SetTarget(fadeAnimation2, ResetTimerBtn);
-                    Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
-                    Storyboard.SetTarget(fadeAnimation3, StartTimerBtn);
-                    Storyboard.SetTargetProperty(fadeAnimation3, new PropertyPath(UIElement.OpacityProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(fadeAnimation1);
-                    storyboard.Children.Add(fadeAnimation2);
-                    storyboard.Children.Add(fadeAnimation3);
-                    storyboard.Begin();
+                    PauseTimerBtn.BeginAnimation(OpacityProperty, fadeAnimation);
+                    ResetTimerBtn.BeginAnimation(OpacityProperty, fadeAnimation.Clone());
+                    StartTimerBtn.BeginAnimation(OpacityProperty, fadeAnimation.Clone());
                 }
                 TimerIsRunning = true;
             }
@@ -3118,66 +2592,31 @@ namespace WinDeskClock
             Log.Info("Timer pause");
             timerTimer.Stop();
             {
-                var fadeAnimation1 = new DoubleAnimation
+                var fadeAnimation = new DoubleAnimation
                 {
                     From = 1,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(tfadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
                 };
-                var fadeAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(tfadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-                };
-                Storyboard.SetTarget(fadeAnimation1, PauseTimerBtn);
-                Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(fadeAnimation2, ResetTimerBtn);
-                Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation1);
-                storyboard.Children.Add(fadeAnimation2);
-                storyboard.Begin();
+                PauseTimerBtn.BeginAnimation(OpacityProperty, fadeAnimation);
+                ResetTimerBtn.BeginAnimation(OpacityProperty, fadeAnimation.Clone());
             }
-            await Task.Delay(150);
+            await Task.Delay(tfadedelay);
             StartTimerBtn.Visibility = Visibility.Visible;
             PauseTimerBtn.Visibility = Visibility.Hidden;
             ResetTimerBtn.Visibility = Visibility.Visible;
             {
-                var fadeAnimation1 = new DoubleAnimation
+                var fadeAnimation = new DoubleAnimation
                 {
                     From = 0,
                     To = 1,
                     Duration = TimeSpan.FromSeconds(tfadespeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
                 };
-                var fadeAnimation2 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(tfadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-                };
-                var fadeAnimation3 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(tfadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
-                };
-                Storyboard.SetTarget(fadeAnimation1, StartTimerBtn);
-                Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(fadeAnimation2, ResetTimerBtn);
-                Storyboard.SetTargetProperty(fadeAnimation2, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard.SetTarget(fadeAnimation3, PauseTimerBtn);
-                Storyboard.SetTargetProperty(fadeAnimation3, new PropertyPath(UIElement.OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation1);
-                storyboard.Children.Add(fadeAnimation2);
-                storyboard.Children.Add(fadeAnimation3);
-                storyboard.Begin();
+                StartTimerBtn.BeginAnimation(OpacityProperty, fadeAnimation);
+                PauseTimerBtn.BeginAnimation(OpacityProperty, fadeAnimation.Clone());
+                ResetTimerBtn.BeginAnimation(OpacityProperty, fadeAnimation.Clone());
             }
         }
         // - Reset
@@ -3196,113 +2635,70 @@ namespace WinDeskClock
             StartTimerBtn.Visibility = Visibility.Visible;
             TimerIsRunning = false;
             {
-                var changeAnimation1 = new DoubleAnimation
+                var changeAnimation = new DoubleAnimation
                 {
                     From = 100,
                     To = 200,
                     Duration = TimeSpan.FromSeconds(tzoomspeed),
                     EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                 };
-                var changeAnimation2 = new DoubleAnimation
-                {
-                    From = 100,
-                    To = 200,
-                    Duration = TimeSpan.FromSeconds(tzoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(changeAnimation1, StartTimerBtn);
-                Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                Storyboard.SetTarget(changeAnimation2, PauseTimerBtn);
-                Storyboard.SetTargetProperty(changeAnimation2, new PropertyPath(WidthProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(changeAnimation1);
-                storyboard.Children.Add(changeAnimation2);
-                storyboard.Begin();
+                StartTimerBtn.BeginAnimation(WidthProperty, changeAnimation);
+                PauseTimerBtn.BeginAnimation(WidthProperty, changeAnimation.Clone());
             }
-            {
-                var changeAnimation1 = new DoubleAnimation
+            ResetTimerBtn.BeginAnimation(WidthProperty,
+                new DoubleAnimation
                 {
                     From = 100,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(tzoomspeed),
                     EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(changeAnimation1, ResetTimerBtn);
-                Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(changeAnimation1);
-                storyboard.Begin();
-            }
-            {
-                var changeAnimation1 = new DoubleAnimation
+                });
+            TButtonSep.BeginAnimation(WidthProperty,
+                new DoubleAnimation
                 {
                     From = 20,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(tzoomspeed),
                     EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(changeAnimation1, TButtonSep);
-                Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(changeAnimation1);
-                storyboard.Begin();
-            }
+                });
 
-            await Task.Delay(150);
+            await Task.Delay(tzoomdelay);
 
             PauseTimerBtn.Visibility = Visibility.Hidden;
             ResetTimerBtn.Visibility = Visibility.Hidden;
 
             {
-                var zommAnimation1 = new DoubleAnimation
+                var zoomAnimation = new DoubleAnimation
                 {
                     From = 1,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(tzoomspeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                 };
-                var zommAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(tzoomspeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var fadeAnimation1 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(tfadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(zommAnimation1, TimerProgressRing);
-                Storyboard.SetTargetProperty(zommAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(zommAnimation2, TimerProgressRing);
-                Storyboard.SetTargetProperty(zommAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                Storyboard.SetTarget(fadeAnimation1, TimerProgressRing);
-                Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(zommAnimation1);
-                storyboard.Children.Add(zommAnimation2);
-                storyboard.Children.Add(fadeAnimation1);
-                storyboard.Begin();
+                var scale = (ScaleTransform)TimerProgressRing.RenderTransform;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnimation);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnimation.Clone());
+                TimerProgressRing.BeginAnimation(OpacityProperty,
+                    new DoubleAnimation
+                    {
+                        From = 1,
+                        To = 0,
+                        Duration = TimeSpan.FromSeconds(tfadespeed),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    });
             }
-            foreach (UIElement element in TimerwBtnGrid.Children)
+            foreach (UIElement element in TimerBtnGrid.Children)
             {
                 if (element is System.Windows.Controls.Button)
                 {
-                    var zoomAnimation1 = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 31,
-                        Duration = TimeSpan.FromSeconds(tzoomspeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(zoomAnimation1, element);
-                    Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath(HeightProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(zoomAnimation1);
-                    storyboard.Begin();
+                    element.BeginAnimation(HeightProperty,
+                        new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 31,
+                            Duration = TimeSpan.FromSeconds(tzoomspeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        });
                 }
             }
         }
@@ -3346,38 +2742,24 @@ namespace WinDeskClock
             }
             TimeUpGrid.Visibility = Visibility.Visible;
             {
-                var fadeAnimation1 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(tfadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var zoomAnimation1 = new DoubleAnimation
+                var zoomAnimation = new DoubleAnimation
                 {
                     From = 1.1,
                     To = 1,
                     Duration = TimeSpan.FromSeconds(tzoomspeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
-                var zoomAnimation2 = new DoubleAnimation
-                {
-                    From = 1.1,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(tzoomspeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeAnimation1, TimeUpGrid);
-                Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(OpacityProperty));
-                Storyboard.SetTarget(zoomAnimation1, TimeUpGrid);
-                Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(zoomAnimation2, TimeUpGrid);
-                Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation1);
-                storyboard.Children.Add(zoomAnimation1);
-                storyboard.Children.Add(zoomAnimation2);
-                storyboard.Begin();
+                var scale = (ScaleTransform)TimeUpGrid.RenderTransform; ;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnimation);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnimation.Clone());
+                TimeUpGrid.BeginAnimation(OpacityProperty,
+                    new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(tfadespeed),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    });
             }
             while (TimeUp)
             {
@@ -3385,38 +2767,24 @@ namespace WinDeskClock
             }
             Log.Info("Timer time up stop");
             {
-                var fadeAnimation1 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(tfadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var zoomAnimation1 = new DoubleAnimation
+                var zoomAnimation = new DoubleAnimation
                 {
                     From = 1,
                     To = 1.1,
                     Duration = TimeSpan.FromSeconds(tzoomspeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                 };
-                var zoomAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 1.1,
-                    Duration = TimeSpan.FromSeconds(tzoomspeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(fadeAnimation1, TimeUpGrid);
-                Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(OpacityProperty));
-                Storyboard.SetTarget(zoomAnimation1, TimeUpGrid);
-                Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(zoomAnimation2, TimeUpGrid);
-                Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation1);
-                storyboard.Children.Add(zoomAnimation1);
-                storyboard.Children.Add(zoomAnimation2);
-                storyboard.Begin();
+                var scale = (ScaleTransform)TimeUpGrid.RenderTransform; ;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnimation);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnimation.Clone());
+                TimeUpGrid.BeginAnimation(OpacityProperty,
+                    new DoubleAnimation
+                    {
+                        From = 1,
+                        To = 0,
+                        Duration = TimeSpan.FromSeconds(tfadespeed),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    });
             }
             TimeUpSoundPlayer.Stop();
             TimeUpSoundPlayer.Dispose();
@@ -3431,113 +2799,71 @@ namespace WinDeskClock
             StartTimerBtn.Visibility = Visibility.Visible;
             TimerIsRunning = false;
             {
-                var changeAnimation1 = new DoubleAnimation
+                var changeAnimation = new DoubleAnimation
                 {
                     From = 100,
                     To = 200,
                     Duration = TimeSpan.FromSeconds(tzoomspeed),
                     EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                 };
-                var changeAnimation2 = new DoubleAnimation
-                {
-                    From = 100,
-                    To = 200,
-                    Duration = TimeSpan.FromSeconds(tzoomspeed),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(changeAnimation1, StartTimerBtn);
-                Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                Storyboard.SetTarget(changeAnimation2, PauseTimerBtn);
-                Storyboard.SetTargetProperty(changeAnimation2, new PropertyPath(WidthProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(changeAnimation1);
-                storyboard.Children.Add(changeAnimation2);
-                storyboard.Begin();
+                StartTimerBtn.BeginAnimation(WidthProperty, changeAnimation);
+                PauseTimerBtn.BeginAnimation(WidthProperty, changeAnimation.Clone());
             }
-            {
-                var changeAnimation1 = new DoubleAnimation
+            ResetTimerBtn.BeginAnimation(WidthProperty,
+                new DoubleAnimation
                 {
                     From = 100,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(tzoomspeed),
                     EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(changeAnimation1, ResetTimerBtn);
-                Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(changeAnimation1);
-                storyboard.Begin();
-            }
-            {
-                var changeAnimation1 = new DoubleAnimation
+                });
+            TButtonSep.BeginAnimation(WidthProperty,
+                new DoubleAnimation
                 {
                     From = 20,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(tzoomspeed),
                     EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(changeAnimation1, TButtonSep);
-                Storyboard.SetTargetProperty(changeAnimation1, new PropertyPath(WidthProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(changeAnimation1);
-                storyboard.Begin();
-            }
+                });
 
-            await Task.Delay(300);
+            await Task.Delay(tzoomdelay);
 
             PauseTimerBtn.Visibility = Visibility.Hidden;
             ResetTimerBtn.Visibility = Visibility.Hidden;
 
             {
-                var zommAnimation1 = new DoubleAnimation
+                var zoomAnimation = new DoubleAnimation
                 {
                     From = 1,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(tzoomspeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                 };
-                var zommAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(tzoomspeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var fadeAnimation1 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(tfadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(zommAnimation1, TimerProgressRing);
-                Storyboard.SetTargetProperty(zommAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(zommAnimation2, TimerProgressRing);
-                Storyboard.SetTargetProperty(zommAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                Storyboard.SetTarget(fadeAnimation1, TimerProgressRing);
-                Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(zommAnimation1);
-                storyboard.Children.Add(zommAnimation2);
-                storyboard.Children.Add(fadeAnimation1);
-                storyboard.Begin();
+                var scale = (ScaleTransform)TimerProgressRing.RenderTransform;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnimation);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnimation.Clone());
+                TimerProgressRing.BeginAnimation(OpacityProperty,
+                    new DoubleAnimation
+                    {
+                        From = 1,
+                        To = 0,
+                        Duration = TimeSpan.FromSeconds(tfadespeed),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    });
+
             }
-            foreach (UIElement element in TimerwBtnGrid.Children)
+            foreach (UIElement element in TimerBtnGrid.Children)
             {
                 if (element is System.Windows.Controls.Button)
                 {
-                    var zoomAnimation1 = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 31,
-                        Duration = TimeSpan.FromSeconds(tzoomspeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(zoomAnimation1, element);
-                    Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath(HeightProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(zoomAnimation1);
-                    storyboard.Begin();
+                    element.BeginAnimation(HeightProperty,
+                        new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 31,
+                            Duration = TimeSpan.FromSeconds(tzoomspeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        });
                 }
             }
             TimeUpGrid.Visibility = Visibility.Hidden;
@@ -3657,16 +2983,15 @@ namespace WinDeskClock
             string direction = TimerGetDirection(actualValue, newText, reset);
             if (direction == "none") return;
             double offset = direction == "up" ? -50 : 50;
-            TimerAnimateTranslateYAsync(textBlock, 0, offset, EasingMode.EaseIn);
-            await Task.Delay(ttxtdelay);
+            await TimerAnimateTranslateYAsync(textBlock, 0, offset, EasingMode.EaseIn);
             textBlock.Text = newText;
-            TimerAnimateTranslateYAsync(textBlock, -offset, 0, EasingMode.EaseOut);
+            await TimerAnimateTranslateYAsync(textBlock, -offset, 0, EasingMode.EaseOut);
         }
         private string TimerGetDirection(string actual, string target, bool reset)
         {
-            if ((target == "0" && actual == "9") || (target == "0" && actual == "5") || (target == "0" && actual == "3") && !reset)
+            if ((target == "0" && actual == "9") || (target == "0" && actual == "5") || (target == "0" && actual == "3") || (target == "0" && actual == "2") && !reset)
                 return "up";
-            if ((target == "9" && actual == "0") || (target == "5" && actual == "0") || (target == "3" && actual == "0") && !reset)
+            if ((target == "9" && actual == "0") || (target == "5" && actual == "0") || (target == "3" && actual == "0") || (target == "2" && actual == "0") && !reset)
                 return "down";
             if (reset && target != actual)
                 return "up";
@@ -3677,22 +3002,18 @@ namespace WinDeskClock
             }
             return "none";
         }
-        private void TimerAnimateTranslateYAsync(UIElement element, double from, double to, EasingMode easingMode)
+        private async Task TimerAnimateTranslateYAsync(UIElement element, double from, double to, EasingMode easingMode)
         {
-            var animation = new DoubleAnimation
-            {
-                From = from,
-                To = to,
-                Duration = TimeSpan.FromSeconds(ttxtslidespeed),
-                EasingFunction = new QuadraticEase { EasingMode = easingMode }
-            };
-            var transform = element.RenderTransform as TranslateTransform;
-            if (transform == null)
-            {
-                transform = new TranslateTransform();
-                element.RenderTransform = transform;
-            }
-            transform.BeginAnimation(TranslateTransform.YProperty, animation);
+            var translate = (TranslateTransform)element.RenderTransform;
+            translate.BeginAnimation(TranslateTransform.YProperty,
+                new DoubleAnimation
+                {
+                    From = from,
+                    To = to,
+                    Duration = TimeSpan.FromSeconds(ttxtslidespeed),
+                    EasingFunction = new QuadraticEase { EasingMode = easingMode }
+                });
+            await Task.Delay(ttxtdelay);
         }
 
         private async Task UpdateTimerTextH1(string text, bool reset)
@@ -4333,18 +3654,15 @@ namespace WinDeskClock
         // Timer progress ring update with animation
         private async Task UpdateTimerProgressRing(int value)
         {
-            var transtion = new DoubleAnimation
-            {
-                From = TimerProgressRing.Progress,
-                To = value,
-                Duration = TimeSpan.FromSeconds(0.5),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-            };
-            Storyboard.SetTarget(transtion, TimerProgressRing);
-            Storyboard.SetTargetProperty(transtion, new PropertyPath(ProgressRing.ProgressProperty));
-            var storyboard = new Storyboard();
-            storyboard.Children.Add(transtion);
-            storyboard.Begin();
+            TimerProgressRing.BeginAnimation(ProgressRing.ProgressProperty,
+                new DoubleAnimation
+                {
+                    From = TimerProgressRing.Progress,
+                    To = value,
+                    Duration = TimeSpan.FromSeconds(0.5),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+
+                });
         }
         #endregion
 
@@ -4441,38 +3759,26 @@ namespace WinDeskClock
                 }
                 AlarmAlertGrid.Visibility = Visibility.Visible;
                 {
-                    var fadeAnimation1 = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(tfadespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    var zoomAnimation1 = new DoubleAnimation
-                    {
-                        From = 1.1,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(tzoomspeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    var zoomAnimation2 = new DoubleAnimation
+                    AlarmAlertGrid.BeginAnimation(UIElement.OpacityProperty,
+                        new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(tfadespeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        });
+
+                    var zoomAnimation = new DoubleAnimation
                     {
                         From = 1.1,
                         To = 1,
                         Duration = TimeSpan.FromSeconds(tzoomspeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    Storyboard.SetTarget(fadeAnimation1, AlarmAlertGrid);
-                    Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(OpacityProperty));
-                    Storyboard.SetTarget(zoomAnimation1, AlarmAlertGrid);
-                    Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                    Storyboard.SetTarget(zoomAnimation2, AlarmAlertGrid);
-                    Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(fadeAnimation1);
-                    storyboard.Children.Add(zoomAnimation1);
-                    storyboard.Children.Add(zoomAnimation2);
-                    storyboard.Begin();
+
+                    var scale = (ScaleTransform)AlarmAlertGrid.RenderTransform;
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnimation);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoomAnimation.Clone());
                 }
 
                 double timeout = ConfigManager.Variables.AlarmTimeoutDelay;
@@ -4491,38 +3797,27 @@ namespace WinDeskClock
                 }
                 Log.Info($"Alarm alert ended: {uid}");
                 {
-                    var fadeAnimation1 = new DoubleAnimation
-                    {
-                        From = 1,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(tfadespeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    var zoomAnimation1 = new DoubleAnimation
-                    {
-                        From = 1,
-                        To = 1.1,
-                        Duration = TimeSpan.FromSeconds(tzoomspeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    var zoomAnimation2 = new DoubleAnimation
+
+                    AlarmAlertGrid.BeginAnimation(OpacityProperty,
+                        new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(tfadespeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        });
+
+                    var zoomAnimation = new DoubleAnimation
                     {
                         From = 1,
                         To = 1.1,
                         Duration = TimeSpan.FromSeconds(tzoomspeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                     };
-                    Storyboard.SetTarget(fadeAnimation1, AlarmAlertGrid);
-                    Storyboard.SetTargetProperty(fadeAnimation1, new PropertyPath(OpacityProperty));
-                    Storyboard.SetTarget(zoomAnimation1, AlarmAlertGrid);
-                    Storyboard.SetTargetProperty(zoomAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                    Storyboard.SetTarget(zoomAnimation2, AlarmAlertGrid);
-                    Storyboard.SetTargetProperty(zoomAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(fadeAnimation1);
-                    storyboard.Children.Add(zoomAnimation1);
-                    storyboard.Children.Add(zoomAnimation2);
-                    storyboard.Begin();
+
+                    var scale = (ScaleTransform)AlarmAlertGrid.RenderTransform;
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnimation);
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoomAnimation.Clone());
                 }
                 if (sound != "none")
                 {
@@ -5787,20 +5082,14 @@ namespace WinDeskClock
             Log.Info($"Deleting Alarm {uid}");
             await ConfigManager.DelAlarm(uid);
             FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
-            {
-                var sizeAnimation = new DoubleAnimation
+            AlarmCard.BeginAnimation(HeightProperty,
+                new DoubleAnimation
                 {
                     From = AlarmCard.ActualHeight,
                     To = 0,
                     Duration = TimeSpan.FromSeconds(0.2),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(sizeAnimation, AlarmCard);
-                Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation);
-                storyboard.Begin();
-            }
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                });
             await Task.Delay(200);
             AlarmStack.Children.Remove((CardAction)AlarmCard);
             if (AlarmStack.Children.Count == 0)
@@ -5825,37 +5114,25 @@ namespace WinDeskClock
                     hour++;
                 }
 
-                {
-                    var translateAnimation = new DoubleAnimation
+                ((TranslateTransform)AlarmCardEditHourText.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation
                     {
                         From = 0,
                         To = 50,
                         Duration = TimeSpan.FromSeconds(0.1),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, AlarmCardEditHourText);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    });
 
                 await Task.Delay(100);
 
-                {
-                    var translateAnimation = new DoubleAnimation
+                ((TranslateTransform)AlarmCardEditHourText.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation
                     {
                         From = -50,
                         To = 0,
                         Duration = TimeSpan.FromSeconds(0.1),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, AlarmCardEditHourText);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    });
             }
             else if (direction == "down")
             {
@@ -5868,37 +5145,25 @@ namespace WinDeskClock
                     hour--;
                 }
 
-                {
-                    var translateAnimation = new DoubleAnimation
+                ((TranslateTransform)AlarmCardEditHourText.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation
                     {
                         From = 0,
                         To = -50,
                         Duration = TimeSpan.FromSeconds(0.1),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, AlarmCardEditHourText);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    });
 
                 await Task.Delay(100);
 
-                {
-                    var translateAnimation = new DoubleAnimation
+                ((TranslateTransform)AlarmCardEditHourText.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation
                     {
                         From = 50,
                         To = 0,
                         Duration = TimeSpan.FromSeconds(0.1),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, AlarmCardEditHourText);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    });
             }
             ((System.Windows.Controls.TextBlock)AlarmCardEditHourText).Text = hour.ToString("00");
         }
@@ -5919,37 +5184,25 @@ namespace WinDeskClock
                     minute++;
                 }
 
-                {
-                    var translateAnimation = new DoubleAnimation
+                ((TranslateTransform)AlarmCardEditMinuteText.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation
                     {
                         From = 0,
                         To = 50,
                         Duration = TimeSpan.FromSeconds(0.1),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, AlarmCardEditMinuteText);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    });
 
                 await Task.Delay(100);
 
-                {
-                    var translateAnimation = new DoubleAnimation
+                ((TranslateTransform)AlarmCardEditMinuteText.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation
                     {
                         From = -50,
                         To = 0,
                         Duration = TimeSpan.FromSeconds(0.1),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, AlarmCardEditMinuteText);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    });
             }
             else if (direction == "down")
             {
@@ -5962,37 +5215,25 @@ namespace WinDeskClock
                     minute--;
                 }
 
-                {
-                    var translateAnimation = new DoubleAnimation
+                ((TranslateTransform)AlarmCardEditMinuteText.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation
                     {
                         From = 0,
                         To = -50,
                         Duration = TimeSpan.FromSeconds(0.1),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, AlarmCardEditMinuteText);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    });
 
                 await Task.Delay(100);
 
-                {
-                    var translateAnimation = new DoubleAnimation
+                ((TranslateTransform)AlarmCardEditMinuteText.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation
                     {
                         From = 50,
                         To = 0,
                         Duration = TimeSpan.FromSeconds(0.1),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, AlarmCardEditMinuteText);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    });
             }
             ((System.Windows.Controls.TextBlock)AlarmCardEditMinuteText).Text = minute.ToString("00");
         }
@@ -6009,18 +5250,14 @@ namespace WinDeskClock
                 {
                     if (card.Tag.ToString() != $"{uid}_AlarmCard")
                     {
-                        var sizeAnimation = new DoubleAnimation
-                        {
-                            From = card.ActualHeight,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(0.3),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        Storyboard.SetTarget(sizeAnimation, card);
-                        Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(sizeAnimation);
-                        storyboard.Begin();
+                        card.BeginAnimation(HeightProperty,
+                            new DoubleAnimation
+                            {
+                                From = card.ActualHeight,
+                                To = 0,
+                                Duration = TimeSpan.FromSeconds(0.3),
+                                EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                            });
                     }
                 }
 
@@ -6032,33 +5269,23 @@ namespace WinDeskClock
                 AlarmCardSmallGrid.Visibility = Visibility.Collapsed;
                 AlarmCardBigGrid.Visibility = Visibility.Visible;
 
-                {
-                    var sizeAnimation = new DoubleAnimation
+                AlarmCardMainGrid.BeginAnimation(HeightProperty,
+                    new DoubleAnimation
                     {
                         From = AlarmCard.ActualHeight,
                         To = AlarmScroll.ActualHeight - 23,
                         Duration = TimeSpan.FromSeconds(0.3),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(sizeAnimation, AlarmCardMainGrid);
-                    Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(sizeAnimation);
-                    storyboard.Begin();
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    });
 
-                    var fadeAnimation = new DoubleAnimation
+                AlarmCardBigGrid.BeginAnimation(OpacityProperty,
+                    new DoubleAnimation
                     {
                         From = 0,
                         To = 1,
                         Duration = TimeSpan.FromSeconds(0.5),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    Storyboard.SetTarget(fadeAnimation, AlarmCardBigGrid);
-                    Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                    var storyboard2 = new Storyboard();
-                    storyboard2.Children.Add(fadeAnimation);
-                    storyboard2.Begin();
-                }
+                    });
 
                 await Task.Delay(150);
 
@@ -6097,50 +5324,36 @@ namespace WinDeskClock
             AlarmCardBigGrid.Visibility = Visibility.Collapsed;
             AlarmCardSmallGrid.Visibility = Visibility.Visible;
 
-            {
-                var sizeAnimation = new DoubleAnimation
+            AlarmCardMainGrid.BeginAnimation(HeightProperty,
+                new DoubleAnimation
                 {
                     From = AlarmScroll.ActualHeight - 23,
                     To = AlarmCardSmallGrid.ActualHeight,
                     Duration = TimeSpan.FromSeconds(0.3),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(sizeAnimation, AlarmCardMainGrid);
-                Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation);
-                storyboard.Begin();
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                });
 
-                var fadeAnimation = new DoubleAnimation
+            AlarmCardSmallGrid.BeginAnimation(OpacityProperty,
+                new DoubleAnimation
                 {
                     From = 0,
                     To = 1,
                     Duration = TimeSpan.FromSeconds(0.5),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(fadeAnimation, AlarmCardSmallGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard2 = new Storyboard();
-                storyboard2.Children.Add(fadeAnimation);
-                storyboard2.Begin();
-            }
+                });
 
             foreach (CardAction card in AlarmStack.Children)
             {
                 if (card.Tag.ToString() != $"{uid}_AlarmCard")
                 {
-                    var sizeAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 64,
-                        Duration = TimeSpan.FromSeconds(0.3),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(sizeAnimation, card);
-                    Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(sizeAnimation);
-                    storyboard.Begin();
+                    card.BeginAnimation(HeightProperty,
+                        new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 64,
+                            Duration = TimeSpan.FromSeconds(0.3),
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                        });
                 }
             }
 
@@ -6187,20 +5400,14 @@ namespace WinDeskClock
 
                 FrameworkElement AlarmCard = await TagSearch.FindFrameworkElementwithTag(AlarmStack, $"{uid}_AlarmCard");
 
-                {
-                    var sizeAnimation = new DoubleAnimation
+                AlarmCard.BeginAnimation(HeightProperty,
+                    new DoubleAnimation
                     {
                         From = 0,
                         To = 64,
                         Duration = TimeSpan.FromSeconds(0.3),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(sizeAnimation, AlarmCard);
-                    Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(sizeAnimation);
-                    storyboard.Begin();
-                }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    });
 
                 await Task.Delay(300);
 
@@ -6211,18 +5418,14 @@ namespace WinDeskClock
                 {
                     if (card.Tag.ToString() != $"{uid}_AlarmCard")
                     {
-                        var sizeAnimation = new DoubleAnimation
-                        {
-                            From = card.ActualHeight,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(0.3),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                        };
-                        Storyboard.SetTarget(sizeAnimation, card);
-                        Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                        var storyboard = new Storyboard();
-                        storyboard.Children.Add(sizeAnimation);
-                        storyboard.Begin();
+                        card.BeginAnimation(HeightProperty,
+                            new DoubleAnimation
+                            {
+                                From = card.ActualHeight,
+                                To = 0,
+                                Duration = TimeSpan.FromSeconds(0.3),
+                                EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                            });
                     }
                 }
 
@@ -6233,33 +5436,23 @@ namespace WinDeskClock
                 AlarmCardSmallGrid.Visibility = Visibility.Collapsed;
                 AlarmCardBigGrid.Visibility = Visibility.Visible;
 
-                {
-                    var sizeAnimation = new DoubleAnimation
+                AlarmCardMainGrid.BeginAnimation(HeightProperty,
+                    new DoubleAnimation
                     {
                         From = AlarmCard.ActualHeight,
                         To = AlarmScroll.ActualHeight - 23,
                         Duration = TimeSpan.FromSeconds(0.3),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(sizeAnimation, AlarmCardMainGrid);
-                    Storyboard.SetTargetProperty(sizeAnimation, new PropertyPath(HeightProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(sizeAnimation);
-                    storyboard.Begin();
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    });
 
-                    var fadeAnimation = new DoubleAnimation
+                AlarmCardBigGrid.BeginAnimation(OpacityProperty,
+                    new DoubleAnimation
                     {
                         From = 0,
                         To = 1,
                         Duration = TimeSpan.FromSeconds(0.5),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    Storyboard.SetTarget(fadeAnimation, AlarmCardBigGrid);
-                    Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                    var storyboard2 = new Storyboard();
-                    storyboard2.Children.Add(fadeAnimation);
-                    storyboard2.Begin();
-                }
+                    });
 
                 await Task.Delay(150);
                 foreach (CardAction card in AlarmStack.Children)
@@ -6285,8 +5478,7 @@ namespace WinDeskClock
         #endregion
 
         #region Global Menu
-        private double animspeedzoomgm = 0.2;
-        private double animzoomspeeds = 0.3;
+        private int globalanimspeed = 350;
         private bool globalmenublocked = true;
 
         // Global menu tactile navigation 
@@ -6295,83 +5487,47 @@ namespace WinDeskClock
             if (!globalmenublocked)
             {
                 {
-                    var fadeAnimation = new DoubleAnimation
+                    GlobalMenuGrid.BeginAnimation(OpacityProperty,
+                        new DoubleAnimation
+                        {
+                            From = 1,
+                            To = 0,
+                            Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        });
+                    var sizeAnimation = new DoubleAnimation
                     {
                         From = 1,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
                     };
-                    Storyboard.SetTarget(fadeAnimation, GlobalMenuGrid);
-                    Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(fadeAnimation);
-                    storyboard.Begin();
+                    var scale = (ScaleTransform)GlobalMenuBorder.RenderTransform;
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, sizeAnimation);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, sizeAnimation.Clone());
                 }
-                {
-                    var sizeAnimation1 = new DoubleAnimation
-                    {
-                        From = 1,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    var sizeAnimation2 = new DoubleAnimation
-                    {
-                        From = 1,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    Storyboard.SetTarget(sizeAnimation1, GlobalMenuBorder);
-                    Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                    Storyboard.SetTarget(sizeAnimation2, GlobalMenuBorder);
-                    Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(sizeAnimation1);
-                    storyboard.Children.Add(sizeAnimation2);
-                    storyboard.Begin();
-                }
-                await Task.Delay(150);
+                await Task.Delay(globalanimspeed);
                 GlobalMenuGrid.Visibility = Visibility.Hidden;
                 GlobalMenuBtn.Visibility = Visibility.Visible;
                 {
-                    var fadeAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
-                    Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(fadeAnimation);
-                    storyboard.Begin();
-                }
-                {
-                    var sizeAnimation1 = new DoubleAnimation
+                    GlobalMenuBtn.BeginAnimation(OpacityProperty,
+                        new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        });
+                    var sizeAnimation = new DoubleAnimation
                     {
                         From = 2,
                         To = 1,
-                        Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    var sizeAnimation2 = new DoubleAnimation
-                    {
-                        From = 2,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
-                    Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                    Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
-                    Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(sizeAnimation1);
-                    storyboard.Children.Add(sizeAnimation2);
-                    storyboard.Begin();
+                    var scale = (ScaleTransform)GlobalMenuBtn.RenderTransform;
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, sizeAnimation);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, sizeAnimation.Clone());
                 }
                 await Task.Delay(300);
             }
@@ -6398,45 +5554,27 @@ namespace WinDeskClock
                 {
                     RoutedEvent = PreviewMouseUpEvent
                 });
-                await Task.Delay(150);
+                await Task.Delay(globalanimspeed);
                 MirrorGrid.Visibility = Visibility.Visible;
                 {
-                    var fadeAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(animzoomspeeds),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    Storyboard.SetTarget(fadeAnimation, MirrorGrid);
-                    Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(fadeAnimation);
-                    storyboard.Begin();
-                }
-                {
-                    var sizeAnimation1 = new DoubleAnimation
+                    MirrorGrid.BeginAnimation(OpacityProperty,
+                        new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        });
+                    var sizeAnimation = new DoubleAnimation
                     {
                         From = 1.1,
                         To = 1,
-                        Duration = TimeSpan.FromSeconds(animzoomspeeds),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    var sizeAnimation2 = new DoubleAnimation
-                    {
-                        From = 1.1,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(animzoomspeeds),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(sizeAnimation1, MirrorBorder);
-                    Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                    Storyboard.SetTarget(sizeAnimation2, MirrorBorder);
-                    Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(sizeAnimation1);
-                    storyboard.Children.Add(sizeAnimation2);
-                    storyboard.Begin();
+                    var scale = (ScaleTransform)MirrorGrid.RenderTransform;
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, sizeAnimation);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, sizeAnimation.Clone());
                 }
 
                 Page mirror = new Mirror();
@@ -6489,81 +5627,49 @@ namespace WinDeskClock
                 {
                     RoutedEvent = PreviewMouseUpEvent
                 });
-                await Task.Delay(150);
+                await Task.Delay(globalanimspeed);
                 SettingsGrid.Visibility = Visibility.Visible;
                 {
-                    var fadeAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(animzoomspeeds),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    Storyboard.SetTarget(fadeAnimation, SettingsGrid);
-                    Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(fadeAnimation);
-                    storyboard.Begin();
-                }
-                {
-                    var sizeAnimation1 = new DoubleAnimation
+                    SettingsGrid.BeginAnimation(OpacityProperty,
+                        new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        });
+                    var sizeAnimation = new DoubleAnimation
                     {
                         From = 1.1,
                         To = 1,
-                        Duration = TimeSpan.FromSeconds(animzoomspeeds),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    var sizeAnimation2 = new DoubleAnimation
-                    {
-                        From = 1.1,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(animzoomspeeds),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(sizeAnimation1, SettingsBorder);
-                    Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                    Storyboard.SetTarget(sizeAnimation2, SettingsBorder);
-                    Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(sizeAnimation1);
-                    storyboard.Children.Add(sizeAnimation2);
-                    storyboard.Begin();
+                    var scale = (ScaleTransform)SettingsBorder.RenderTransform;
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, sizeAnimation);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, sizeAnimation.Clone());
                 }
                 SettingsTabControl.SelectedIndex = 0;
                 GeneralFrame.Navigate(SettingsTabs["General"]);
                 {
-                    var opacityAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(stabcontrolpage / 2),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    var sizeAnimation1 = new DoubleAnimation
-                    {
-                        From = 0.9,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(stabcontrolpage),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    var sizeAnimation2 = new DoubleAnimation
+                    GeneralFrame.BeginAnimation(OpacityProperty,
+                        new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(stabcontrolpage / 2),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        });
+                    var sizeAnimation = new DoubleAnimation
                     {
                         From = 0.9,
                         To = 1,
                         Duration = TimeSpan.FromSeconds(stabcontrolpage),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    Storyboard.SetTarget(opacityAnimation, GeneralFrame);
-                    Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(OpacityProperty));
-                    Storyboard.SetTarget(sizeAnimation1, GeneralFrame);
-                    Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                    Storyboard.SetTarget(sizeAnimation2, GeneralFrame);
-                    Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(opacityAnimation);
-                    storyboard.Children.Add(sizeAnimation1);
-                    storyboard.Children.Add(sizeAnimation2);
-                    storyboard.Begin();
+                    var scale = (ScaleTransform)GeneralFrame.RenderTransform;
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, sizeAnimation);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, sizeAnimation.Clone());
                 }
             }
         }
@@ -6584,90 +5690,55 @@ namespace WinDeskClock
         }
         private async void GlobalMenuBtn_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            Task.Run(async () => {
+            Task.Run(async () =>
+            {
                 globalmenublocked = true;
                 await Task.Delay(500);
                 globalmenublocked = false;
             });
 
             {
-                var sizeAnimation1 = new DoubleAnimation
+                GlobalMenuBtn.BeginAnimation(OpacityProperty,
+                    new DoubleAnimation
+                    {
+                        From = 1,
+                        To = 0,
+                        Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    });
+                var sizeAnimation = new DoubleAnimation
                 {
                     From = 1,
                     To = 2,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
                 };
-                var sizeAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 2,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation1);
-                storyboard.Children.Add(sizeAnimation2);
-                storyboard.Begin();
+                var scale = (ScaleTransform)GlobalMenuBtn.RenderTransform;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, sizeAnimation);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, sizeAnimation.Clone());
             }
-            {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(fadeAnimation, GlobalMenuBtn);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
-            await Task.Delay(150);
+            await Task.Delay(globalanimspeed);
             GlobalMenuGrid.Visibility = Visibility.Visible;
             GlobalMenuBtn.Visibility = Visibility.Collapsed;
             {
-                var fadeAnimation = new DoubleAnimation
+                GlobalMenuGrid.BeginAnimation(OpacityProperty,
+                    new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1,
+                        Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    });
+                var sizeAnimation = new DoubleAnimation
                 {
                     From = 0,
                     To = 1,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                 };
-                Storyboard.SetTarget(fadeAnimation, GlobalMenuGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
-            {
-                var sizeAnimation1 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var sizeAnimation2 = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(animspeedzoomgm),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(sizeAnimation1, GlobalMenuBorder);
-                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(sizeAnimation2, GlobalMenuBorder);
-                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation1);
-                storyboard.Children.Add(sizeAnimation2);
-                storyboard.Begin();
+                var scale = (ScaleTransform)GlobalMenuBorder.RenderTransform;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, sizeAnimation);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, sizeAnimation.Clone());
             }
         }
         #endregion
@@ -6676,44 +5747,26 @@ namespace WinDeskClock
         private async void SettingsBackBtn_Click(object sender, RoutedEventArgs e)
         {
             {
-                var fadeAnimation = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeAnimation, SettingsGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
-            {
-                var sizeAnimation1 = new DoubleAnimation
+                SettingsGrid.BeginAnimation(OpacityProperty,
+                    new DoubleAnimation
+                    {
+                        From = 1,
+                        To = 0,
+                        Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    });
+                var sizeAnimation = new DoubleAnimation
                 {
                     From = 1,
                     To = 1.1,
-                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
                 };
-                var sizeAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 1.1,
-                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(sizeAnimation1, SettingsBorder);
-                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(sizeAnimation2, SettingsBorder);
-                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation1);
-                storyboard.Children.Add(sizeAnimation2);
-                storyboard.Begin();
+                var scale = (ScaleTransform)SettingsBorder.RenderTransform;
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, sizeAnimation);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, sizeAnimation.Clone());
             }
-            await Task.Delay(300);
+            await Task.Delay(globalanimspeed);
             GeneralFrame.Navigate(SettingsTabs["About"]);
             SettingsGrid.Visibility = Visibility.Hidden;
         }
@@ -6725,38 +5778,24 @@ namespace WinDeskClock
             {
                 AboutFrame.Navigate(SettingsTabs["About"]);
                 {
-                    var opacityAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(stabcontrolpage / 2),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    var sizeAnimation1 = new DoubleAnimation
-                    {
-                        From = 0.9,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(stabcontrolpage),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    var sizeAnimation2 = new DoubleAnimation
+                    AboutFrame.BeginAnimation(OpacityProperty,
+                        new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(stabcontrolpage / 2),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        });
+                    var sizeAnimation = new DoubleAnimation
                     {
                         From = 0.9,
                         To = 1,
                         Duration = TimeSpan.FromSeconds(stabcontrolpage),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    Storyboard.SetTarget(opacityAnimation, AboutFrame);
-                    Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(OpacityProperty));
-                    Storyboard.SetTarget(sizeAnimation1, AboutFrame);
-                    Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                    Storyboard.SetTarget(sizeAnimation2, AboutFrame);
-                    Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(opacityAnimation);
-                    storyboard.Children.Add(sizeAnimation1);
-                    storyboard.Children.Add(sizeAnimation2);
-                    storyboard.Begin();
+                    var scale = (ScaleTransform)AboutFrame.RenderTransform;
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, sizeAnimation);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, sizeAnimation.Clone());
                 }
             }
 
@@ -6768,38 +5807,24 @@ namespace WinDeskClock
             {
                 GeneralFrame.Navigate(SettingsTabs["General"]);
                 {
-                    var opacityAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(stabcontrolpage / 2),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    var sizeAnimation1 = new DoubleAnimation
-                    {
-                        From = 0.9,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(stabcontrolpage),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    var sizeAnimation2 = new DoubleAnimation
+                    GeneralFrame.BeginAnimation(OpacityProperty,
+                        new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(stabcontrolpage / 2),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        });
+                    var sizeAnimation = new DoubleAnimation
                     {
                         From = 0.9,
                         To = 1,
                         Duration = TimeSpan.FromSeconds(stabcontrolpage),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    Storyboard.SetTarget(opacityAnimation, GeneralFrame);
-                    Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(OpacityProperty));
-                    Storyboard.SetTarget(sizeAnimation1, GeneralFrame);
-                    Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                    Storyboard.SetTarget(sizeAnimation2, GeneralFrame);
-                    Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(opacityAnimation);
-                    storyboard.Children.Add(sizeAnimation1);
-                    storyboard.Children.Add(sizeAnimation2);
-                    storyboard.Begin();
+                    var scale = (ScaleTransform)GeneralFrame.RenderTransform;
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, sizeAnimation);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, sizeAnimation.Clone());
                 }
             }
         }
@@ -6810,38 +5835,24 @@ namespace WinDeskClock
             {
                 PluginManagerFrame.Navigate(SettingsTabs["PluginManager"]);
                 {
-                    var opacityAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(stabcontrolpage / 2),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    var sizeAnimation1 = new DoubleAnimation
-                    {
-                        From = 0.9,
-                        To = 1,
-                        Duration = TimeSpan.FromSeconds(stabcontrolpage),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    var sizeAnimation2 = new DoubleAnimation
+                    PluginManagerFrame.BeginAnimation(OpacityProperty,
+                        new DoubleAnimation
+                        {
+                            From = 0,
+                            To = 1,
+                            Duration = TimeSpan.FromSeconds(stabcontrolpage / 2),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                        });
+                    var sizeAnimation = new DoubleAnimation
                     {
                         From = 0.9,
                         To = 1,
                         Duration = TimeSpan.FromSeconds(stabcontrolpage),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                     };
-                    Storyboard.SetTarget(opacityAnimation, PluginManagerFrame);
-                    Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(OpacityProperty));
-                    Storyboard.SetTarget(sizeAnimation1, PluginManagerFrame);
-                    Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                    Storyboard.SetTarget(sizeAnimation2, PluginManagerFrame);
-                    Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(opacityAnimation);
-                    storyboard.Children.Add(sizeAnimation1);
-                    storyboard.Children.Add(sizeAnimation2);
-                    storyboard.Begin();
+                    var scale = (ScaleTransform)PluginManagerFrame.RenderTransform;
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, sizeAnimation);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, sizeAnimation.Clone());
                 }
             }
         }
@@ -6861,45 +5872,26 @@ namespace WinDeskClock
         #region Mirror
         private async void MirrorBackBtn_Click(object sender, RoutedEventArgs e)
         {
-            {
-                var fadeAnimation = new DoubleAnimation
+            MirrorGrid.BeginAnimation(OpacityProperty,
+                new DoubleAnimation
                 {
                     From = 1,
                     To = 0,
-                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeAnimation, MirrorGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
+                });
+            var sizeAnimation = new DoubleAnimation
             {
-                var sizeAnimation1 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 1.1,
-                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var sizeAnimation2 = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 1.1,
-                    Duration = TimeSpan.FromSeconds(animzoomspeeds),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(sizeAnimation1, MirrorBorder);
-                Storyboard.SetTargetProperty(sizeAnimation1, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleX)"));
-                Storyboard.SetTarget(sizeAnimation2, MirrorBorder);
-                Storyboard.SetTargetProperty(sizeAnimation2, new PropertyPath("(UIElement.RenderTransform).(ScaleTransform.ScaleY)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(sizeAnimation1);
-                storyboard.Children.Add(sizeAnimation2);
-                storyboard.Begin();
-            }
-            await Task.Delay(300);
+                From = 1,
+                To = 1.1,
+                Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+            };
+            var scale = (ScaleTransform)MirrorGrid.RenderTransform;
+            scale.BeginAnimation(ScaleTransform.ScaleXProperty, sizeAnimation);
+            scale.BeginAnimation(ScaleTransform.ScaleYProperty, sizeAnimation.Clone());
+
+            await Task.Delay(globalanimspeed);
             Page mirror = MirrorFrame.Content as Page;
             MirrorFrame.Navigate(null);
             mirror = null;
@@ -6911,32 +5903,24 @@ namespace WinDeskClock
 
         private async void EnterDownMenuPluginBtn_Click(object sender, RoutedEventArgs e)
         {
-            {
-                var translateAnimation = new DoubleAnimation
+            ((TranslateTransform)PluginGrid.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                new DoubleAnimation
                 {
                     From = 0,
                     To = -100,
-                    Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var fadeAnimation = new DoubleAnimation
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+                });
+            PluginGrid.BeginAnimation(OpacityProperty,
+                new DoubleAnimation
                 {
                     From = 1,
                     To = 0,
-                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(translateAnimation, PluginGrid);
-                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                Storyboard.SetTarget(fadeAnimation, PluginGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(translateAnimation);
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
+                });
 
-            await Task.Delay(400);
+            await Task.Delay(globalanimspeed);
 
             PluginGrid.Visibility = Visibility.Hidden;
             MenuPluginGrid.Visibility = Visibility.Visible;
@@ -6952,60 +5936,44 @@ namespace WinDeskClock
                 MenuPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[0]].GetMain());
             }
 
-            {
-                var translateAnimation = new DoubleAnimation
+            ((TranslateTransform)MenuPluginGrid.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                new DoubleAnimation
                 {
                     From = 100,
                     To = 0,
-                    Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var fadeAnimation = new DoubleAnimation
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                });
+            MenuPluginGrid.BeginAnimation(OpacityProperty,
+                new DoubleAnimation
                 {
                     From = 0,
                     To = 1,
-                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(translateAnimation, MenuPluginGrid);
-                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                Storyboard.SetTarget(fadeAnimation, MenuPluginGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(translateAnimation);
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
+                });
         }
 
         private async void ExitDownMenuPluginBtn_Click(object sender, RoutedEventArgs e)
         {
-            {
-                var translateAnimation = new DoubleAnimation
+            ((TranslateTransform)MenuPluginGrid.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                new DoubleAnimation
                 {
                     From = 0,
                     To = 100,
-                    Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var fadeAnimation = new DoubleAnimation
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+                });
+            MenuPluginGrid.BeginAnimation(OpacityProperty,
+                new DoubleAnimation
                 {
                     From = 1,
                     To = 0,
-                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(translateAnimation, MenuPluginGrid);
-                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                Storyboard.SetTarget(fadeAnimation, MenuPluginGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(translateAnimation);
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
+                });
 
-            await Task.Delay(400);
+            await Task.Delay(globalanimspeed);
 
             MenuPluginGrid.Visibility = Visibility.Hidden;
             PluginGrid.Visibility = Visibility.Visible;
@@ -7016,30 +5984,22 @@ namespace WinDeskClock
                 CarouselPluginFrame.Navigate(PluginLoader.PluginModules[CarouselPluginList[0]].GetMain());
             }
 
-            {
-                var translateAnimation = new DoubleAnimation
+            ((TranslateTransform)PluginGrid.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                new DoubleAnimation
                 {
                     From = -100,
                     To = 0,
-                    Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var fadeAnimation = new DoubleAnimation
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                });
+            PluginGrid.BeginAnimation(OpacityProperty,
+                new DoubleAnimation
                 {
                     From = 0,
                     To = 1,
-                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(translateAnimation, PluginGrid);
-                Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                Storyboard.SetTarget(fadeAnimation, PluginGrid);
-                Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(translateAnimation);
-                storyboard.Children.Add(fadeAnimation);
-                storyboard.Begin();
-            }
+                });
         }
 
         private int PluginIndex = 0;
@@ -7055,59 +6015,43 @@ namespace WinDeskClock
                 LeftMenuPluginBtn.IsEnabled = false;
             }
 
+            ((TranslateTransform)MenuPluginFrame.RenderTransform).BeginAnimation(TranslateTransform.XProperty,
+            new DoubleAnimation
             {
-                var fadeanimation = new DoubleAnimation
+                From = 0,
+                To = 100,
+                Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+            });
+            MenuPluginFrame.BeginAnimation(OpacityProperty,
+                new DoubleAnimation
                 {
                     From = 1,
                     To = 0,
-                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var translateanimation = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 100,
-                    Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(fadeanimation, MenuPluginFrame);
-                Storyboard.SetTargetProperty(fadeanimation, new PropertyPath(OpacityProperty));
-                Storyboard.SetTarget(translateanimation, MenuPluginFrame);
-                Storyboard.SetTargetProperty(translateanimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeanimation);
-                storyboard.Children.Add(translateanimation);
-                storyboard.Begin();
-            }
+                });
 
-            await Task.Delay(400);
+            await Task.Delay(globalanimspeed);
             CarouselPluginFrame.Navigate(null);
             MenuPluginFrame.Navigate(PluginLoader.PluginModules[PluginList[PluginIndex]].GetMain());
 
+            ((TranslateTransform)MenuPluginFrame.RenderTransform).BeginAnimation(TranslateTransform.XProperty,
+            new DoubleAnimation
             {
-                var fadeanimation = new DoubleAnimation
+                From = -100,
+                To = 0,
+                Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+            });
+            MenuPluginFrame.BeginAnimation(OpacityProperty,
+                new DoubleAnimation
                 {
                     From = 0,
                     To = 1,
-                    Duration = TimeSpan.FromSeconds(fadespeed),
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var translateanimation = new DoubleAnimation
-                {
-                    From = -100,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeanimation, MenuPluginFrame);
-                Storyboard.SetTargetProperty(fadeanimation, new PropertyPath(OpacityProperty));
-                Storyboard.SetTarget(translateanimation, MenuPluginFrame);
-                Storyboard.SetTargetProperty(translateanimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeanimation);
-                storyboard.Children.Add(translateanimation);
-                storyboard.Begin();
-            }
+                });
         }
 
         private async void RightMenuPluginBtn_Click(object sender, RoutedEventArgs e)
@@ -7121,59 +6065,43 @@ namespace WinDeskClock
             {
                 RightMenuPluginBtn.IsEnabled = false;
             }
-            {
-                var fadeanimation = new DoubleAnimation
-                {
-                    From = 1,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(fadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                var translateanimation = new DoubleAnimation
+            ((TranslateTransform)MenuPluginFrame.RenderTransform).BeginAnimation(TranslateTransform.XProperty,
+                new DoubleAnimation
                 {
                     From = 0,
                     To = -100,
-                    Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                Storyboard.SetTarget(fadeanimation, MenuPluginFrame);
-                Storyboard.SetTargetProperty(fadeanimation, new PropertyPath(OpacityProperty));
-                Storyboard.SetTarget(translateanimation, MenuPluginFrame);
-                Storyboard.SetTargetProperty(translateanimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeanimation);
-                storyboard.Children.Add(translateanimation);
-                storyboard.Begin();
-            }
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+                });
+            MenuPluginFrame.BeginAnimation(OpacityProperty,
+                new DoubleAnimation
+                {
+                    From = 1,
+                    To = 0,
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                });
 
-            await Task.Delay(400);
+            await Task.Delay(globalanimspeed);
             CarouselPluginFrame.Navigate(null);
             MenuPluginFrame.Navigate(PluginLoader.PluginModules[PluginList[PluginIndex]].GetMain());
 
-            {
-                var fadeanimation = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(fadespeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-                var translateanimation = new DoubleAnimation
+            ((TranslateTransform)MenuPluginFrame.RenderTransform).BeginAnimation(TranslateTransform.XProperty,
+                new DoubleAnimation
                 {
                     From = 100,
                     To = 0,
-                    Duration = TimeSpan.FromSeconds(zoomspeed),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Storyboard.SetTarget(fadeanimation, MenuPluginFrame);
-                Storyboard.SetTargetProperty(fadeanimation, new PropertyPath(OpacityProperty));
-                Storyboard.SetTarget(translateanimation, MenuPluginFrame);
-                Storyboard.SetTargetProperty(translateanimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                var storyboard = new Storyboard();
-                storyboard.Children.Add(fadeanimation);
-                storyboard.Children.Add(translateanimation);
-                storyboard.Begin();
-            }
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                });
+            MenuPluginFrame.BeginAnimation(OpacityProperty,
+                new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                });
         }
 
         private int CarouselIndex = 0;
@@ -7205,21 +6133,21 @@ namespace WinDeskClock
                             From = 1,
                             To = 1.1,
                             Duration = TimeSpan.FromSeconds(0.5),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
                         };
                         var zoomanimation2 = new DoubleAnimation
                         {
                             From = 1,
                             To = 1.1,
                             Duration = TimeSpan.FromSeconds(0.5),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
                         };
                         var translateanimation = new DoubleAnimation
                         {
                             From = 0,
                             To = 10,
                             Duration = TimeSpan.FromSeconds(0.5),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
                         };
                         Storyboard.SetTarget(fadeanimation, CarouselPluginFrame);
                         Storyboard.SetTargetProperty(fadeanimation, new PropertyPath(OpacityProperty));
@@ -7254,21 +6182,21 @@ namespace WinDeskClock
                             From = 0.9,
                             To = 1,
                             Duration = TimeSpan.FromSeconds(0.5),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                         };
                         var zoomanimation2 = new DoubleAnimation
                         {
                             From = 0.9,
                             To = 1,
                             Duration = TimeSpan.FromSeconds(0.5),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                         };
                         var translateanimation = new DoubleAnimation
                         {
                             From = -10,
                             To = 0,
                             Duration = TimeSpan.FromSeconds(0.5),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                         };
                         Storyboard.SetTarget(fadeanimation, CarouselPluginFrame);
                         Storyboard.SetTargetProperty(fadeanimation, new PropertyPath(OpacityProperty));
@@ -7293,32 +6221,24 @@ namespace WinDeskClock
         {
             if (CarouselPluginList.Count != 0)
             {
+                ((TranslateTransform)PluginGrid.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                new DoubleAnimation
                 {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = -100,
-                        Duration = TimeSpan.FromSeconds(zoomspeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    var fadeAnimation = new DoubleAnimation
+                    From = 0,
+                    To = -100,
+                    Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
+                });
+                PluginGrid.BeginAnimation(OpacityProperty,
+                    new DoubleAnimation
                     {
                         From = 1,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(fadespeed),
+                        Duration = TimeSpan.FromMilliseconds(globalanimspeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    Storyboard.SetTarget(translateAnimation, PluginGrid);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    Storyboard.SetTarget(fadeAnimation, PluginGrid);
-                    Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Children.Add(fadeAnimation);
-                    storyboard.Begin();
-                }
+                    });
 
-                await Task.Delay(400);
+                await Task.Delay(globalanimspeed);
 
                 PluginGrid.Visibility = Visibility.Hidden;
                 MenuPluginGrid.Visibility = Visibility.Visible;
@@ -7343,30 +6263,22 @@ namespace WinDeskClock
                 CarouselPluginFrame.Navigate(null);
                 MenuPluginFrame.Navigate(PluginLoader.PluginModules[PluginList[index]].GetMain());
 
-                {
-                    var translateAnimation = new DoubleAnimation
+                ((TranslateTransform)MenuPluginGrid.RenderTransform).BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation
                     {
                         From = 100,
                         To = 0,
-                        Duration = TimeSpan.FromSeconds(zoomspeed),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-                    var fadeAnimation = new DoubleAnimation
+                        Duration = TimeSpan.FromMilliseconds(globalanimspeed),
+                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    });
+                MenuPluginGrid.BeginAnimation(OpacityProperty,
+                    new DoubleAnimation
                     {
                         From = 0,
                         To = 1,
-                        Duration = TimeSpan.FromSeconds(fadespeed),
+                        Duration = TimeSpan.FromMilliseconds(globalanimspeed),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                    };
-                    Storyboard.SetTarget(translateAnimation, MenuPluginGrid);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    Storyboard.SetTarget(fadeAnimation, MenuPluginGrid);
-                    Storyboard.SetTargetProperty(fadeAnimation, new PropertyPath(OpacityProperty));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Children.Add(fadeAnimation);
-                    storyboard.Begin();
-                }
+                    });
             }
         }
 
