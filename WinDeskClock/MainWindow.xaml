@@ -498,7 +498,7 @@
                                             CornerRadius="8"
                                             Background="#0affffff"
                                             Padding="10">
-                                        <Grid x:Name="TimerwBtnGrid">
+                                        <Grid x:Name="TimerBtnGrid">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="20" />
