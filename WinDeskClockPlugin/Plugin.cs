@@ -5,26 +5,25 @@ using System.Windows.Navigation;
 using WinDeskClock.Interfaces;
 using WinDeskClock.Utils;
 
-namespace WinDeskClockPlugin
+namespace WinDeskClock.Plugin
 {
-    public class Plugin
+    public static class Plugin
     {
+        private static readonly PluginInfo pluginInfo = new PluginInfo();
+
+        static Plugin()
+        {
+            //Intialize logging for the plugin
+            IPluginLog.Init(pluginInfo.ID);
+            // If you want to use logging (I recommend it), you can use the IPluginLog class to log messages
+            // Example: IPluginLog.Error("This is an error message");
+            // There is also other methods, IPluginLog.Info and IPluginLog.Warning
+            // Plugin specific logging will be saved in the "plugins_log" folder in the "plugins" folder
+        }
+
         // Plugin variables
         // - You must use PluginDataPath (folder) to store the plugin data, you need to manage only the folder content, the folder is created automatically by the main program
-        public readonly string PluginDataPath;
-        // - You need to use Language for your plugin language system, this variable is the same as the main program language. If your plugin don't have the language that set in the main program, you need to use the default language (en-us)
-        public readonly string Language;
-
-        // Don't touch this, this is for the Plugin variables
-        public Plugin()
-        {
-            var pluginInfo = new PluginInfo();
-
-            // Plugin data path
-            PluginDataPath = Path.Combine((string)AppDomain.CurrentDomain.GetData("PluginFolderPath"), "plugins_data", pluginInfo.ID);
-            // Plugin language
-            Language = ConfigManager.Variables.Language;
-        }
+        public static string PluginDataPath => Path.Combine((string)AppDomain.CurrentDomain.GetData("PluginFolderPath"), "plugins_data", pluginInfo.ID);
     }
 
     public class PluginInfo : IPluginInfo
@@ -64,17 +63,15 @@ namespace WinDeskClockPlugin
         // Don't touch this, this is for the Plugin Interface (IPluginModule)
         Main _main = new Main();
         Settings _settings = new Settings();
-        public Page GetMain()
+        public Page GetMain() => _main;
+        public Page GetSettings() =>  _settings;
+        public async Task SaveConfig() => await _settings.SaveConfig();
+        public async Task OnEvent(string eventName, object? data = null)
         {
-            return _main;
-        }
-        public Page GetSettings()
-        {
-            return _settings;
-        }
-        public async Task SaveConfig()
-        {
-            await _settings.SaveConfig();
+            // Handle events here if needed
+            // - You can use the eventName to identify the event and the data to get the data passed with the event
+            // See the documentation for more information about the events
+            await Task.CompletedTask;
         }
     }
 }
