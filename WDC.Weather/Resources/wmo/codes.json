@@ -1,0 +1,338 @@
+{
+	"0": {
+		"day": {
+			"desc": "cleard",
+			"icon": "ClearDay.png",
+			"back": "ClearDay.png"
+		},
+		"night": {
+			"desc": "clearn",
+			"icon": "ClearNight.png",
+			"back": "ClearNight.png"
+		}
+	},
+	"1": {
+		"day": {
+			"desc": "mostlycleard",
+			"icon": "MostlySunnyDay.png",
+			"back": "MostSunDay.png"
+		},
+		"night": {
+			"desc": "mostlyclearn",
+			"icon": "MostlyClearNight.png",
+			"back": "MostClearNight.png"
+		}
+	},
+	"2": {
+		"day": {
+			"desc": "mostlycloudyd",
+			"icon": "MostlyCloudyDay.png",
+			"back": "MosyCloudDay.png"
+		},
+		"night": {
+			"desc": "mostlycloudyn",
+			"icon": "MostlyCloudyNight.png",
+			"back": "MostCloudNight.png"
+		}
+	},
+	"3": {
+		"day": {
+			"desc": "cloudy",
+			"icon": "Cloudy.png",
+			"back": "CloudDay.png"
+		},
+		"night": {
+			"desc": "cloudy",
+			"icon": "Cloudy.png",
+			"back": "CloudNight.png"
+		}
+	},
+	"45": {
+		"day": {
+			"desc": "foggy",
+			"icon": "Foggy.png",
+			"back": "FogDay.png"
+		},
+		"night": {
+			"desc": "foggy",
+			"icon": "Foggy.png",
+			"back": "FogNight.png"
+		}
+	},
+	"48": {
+		"day": {
+			"desc": "rimefog",
+			"icon": "RimeFog.png",
+			"back": "FreezeWind.png"
+		},
+		"night": {
+			"desc": "rimefog",
+			"icon": "RimeFog.png",
+			"back": "FreezeWind.png"
+		}
+	},
+	"51": {
+		"day": {
+			"desc": "lightdrizzle",
+			"icon": "LightDrizzle.png",
+			"back": "LightRainDay.png"
+		},
+		"night": {
+			"desc": "lightdrizzle",
+			"icon": "LightDrizzle.png",
+			"back": "LightRainNight.png"
+		}
+	},
+	"53": {
+		"day": {
+			"desc": "drizzle",
+			"icon": "Drizzle.png",
+			"back": "RainDay.png"
+		},
+		"night": {
+			"desc": "drizzle",
+			"icon": "Drizzle.png",
+			"back": "RainNight.png"
+		}
+	},
+	"55": {
+		"day": {
+			"desc": "heavydrizzle",
+			"icon": "HeavyDrizzle.png",
+			"back": "RainDay.png"
+		},
+		"night": {
+			"desc": "heavydrizzle",
+			"icon": "HeavyDrizzle.png",
+			"back": "RainNight.png"
+		}
+	},
+	"56": {
+		"day": {
+			"desc": "lightfreezingdrizzle",
+			"icon": "FreezingDrizzle.png",
+			"back": "LightSnowDay.png"
+		},
+		"night": {
+			"desc": "lightfreezingdrizzle",
+			"icon": "FreezingDrizzle.png",
+			"back": "LightSnowNight.png"
+		}
+	},
+	"57": {
+		"day": {
+			"desc": "freezingdrizzle",
+			"icon": "FreezingDrizzle.png",
+			"back": "LightSnowDay.png"
+		},
+		"night": {
+			"desc": "freezingdrizzle",
+			"icon": "FreezingDrizzle.png",
+			"back": "LightSnowNight.png"
+		}
+	},
+	"61": {
+		"day": {
+			"desc": "lightraind",
+			"icon": "LightRainDay.png",
+			"back": "LightRainDay.png"
+		},
+		"night": {
+			"desc": "lightrainn",
+			"icon": "LightRainNight.png",
+			"back": "LightRainNight.png"
+		}
+	},
+	"63": {
+		"day": {
+			"desc": "raind",
+			"icon": "ModerateRainDay.png",
+			"back": "RainDay.png"
+		},
+		"night": {
+			"desc": "rainn",
+			"icon": "ModerateRainNight.png",
+			"back": "RainNight.png"
+		}
+	},
+	"65": {
+		"day": {
+			"desc": "heavyraind",
+			"icon": "HeavyRainDay.png",
+			"back": "RainDay.png"
+		},
+		"night": {
+			"desc": "heavyrainn",
+			"icon": "HeavyRainNight.png",
+			"back": "RainNight.png"
+		}
+	},
+	"66": {
+		"day": {
+			"desc": "lightfreezingraind",
+			"icon": "FreezingRainDay.png",
+			"back": "LightRainDay.png"
+		},
+		"night": {
+			"desc": "lightfreezingrainn",
+			"icon": "FreezingRainNight.png",
+			"back": "LightRainNight.png"
+		}
+	},
+	"67": {
+		"day": {
+			"desc": "freezingraind",
+			"icon": "FreezingRainDay.png",
+			"back": "RainDay.png"
+		},
+		"night": {
+			"desc": "freezingrainn",
+			"icon": "FreezingRainNight.png",
+			"back": "RainNight.png"
+		}
+	},
+	"71": {
+		"day": {
+			"desc": "lightsnow",
+			"icon": "LightSnow.png",
+			"back": "LightSnowDay.png"
+		},
+		"night": {
+			"desc": "lightsnow",
+			"icon": "LightSnow.png",
+			"back": "LightSnowNight.png"
+		}
+	},
+	"73": {
+		"day": {
+			"desc": "snow",
+			"icon": "ModerateSnow.png",
+			"back": "Snow.png"
+		},
+		"night": {
+			"desc": "snow",
+			"icon": "ModerateSnow.png",
+			"back": "Snow.png"
+		}
+	},
+	"75": {
+		"day": {
+			"desc": "heavysnow",
+			"icon": "HeavySnow.png",
+			"back": "Snow.png"
+		},
+		"night": {
+			"desc": "heavysnow",
+			"icon": "HeavySnow.png",
+			"back": "Snow.png"
+		}
+	},
+	"77": {
+		"day": {
+			"desc": "snowgrains",
+			"icon": "LightSnow.png",
+			"back": "LightSnowDay.png"
+		},
+		"night": {
+			"desc": "snowgrains",
+			"icon": "LightSnow.png",
+			"back": "LightSnowNight.png"
+		}
+	},
+	"80": {
+		"day": {
+			"desc": "lightshowers",
+			"icon": "LightDrizzle.png",
+			"back": "LightRainDay.png"
+		},
+		"night": {
+			"desc": "lightshowers",
+			"icon": "LightDrizzle.png",
+			"back": "LightRainNight.png"
+		}
+	},
+	"81": {
+		"day": {
+			"desc": "showers",
+			"icon": "Drizzle.png",
+			"back": "RainDay.png"
+		},
+		"night": {
+			"desc": "showers",
+			"icon": "Drizzle.png",
+			"back": "RainNight.png"
+		}
+	},
+	"82": {
+		"day": {
+			"desc": "heavyshowers",
+			"icon": "HeavyDrizzle.png",
+			"back": "RainDay.png"
+		},
+		"night": {
+			"desc": "heavyshowers",
+			"icon": "HeavyDrizzle.png",
+			"back": "RainNight.png"
+		}
+	},
+	"85": {
+		"day": {
+			"desc": "lightsnowshowers",
+			"icon": "FreezingDrizzle.png",
+			"back": "LightSnowDay.png"
+		},
+		"night": {
+			"desc": "lightsnowshowers",
+			"icon": "FreezingDrizzle.png",
+			"back": "LightSnowNight.png"
+		}
+	},
+	"86": {
+		"day": {
+			"desc": "snowshowers",
+			"icon": "FreezingDrizzle.png",
+			"back": "Snow.png"
+		},
+		"night": {
+			"desc": "snowshowers",
+			"icon": "FreezingDrizzle.png",
+			"back": "Snow.png"
+		}
+	},
+	"95": {
+		"day": {
+			"desc": "thunderstorm",
+			"icon": "Lightning.png",
+			"back": "Storm.png"
+		},
+		"night": {
+			"desc": "thunderstorm",
+			"icon": "Lightning.png",
+			"back": "Storm.png"
+		}
+	},
+	"96": {
+		"day": {
+			"desc": "lightthunderstormswithhail",
+			"icon": "Lightning.png",
+			"back": "Storm.png"
+		},
+		"night": {
+			"desc": "lightthunderstormswithhail",
+			"icon": "Lightning.png",
+			"back": "Storm.png"
+		}
+	},
+	"99": {
+		"day": {
+			"desc": "thunderstormwithhail",
+			"icon": "Lightning.png",
+			"back": "Storm.png"
+		},
+		"night": {
+			"desc": "thunderstormwithhail",
+			"icon": "Lightning.png",
+			"back": "Storm.png"
+		}
+	}
+}

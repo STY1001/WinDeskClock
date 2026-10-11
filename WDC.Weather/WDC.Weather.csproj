@@ -1,0 +1,193 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<AssemblyName>WDC.Weather</AssemblyName>
+		<Company>STY Inc. (STY1001)</Company>
+		<Product>WinDeskClock</Product>
+		<Description>A plugin for WinDeskClock</Description>
+		<Copyright>STY1001</Copyright>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="Resources\icon.png" />
+	  <None Remove="Resources\icons\airquality.png" />
+	  <None Remove="Resources\icons\cloud.png" />
+	  <None Remove="Resources\icons\distance.png" />
+	  <None Remove="Resources\icons\hashtag.png" />
+	  <None Remove="Resources\icons\humidity.png" />
+	  <None Remove="Resources\icons\hygrometer.png" />
+	  <None Remove="Resources\icons\location.png" />
+	  <None Remove="Resources\icons\maxtemp.png" />
+	  <None Remove="Resources\icons\mintemp.png" />
+	  <None Remove="Resources\icons\nextday.png" />
+	  <None Remove="Resources\icons\pressure.png" />
+	  <None Remove="Resources\icons\rain.png" />
+	  <None Remove="Resources\icons\speed.png" />
+	  <None Remove="Resources\icons\sunrise.png" />
+	  <None Remove="Resources\icons\sunset.png" />
+	  <None Remove="Resources\icons\temperature.png" />
+	  <None Remove="Resources\icons\uv.png" />
+	  <None Remove="Resources\icons\visibility.png" />
+	  <None Remove="Resources\icons\wind.png" />
+	  <None Remove="Resources\langs.json" />
+	  <None Remove="Resources\wmo\backs\ClearDay.png" />
+	  <None Remove="Resources\wmo\backs\ClearNight.png" />
+	  <None Remove="Resources\wmo\backs\CloudDay.png" />
+	  <None Remove="Resources\wmo\backs\CloudNight.png" />
+	  <None Remove="Resources\wmo\backs\FogDay.png" />
+	  <None Remove="Resources\wmo\backs\FogNight.png" />
+	  <None Remove="Resources\wmo\backs\FreezeWind.png" />
+	  <None Remove="Resources\wmo\backs\LightRainDay.png" />
+	  <None Remove="Resources\wmo\backs\LightRainNight.png" />
+	  <None Remove="Resources\wmo\backs\LightSnowDay.png" />
+	  <None Remove="Resources\wmo\backs\LightSnowNight.png" />
+	  <None Remove="Resources\wmo\backs\MostClearNight.png" />
+	  <None Remove="Resources\wmo\backs\MostCloudNight.png" />
+	  <None Remove="Resources\wmo\backs\MostSunDay.png" />
+	  <None Remove="Resources\wmo\backs\MosyCloudDay.png" />
+	  <None Remove="Resources\wmo\backs\RainDay.png" />
+	  <None Remove="Resources\wmo\backs\RainNight.png" />
+	  <None Remove="Resources\wmo\backs\SandWind.png" />
+	  <None Remove="Resources\wmo\backs\Snow.png" />
+	  <None Remove="Resources\wmo\backs\Storm.png" />
+	  <None Remove="Resources\wmo\backs\Wind.png" />
+	  <None Remove="Resources\wmo\codes.json" />
+	  <None Remove="Resources\wmo\icons\ClearDay.png" />
+	  <None Remove="Resources\wmo\icons\ClearNight.png" />
+	  <None Remove="Resources\wmo\icons\Cloudy.png" />
+	  <None Remove="Resources\wmo\icons\Drizzle.png" />
+	  <None Remove="Resources\wmo\icons\Foggy.png" />
+	  <None Remove="Resources\wmo\icons\Freezing.png" />
+	  <None Remove="Resources\wmo\icons\FreezingDrizzle.png" />
+	  <None Remove="Resources\wmo\icons\FreezingRainDay.png" />
+	  <None Remove="Resources\wmo\icons\FreezingRainNight.png" />
+	  <None Remove="Resources\wmo\icons\FrozenWind.png" />
+	  <None Remove="Resources\wmo\icons\HeavyDrizzle.png" />
+	  <None Remove="Resources\wmo\icons\HeavyRainDay.png" />
+	  <None Remove="Resources\wmo\icons\HeavyRainNight.png" />
+	  <None Remove="Resources\wmo\icons\HeavySnow.png" />
+	  <None Remove="Resources\wmo\icons\IcePellets.png" />
+	  <None Remove="Resources\wmo\icons\IcePelletsDay.png" />
+	  <None Remove="Resources\wmo\icons\IcePelletsNight.png" />
+	  <None Remove="Resources\wmo\icons\LightDrizzle.png" />
+	  <None Remove="Resources\wmo\icons\LightFog.png" />
+	  <None Remove="Resources\wmo\icons\Lightning.png" />
+	  <None Remove="Resources\wmo\icons\LightRainDay.png" />
+	  <None Remove="Resources\wmo\icons\LightRainNight.png" />
+	  <None Remove="Resources\wmo\icons\LightSnow.png" />
+	  <None Remove="Resources\wmo\icons\LightSnowNight.png" />
+	  <None Remove="Resources\wmo\icons\LightSnowShowersDay.png" />
+	  <None Remove="Resources\wmo\icons\ModerateRainDay.png" />
+	  <None Remove="Resources\wmo\icons\ModerateRainNight.png" />
+	  <None Remove="Resources\wmo\icons\ModerateSnow.png" />
+	  <None Remove="Resources\wmo\icons\MostlyClearNight.png" />
+	  <None Remove="Resources\wmo\icons\MostlyCloudyDay.png" />
+	  <None Remove="Resources\wmo\icons\MostlyCloudyNight.png" />
+	  <None Remove="Resources\wmo\icons\MostlySunnyDay.png" />
+	  <None Remove="Resources\wmo\icons\RimeFog.png" />
+	  <None Remove="Resources\wmo\icons\SandWind.png" />
+	  <None Remove="Resources\wmo\icons\SmokeDay.png" />
+	  <None Remove="Resources\wmo\icons\SmokeNight.png" />
+	  <None Remove="Resources\wmo\icons\SnowDay.png" />
+	  <None Remove="Resources\wmo\icons\Wind.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="WPF-UI" Version="4.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\WinDeskClock\WinDeskClock.csproj">
+		  <Private>False</Private>
+		</ProjectReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\icon.png" />
+	  <Resource Include="Resources\icons\airquality.png" />
+	  <Resource Include="Resources\icons\cloud.png" />
+	  <Resource Include="Resources\icons\distance.png" />
+	  <Resource Include="Resources\icons\hashtag.png" />
+	  <Resource Include="Resources\icons\humidity.png" />
+	  <Resource Include="Resources\icons\hygrometer.png" />
+	  <Resource Include="Resources\icons\location.png" />
+	  <Resource Include="Resources\icons\maxtemp.png" />
+	  <Resource Include="Resources\icons\mintemp.png" />
+	  <Resource Include="Resources\icons\nextday.png" />
+	  <Resource Include="Resources\icons\pressure.png" />
+	  <Resource Include="Resources\icons\rain.png" />
+	  <Resource Include="Resources\icons\speed.png" />
+	  <Resource Include="Resources\icons\sunrise.png" />
+	  <Resource Include="Resources\icons\sunset.png" />
+	  <Resource Include="Resources\icons\temperature.png" />
+	  <Resource Include="Resources\icons\uv.png" />
+	  <Resource Include="Resources\icons\visibility.png" />
+	  <Resource Include="Resources\icons\wind.png" />
+	  <Resource Include="Resources\langs.json" />
+	  <Resource Include="Resources\wmo\backs\ClearDay.png" />
+	  <Resource Include="Resources\wmo\backs\ClearNight.png" />
+	  <Resource Include="Resources\wmo\backs\CloudDay.png" />
+	  <Resource Include="Resources\wmo\backs\CloudNight.png" />
+	  <Resource Include="Resources\wmo\backs\FogDay.png" />
+	  <Resource Include="Resources\wmo\backs\FogNight.png" />
+	  <Resource Include="Resources\wmo\backs\FreezeWind.png" />
+	  <Resource Include="Resources\wmo\backs\LightRainDay.png" />
+	  <Resource Include="Resources\wmo\backs\LightRainNight.png" />
+	  <Resource Include="Resources\wmo\backs\LightSnowDay.png" />
+	  <Resource Include="Resources\wmo\backs\LightSnowNight.png" />
+	  <Resource Include="Resources\wmo\backs\MostClearNight.png" />
+	  <Resource Include="Resources\wmo\backs\MostCloudNight.png" />
+	  <Resource Include="Resources\wmo\backs\MostSunDay.png" />
+	  <Resource Include="Resources\wmo\backs\MosyCloudDay.png" />
+	  <Resource Include="Resources\wmo\backs\RainDay.png" />
+	  <Resource Include="Resources\wmo\backs\RainNight.png" />
+	  <Resource Include="Resources\wmo\backs\SandWind.png" />
+	  <Resource Include="Resources\wmo\backs\Snow.png" />
+	  <Resource Include="Resources\wmo\backs\Storm.png" />
+	  <Resource Include="Resources\wmo\backs\Wind.png" />
+	  <Resource Include="Resources\wmo\codes.json" />
+	  <Resource Include="Resources\wmo\icons\ClearDay.png" />
+	  <Resource Include="Resources\wmo\icons\ClearNight.png" />
+	  <Resource Include="Resources\wmo\icons\Cloudy.png" />
+	  <Resource Include="Resources\wmo\icons\Drizzle.png" />
+	  <Resource Include="Resources\wmo\icons\Foggy.png" />
+	  <Resource Include="Resources\wmo\icons\Freezing.png" />
+	  <Resource Include="Resources\wmo\icons\FreezingDrizzle.png" />
+	  <Resource Include="Resources\wmo\icons\FreezingRainDay.png" />
+	  <Resource Include="Resources\wmo\icons\FreezingRainNight.png" />
+	  <Resource Include="Resources\wmo\icons\FrozenWind.png" />
+	  <Resource Include="Resources\wmo\icons\HeavyDrizzle.png" />
+	  <Resource Include="Resources\wmo\icons\HeavyRainDay.png" />
+	  <Resource Include="Resources\wmo\icons\HeavyRainNight.png" />
+	  <Resource Include="Resources\wmo\icons\HeavySnow.png" />
+	  <Resource Include="Resources\wmo\icons\IcePellets.png" />
+	  <Resource Include="Resources\wmo\icons\IcePelletsDay.png" />
+	  <Resource Include="Resources\wmo\icons\IcePelletsNight.png" />
+	  <Resource Include="Resources\wmo\icons\LightDrizzle.png" />
+	  <Resource Include="Resources\wmo\icons\LightFog.png" />
+	  <Resource Include="Resources\wmo\icons\Lightning.png" />
+	  <Resource Include="Resources\wmo\icons\LightRainDay.png" />
+	  <Resource Include="Resources\wmo\icons\LightRainNight.png" />
+	  <Resource Include="Resources\wmo\icons\LightSnow.png" />
+	  <Resource Include="Resources\wmo\icons\LightSnowNight.png" />
+	  <Resource Include="Resources\wmo\icons\LightSnowShowersDay.png" />
+	  <Resource Include="Resources\wmo\icons\ModerateRainDay.png" />
+	  <Resource Include="Resources\wmo\icons\ModerateRainNight.png" />
+	  <Resource Include="Resources\wmo\icons\ModerateSnow.png" />
+	  <Resource Include="Resources\wmo\icons\MostlyClearNight.png" />
+	  <Resource Include="Resources\wmo\icons\MostlyCloudyDay.png" />
+	  <Resource Include="Resources\wmo\icons\MostlyCloudyNight.png" />
+	  <Resource Include="Resources\wmo\icons\MostlySunnyDay.png" />
+	  <Resource Include="Resources\wmo\icons\RimeFog.png" />
+	  <Resource Include="Resources\wmo\icons\SandWind.png" />
+	  <Resource Include="Resources\wmo\icons\SmokeDay.png" />
+	  <Resource Include="Resources\wmo\icons\SmokeNight.png" />
+	  <Resource Include="Resources\wmo\icons\SnowDay.png" />
+	  <Resource Include="Resources\wmo\icons\Wind.png" />
+	</ItemGroup>
+</Project>

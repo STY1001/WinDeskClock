@@ -1,0 +1,737 @@
+﻿<Page x:Class="WDC.Weather.Main"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:WDC.Weather"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      mc:Ignorable="d"
+      d:DesignHeight="600"
+      d:DesignWidth="585"
+      Title="Main">
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary Theme="Dark" />
+                <ui:ControlsDictionary />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid>
+        <Grid VerticalAlignment="Center"
+              HorizontalAlignment="Center"
+              x:Name="LocationGrid"
+              Visibility="Hidden">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Image Source="/WDC.Weather;component/Resources/icons/location.png"
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   Width="72"
+                   Height="72"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center" />
+            <TextBlock Text="Set location in plugin settings"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="20"
+                       Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                       Grid.Row="2"/>
+        </Grid>
+        <Grid VerticalAlignment="Center"
+              HorizontalAlignment="Center"
+              x:Name="NoDataGrid"
+              Visibility="Hidden">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Image Source="/WDC.Weather;component/Resources/icons/cloud.png"
+                   x:Name="NoDataIcon"
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   Width="72"
+                   Height="72"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center" />
+            <TextBlock Text="Cannot get data"
+                       x:Name="NoDataText"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="20"
+                       Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                       Grid.Row="2"/>
+            <TextBlock Text=""
+                       x:Name="NoDataReason"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="13"
+                       Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                       Grid.Row="4"/>
+        </Grid>
+        <Grid Margin="5"
+              x:Name="WeatherGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="160" />
+                <RowDefinition Height="100" />
+                <RowDefinition Height="100" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.75*" />
+                    <ColumnDefinition Width="0.25*" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="WMOCard"
+                        Background="#0affffff"
+                        CornerRadius="8"
+                        Margin="5"
+                        Grid.Column="0"
+                        ClipToBounds="True">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Border CornerRadius="8"
+                                Grid.Column="1"
+                                Grid.RowSpan="2"
+                                x:Name="WMOBackBorder">
+                            <Border.Background>
+                                <ImageBrush Stretch="Fill"
+                                            x:Name="WMOBack"/>
+                            </Border.Background>
+                            <Border.OpacityMask>
+                                <LinearGradientBrush StartPoint="0,0.5"
+                                                     EndPoint="1,0.5">
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Offset="0"
+                                                      Color="Transparent" />
+                                        <GradientStop Offset="1"
+                                                      Color="Black" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </Border.OpacityMask>
+                        </Border>
+                        <Grid Margin="5,0,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="/WDC.Weather;component/Resources/icons/location.png"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   Grid.Column="0"
+                                   Height="16"
+                                   Width="16" />
+                            <TextBlock Text="-"
+                                       Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"
+                                       Foreground="White"
+                                       FontSize="11"
+                                       FontFamily="Segoe UI Variable Display SemiBold"
+                                       x:Name="CityText"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="/WDC.Weather;component/Resources/icon.png"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   Grid.Column="0"
+                                   Height="72"
+                                   Width="72"
+                                   x:Name="WMOIcon"
+                                   RenderTransformOrigin="0.5,0.5">
+                                <Image.RenderTransform>
+                                    <ScaleTransform ScaleX="1"
+                                                    ScaleY="1" />
+                                </Image.RenderTransform>
+                            </Image>
+                            <Grid Grid.Column="1">
+                                <Grid VerticalAlignment="Center"
+                                      HorizontalAlignment="Left">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="-"
+                                               Grid.Row="0"
+                                               Foreground="White"
+                                               FontSize="24"
+                                               FontFamily="Segoe UI Variable Display SemiBold"
+                                               TextWrapping="Wrap"
+                                               VerticalAlignment="Bottom"
+                                               x:Name="WMOText"/>
+                                    <Grid Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="-°C"
+                                                   Grid.Column="0"
+                                                   Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                                   FontSize="24"
+                                                   FontFamily="Segoe UI Variable Display" 
+                                                   x:Name="TempText"/>
+                                        <TextBlock Text="Feels like -°C"
+                                                   Grid.Column="1"
+                                                   Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                                                   FontSize="13"
+                                                   FontFamily="Segoe UI Variable Display"
+                                                   VerticalAlignment="Bottom"
+                                                   Margin="5,0,0,4"
+                                                   x:Name="FeelsTempText"/>
+                                    </Grid>
+                                    <Grid Grid.Row="2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="18" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="10" />
+                                            <ColumnDefinition Width="18" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Image Source="/WDC.Weather;component/Resources/icons/maxtemp.png"
+                                               RenderOptions.BitmapScalingMode="HighQuality"
+                                               Grid.Column="0"
+                                               Height="18"
+                                               Width="18" />
+                                        <TextBlock Text="-°C"
+                                                   Grid.Column="1"
+                                                   Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                                   FontSize="11"
+                                                   FontFamily="Segoe UI Variable Display"
+                                                   VerticalAlignment="Center"
+                                                   x:Name="MaxTempText"/>
+                                        <Image Source="/WDC.Weather;component/Resources/icons/mintemp.png"
+                                               RenderOptions.BitmapScalingMode="HighQuality"
+                                               Grid.Column="3"
+                                               Height="18"
+                                               Width="18" />
+                                        <TextBlock Text="-°C"
+                                                   Grid.Column="4"
+                                                   Foreground="{ui:ThemeResource TextFillColorTertiaryBrush}"
+                                                   FontSize="11"
+                                                   FontFamily="Segoe UI Variable Display"
+                                                   VerticalAlignment="Center"
+                                                   x:Name="MinTempText"/>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Border x:Name="DailyCard"
+                        Background="#0aFFFFFF"
+                        CornerRadius="8"
+                        Margin="5"
+                        Grid.Column="1"
+                        ClipToBounds="True">
+                    <Grid>
+                        <ScrollViewer PanningMode="VerticalOnly"
+                                      x:Name="DailyScroll">
+                            <ui:ListView Margin="5"
+                                         SelectionChanged="DayList_SelectionChanged"
+                                         x:Name="DayListView">
+                                <ui:ListView.Items>
+                                    <ui:ListViewItem IsSelected="True"
+                                                     x:Name="DailyList1">
+                                        <TextBlock Text="Today"
+                                                   x:Name="DailyText1"
+                                                   Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                                   FontSize="11"
+                                                   FontFamily="Segoe UI Variable Display"
+                                                   Margin="5,0,0,0" />
+                                    </ui:ListViewItem>
+                                    <ui:ListViewItem x:Name="DailyList2">
+                                        <TextBlock Text="Tomorrow"
+                                                   x:Name="DailyText2"
+                                                   Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                                   FontSize="11"
+                                                   FontFamily="Segoe UI Variable Display"
+                                                   Margin="5,0,0,0" />
+                                    </ui:ListViewItem>
+                                    <ui:ListViewItem x:Name="DailyList3">
+                                        <TextBlock Text="-"
+                                                   x:Name="DailyText3"
+                                                   Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                                   FontSize="11"
+                                                   FontFamily="Segoe UI Variable Display"
+                                                   Margin="5,0,0,0" />
+                                    </ui:ListViewItem>
+                                    <ui:ListViewItem x:Name="DailyList4">
+                                        <TextBlock Text="-"
+                                                   x:Name="DailyText4"
+                                                   Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                                   FontSize="11"
+                                                   FontFamily="Segoe UI Variable Display"
+                                                   Margin="5,0,0,0" />
+                                    </ui:ListViewItem>
+                                    <ui:ListViewItem x:Name="DailyList5">
+                                        <TextBlock Text="-"
+                                                   x:Name="DailyText5"
+                                                   Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                                   FontSize="11"
+                                                   FontFamily="Segoe UI Variable Display"
+                                                   Margin="5,0,0,0" />
+                                    </ui:ListViewItem>
+                                    <ui:ListViewItem x:Name="DailyList6">
+                                        <TextBlock Text="-"
+                                                   x:Name="DailyText6"
+                                                   Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                                   FontSize="11"
+                                                   FontFamily="Segoe UI Variable Display"
+                                                   Margin="5,0,0,0" />
+                                    </ui:ListViewItem>
+                                    <ui:ListViewItem x:Name="DailyList7">
+                                        <TextBlock Text="-"
+                                                   x:Name="DailyText7"
+                                                   Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                                   FontSize="11"
+                                                   FontFamily="Segoe UI Variable Display"
+                                                   Margin="5,0,0,0" />
+                                    </ui:ListViewItem>
+                                </ui:ListView.Items>
+                            </ui:ListView>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="HumidityCard"
+                        Background="#0affffff"
+                        CornerRadius="8"
+                        Margin="5"
+                        Grid.Column="0"
+                        ClipToBounds="True">
+                    <Grid>
+                        <Grid VerticalAlignment="Bottom"
+                              HorizontalAlignment="Right">
+                            <Image Source="/WDC.Weather;component/Resources/icons/humidity.png"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   Height="48"
+                                   Width="48"
+                                   Margin="0,0,5,5">
+                                <Image.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                         EndPoint="1,1">
+                                        <GradientStop Color="#0a000000"
+                                                      Offset="0.0" />
+                                        <GradientStop Color="#a0000000"
+                                                      Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Image.OpacityMask>
+                            </Image>
+                        </Grid>
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Humidity"
+                                       x:Name="HumidityTitle"
+                                       Grid.Row="0"
+                                       FontSize="11"
+                                       FontFamily="Segoe UI SemiBold"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"
+                                       Foreground="{ui:ThemeResource TextFillColorDisabledBrush}" />
+                            <TextBlock Text="--%"
+                                       x:Name="HumidityText"
+                                       Grid.Row="1"
+                                       Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                       FontSize="20"
+                                       FontFamily="Segoe UI Variable Display"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0" />
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Border x:Name="WindCard"
+                        Background="#0affffff"
+                        CornerRadius="8"
+                        Margin="5"
+                        Grid.Column="1"
+                        ClipToBounds="True">
+                    <Grid>
+                        <Grid VerticalAlignment="Bottom"
+                              HorizontalAlignment="Right">
+                            <Image Source="/WDC.Weather;component/Resources/icons/wind.png"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   Height="48"
+                                   Width="48"
+                                   Margin="0,0,5,5">
+                                <Image.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                         EndPoint="1,1">
+                                        <GradientStop Color="#0a000000"
+                                                      Offset="0.0" />
+                                        <GradientStop Color="#a0000000"
+                                                      Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Image.OpacityMask>
+                            </Image>
+                        </Grid>
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Wind"
+                                       x:Name="WindTitle"
+                                       Grid.Row="0"
+                                       FontSize="11"
+                                       FontFamily="Segoe UI SemiBold"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"
+                                       Foreground="{ui:ThemeResource TextFillColorDisabledBrush}" />
+                            <TextBlock Text="-.- km/h&#x0a;- -°"
+                                       x:Name="WindText"
+                                       Grid.Row="1"
+                                       Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                       FontSize="18"
+                                       FontFamily="Segoe UI Variable Display"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0" />
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Border x:Name="UVCard"
+                        Background="#0affffff"
+                        CornerRadius="8"
+                        Margin="5"
+                        Grid.Column="2"
+                        ClipToBounds="True">
+                    <Grid>
+                        <Grid VerticalAlignment="Bottom"
+                              HorizontalAlignment="Right">
+                            <Image Source="/WDC.Weather;component/Resources/icons/uv.png"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   Height="48"
+                                   Width="48"
+                                   Margin="0,0,5,5">
+                                <Image.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                         EndPoint="1,1">
+                                        <GradientStop Color="#0a000000"
+                                                      Offset="0.0" />
+                                        <GradientStop Color="#a0000000"
+                                                      Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Image.OpacityMask>
+                            </Image>
+                        </Grid>
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="UV Index"
+                                       x:Name="UVTitle"
+                                       Grid.Row="0"
+                                       FontSize="11"
+                                       FontFamily="Segoe UI SemiBold"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"
+                                       Foreground="{ui:ThemeResource TextFillColorDisabledBrush}" />
+                            <TextBlock Text="-&#x0a;-"
+                                       x:Name="UVText"
+                                       Grid.Row="1"
+                                       Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                       FontSize="18"
+                                       FontFamily="Segoe UI Variable Display"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0" />
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Border x:Name="AQCard"
+                        Background="#0affffff"
+                        CornerRadius="8"
+                        Margin="5"
+                        Grid.Column="3"
+                        ClipToBounds="True">
+                    <Grid>
+                        <Grid VerticalAlignment="Bottom"
+                              HorizontalAlignment="Right">
+                            <Image Source="/WDC.Weather;component/Resources/icons/airquality.png"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   Height="48"
+                                   Width="48"
+                                   Margin="0,0,5,5">
+                                <Image.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                         EndPoint="1,1">
+                                        <GradientStop Color="#0a000000"
+                                                      Offset="0.0" />
+                                        <GradientStop Color="#a0000000"
+                                                      Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Image.OpacityMask>
+                            </Image>
+                        </Grid>
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Air Quality"
+                                       x:Name="AQTitle"
+                                       Grid.Row="0"
+                                       FontSize="11"
+                                       FontFamily="Segoe UI SemiBold"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"
+                                       Foreground="{ui:ThemeResource TextFillColorDisabledBrush}" />
+                            <TextBlock Text="--&#x0a;-"
+                                       x:Name="AQText"
+                                       Grid.Row="1"
+                                       Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                       FontSize="18"
+                                       FontFamily="Segoe UI Variable Display"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0" />
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="PrecipitationCard"
+                        Background="#0affffff"
+                        CornerRadius="8"
+                        Margin="5"
+                        Grid.Column="0"
+                        ClipToBounds="True">
+                    <Grid>
+                        <Grid VerticalAlignment="Bottom"
+                              HorizontalAlignment="Right">
+                            <Image Source="/WDC.Weather;component/Resources/icons/rain.png"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   Height="48"
+                                   Width="48"
+                                   Margin="0,0,5,5">
+                                <Image.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                         EndPoint="1,1">
+                                        <GradientStop Color="#0a000000"
+                                                      Offset="0.0" />
+                                        <GradientStop Color="#a0000000"
+                                                      Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Image.OpacityMask>
+                            </Image>
+                        </Grid>
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Precipitation"
+                                       x:Name="PrecipitationTitle"
+                                       Grid.Row="0"
+                                       FontSize="11"
+                                       FontFamily="Segoe UI SemiBold"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"
+                                       Foreground="{ui:ThemeResource TextFillColorDisabledBrush}" />
+                            <TextBlock Text="-.- mm"
+                                       x:Name="PrecipitationText"
+                                       Grid.Row="1"
+                                       Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                       FontSize="20"
+                                       FontFamily="Segoe UI Variable Display"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0" />
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Border x:Name="PressureCard"
+                        Background="#0affffff"
+                        CornerRadius="8"
+                        Margin="5"
+                        Grid.Column="1"
+                        ClipToBounds="True">
+                    <Grid>
+                        <Grid VerticalAlignment="Bottom"
+                              HorizontalAlignment="Right">
+                            <Image Source="/WDC.Weather;component/Resources/icons/pressure.png"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   Height="48"
+                                   Width="48"
+                                   Margin="0,0,5,5">
+                                <Image.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                         EndPoint="1,1">
+                                        <GradientStop Color="#0a000000"
+                                                      Offset="0.0" />
+                                        <GradientStop Color="#a0000000"
+                                                      Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Image.OpacityMask>
+                            </Image>
+                        </Grid>
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Pressure"
+                                       x:Name="PressureTitle"
+                                       Grid.Row="0"
+                                       FontSize="11"
+                                       FontFamily="Segoe UI SemiBold"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"
+                                       Foreground="{ui:ThemeResource TextFillColorDisabledBrush}" />
+                            <TextBlock Text="- hPa"
+                                       x:Name="PressureText"
+                                       Grid.Row="1"
+                                       Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                       FontSize="20"
+                                       FontFamily="Segoe UI Variable Display"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0" />
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Border x:Name="CloudCard"
+                        Background="#0affffff"
+                        CornerRadius="8"
+                        Margin="5"
+                        Grid.Column="2"
+                        ClipToBounds="True">
+                    <Grid>
+                        <Grid VerticalAlignment="Bottom"
+                              HorizontalAlignment="Right">
+                            <Image Source="/WDC.Weather;component/Resources/icons/cloud.png"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   Height="48"
+                                   Width="48"
+                                   Margin="0,0,5,5">
+                                <Image.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                         EndPoint="1,1">
+                                        <GradientStop Color="#0a000000"
+                                                      Offset="0.0" />
+                                        <GradientStop Color="#a0000000"
+                                                      Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Image.OpacityMask>
+                            </Image>
+                        </Grid>
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Cloud Cover"
+                                       x:Name="CloudTitle"
+                                       Grid.Row="0"
+                                       FontSize="11"
+                                       FontFamily="Segoe UI SemiBold"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"
+                                       Foreground="{ui:ThemeResource TextFillColorDisabledBrush}" />
+                            <TextBlock Text="-%"
+                                       x:Name="CloudText"
+                                       Grid.Row="1"
+                                       Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                       FontSize="20"
+                                       FontFamily="Segoe UI Variable Display"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0" />
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Border x:Name="VisibilityCard"
+                        Background="#0affffff"
+                        CornerRadius="8"
+                        Margin="5"
+                        Grid.Column="3"
+                        ClipToBounds="True">
+                    <Grid>
+                        <Grid VerticalAlignment="Bottom"
+                              HorizontalAlignment="Right">
+                            <Image Source="/WDC.Weather;component/Resources/icons/visibility.png"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   Height="48"
+                                   Width="48"
+                                   Margin="0,0,5,5">
+                                <Image.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                                         EndPoint="1,1">
+                                        <GradientStop Color="#0a000000"
+                                                      Offset="0.0" />
+                                        <GradientStop Color="#a0000000"
+                                                      Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Image.OpacityMask>
+                            </Image>
+                        </Grid>
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Visibility"
+                                       x:Name="VisibilityTitle"
+                                       Grid.Row="0"
+                                       FontSize="11"
+                                       FontFamily="Segoe UI SemiBold"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"
+                                       Foreground="{ui:ThemeResource TextFillColorDisabledBrush}" />
+                            <TextBlock Text="-.- km"
+                                       x:Name="VisibilityText"
+                                       Grid.Row="1"
+                                       Foreground="{ui:ThemeResource TextFillColorPrimaryBrush}"
+                                       FontSize="20"
+                                       FontFamily="Segoe UI Variable Display"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0" />
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+            <Grid Grid.Row="3">
+                <Border x:Name="HourlyCard"
+                        Background="#0aFFFFFF"
+                        CornerRadius="8"
+                        Margin="5"
+                        ClipToBounds="True">
+                    <Grid>
+                        <ScrollViewer HorizontalScrollBarVisibility="Hidden"
+                                      x:Name="HourlyScroll"
+                                      MouseEnter="HourlyScroll_MouseEnter"
+                                      MouseLeave="HourlyScroll_MouseLeave"
+                                      PanningMode="HorizontalOnly">
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="2.5"
+                                        x:Name="HourlyStack">
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>
