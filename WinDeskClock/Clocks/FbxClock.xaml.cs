@@ -1,27 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
+using WinDeskClock.ViewModels;
+using WinDeskClock.Views.Animation;
 
 namespace WinDeskClock.Clocks
 {
     /// <summary>
-    /// Interaction logic for FbxClock.xaml
+    /// Interaction logic for FbxClock.xaml (data below is unchanged: a pure pixel-map lookup table
+    /// with no UI/business logic, so it doesn't need any MVVM treatment).
     /// </summary>
-
     public static class FbxStyle
     {
         // Freebox number style is just a 5x5 matrix of monochrome pixels (#ffff00)
@@ -349,8 +340,26 @@ namespace WinDeskClock.Clocks
         public static List<BitmapImage> FbxNumberBitmaps = new List<BitmapImage>();
         public static Dictionary<string, BitmapImage> FbxLetterBitmaps = new Dictionary<string, BitmapImage>();
 
+        private static bool _loaded;
+
+        /// <summary>Generates every number/letter bitmap once. Must run before any Get*BitmapImage
+        /// call - <see cref="FbxNumberBitmaps"/>/<see cref="FbxLetterBitmaps"/> stay empty otherwise,
+        /// which is what made every digit/letter image fail to render (nothing visible but the
+        /// page's plain black background). Safe to call more than once (no-op after the first).
+        /// Synchronous: nothing below actually awaits I/O, it's pure in-memory bitmap generation, so
+        /// there's no reason to force every caller through async/await for it.</summary>
+        public static void EnsureLoaded(int size)
+        {
+            if (_loaded)
+            {
+                return;
+            }
+            _loaded = true;
+            LoadFbxStyleBitmaps(size);
+        }
+
         // Load all Freebox style numbers and letter
-        public static async Task LoadFbxStyleBitmaps(int size)
+        private static void LoadFbxStyleBitmaps(int size)
         {
             FbxNumberBitmaps.Clear();
             for (int i = 0; i < 10; i++)
@@ -442,463 +451,136 @@ namespace WinDeskClock.Clocks
         }
 
         // Return a WritableBitmap of the number in Freebox style
-        public static async Task<WriteableBitmap> GetFbxNumberBitmapImage(int number)
+        public static WriteableBitmap GetFbxNumberBitmapImage(int number)
         {
             return new WriteableBitmap(FbxNumberBitmaps[number]);
         }
 
         // Return a WritableBitmap of the letter in Freebox style
-        public static async Task<WriteableBitmap> GetFbxLetterBitmapImage(string letter)
+        public static WriteableBitmap GetFbxLetterBitmapImage(string letter)
         {
             return new WriteableBitmap(FbxLetterBitmaps[letter]);
         }
     }
 
+
+    /// <summary>
+    /// The "Freebox"-style LED clock face: renders each digit/letter as a small bitmap from
+    /// <see cref="FbxStyle"/> instead of text. Shares <see cref="ClockViewModel"/> with FluentClock;
+    /// this class only decides how to animate/rebuild its images when the ViewModel changes.
+    /// </summary>
     public partial class FbxClock : Page
     {
-        DispatcherTimer time;
+        // The original's txtslidespeed (1 second per phase) / txtdelay (1000ms, i.e. the swap
+        // happens exactly when the out-phase finishes, with no extra gap).
+        private const double SlideSeconds = 1.0;
+        private const int SlideDelayMs = 1000;
 
-        public FbxClock()
+        public FbxClock(ClockViewModel viewModel)
         {
             InitializeComponent();
+            DataContext = viewModel;
 
-            Loaded += async (s, e) => await Load();
-        }
+            // Must happen before anything below touches a Get*BitmapImage call, directly or via a
+            // PropertyChanged-triggered slide.
+            FbxStyle.EnsureLoaded(180);
 
-        private bool Init = false;
-        public async Task Load()
-        {
-            if (!Init)
+            // Render the current value immediately instead of waiting for the ViewModel's first
+            // per-second Tick (up to ~1s away) or, worse, for some *later* tick where the digit
+            // finally happens to differ from ClockViewModel's own initial value - every image would
+            // stay blank until then otherwise, since nothing else sets an initial Source.
+            H1Img.Source = FbxStyle.GetFbxNumberBitmapImage(int.Parse(viewModel.H1));
+            H2Img.Source = FbxStyle.GetFbxNumberBitmapImage(int.Parse(viewModel.H2));
+            M1Img.Source = FbxStyle.GetFbxNumberBitmapImage(int.Parse(viewModel.M1));
+            M2Img.Source = FbxStyle.GetFbxNumberBitmapImage(int.Parse(viewModel.M2));
+            SetWord(DDayStack, viewModel.DDay, useLetters: false);
+            SetWord(DNameStack, viewModel.DName, useLetters: true);
+            SetWord(DMonthStack, viewModel.DMonth, useLetters: true);
+
+            viewModel.PropertyChanged += (_, e) =>
             {
-                FbxStyle.LoadFbxStyleBitmaps(180);
-
-                H1Img.Source = await FbxStyle.GetFbxNumberBitmapImage(1);
-                H2Img.Source = await FbxStyle.GetFbxNumberBitmapImage(7);
-                M1Img.Source = await FbxStyle.GetFbxNumberBitmapImage(2);
-                M2Img.Source = await FbxStyle.GetFbxNumberBitmapImage(0);
-                DNameStack.Children.Clear();
-                foreach (char c in "MON")
+                switch (e.PropertyName)
                 {
-                    string letter = c.ToString().ToUpper();
-                    Image img = new Image();
-                    img.Source = await FbxStyle.GetFbxLetterBitmapImage(letter);
-                    img.Margin = new Thickness(5);
-                    img.Height = 30;
-                    img.Width = 30;
-                    DNameStack.Children.Add(img);
+                    // Out axis/distance, then in axis/distance - deliberately mismatched (sideways
+                    // out, vertical in) for every field except the day-of-month; see SlideReplace.
+                    // Hour digits drop down from above on the way in (Y: -180 -> 0), minute digits
+                    // rise up from below (Y: 180 -> 0) - the original's actual, intentional look.
+                    case nameof(ClockViewModel.H1):
+                        SlideReplace(H1Img, SlideAxis.X, -180, SlideAxis.Y, -180, () => H1Img.Source = FbxStyle.GetFbxNumberBitmapImage(int.Parse(viewModel.H1)));
+                        break;
+                    case nameof(ClockViewModel.H2):
+                        SlideReplace(H2Img, SlideAxis.X, 180, SlideAxis.Y, -180, () => H2Img.Source = FbxStyle.GetFbxNumberBitmapImage(int.Parse(viewModel.H2)));
+                        break;
+                    case nameof(ClockViewModel.M1):
+                        SlideReplace(M1Img, SlideAxis.X, -180, SlideAxis.Y, 180, () => M1Img.Source = FbxStyle.GetFbxNumberBitmapImage(int.Parse(viewModel.M1)));
+                        break;
+                    case nameof(ClockViewModel.M2):
+                        SlideReplace(M2Img, SlideAxis.X, 180, SlideAxis.Y, 180, () => M2Img.Source = FbxStyle.GetFbxNumberBitmapImage(int.Parse(viewModel.M2)));
+                        break;
+                    case nameof(ClockViewModel.DDay):
+                        SlideReplace(DDayStack, SlideAxis.Y, -55, SlideAxis.Y, 55, () => SetWord(DDayStack, viewModel.DDay, useLetters: false));
+                        break;
+                    case nameof(ClockViewModel.DName):
+                        SlideReplace(DNameStack, SlideAxis.X, -165, SlideAxis.Y, 55, () => SetWord(DNameStack, viewModel.DName, useLetters: true));
+                        break;
+                    case nameof(ClockViewModel.DMonth):
+                        SlideReplace(DMonthStack, SlideAxis.X, 165, SlideAxis.Y, 55, () => SetWord(DMonthStack, viewModel.DMonth, useLetters: true));
+                        break;
                 }
-                DDayStack.Children.Clear();
-                foreach (char c in "7")
-                {
-                    string letter = c.ToString();
-                    Image img = new Image();
-                    img.Source = await FbxStyle.GetFbxNumberBitmapImage(int.Parse(letter));
-                    img.Margin = new Thickness(5);
-                    img.Height = 30;
-                    img.Width = 30;
-                    DDayStack.Children.Add(img);
-                }
-                DMonthStack.Children.Clear();
-                foreach (char c in "AUG")
-                {
-                    string letter = c.ToString().ToUpper();
-                    Image img = new Image();
-                    img.Source = await FbxStyle.GetFbxLetterBitmapImage(letter);
-                    img.Margin = new Thickness(5);
-                    img.Height = 30;
-                    img.Width = 30;
-                    DMonthStack.Children.Add(img);
-                }
+            };
 
-                // Create a timer to update the clock every second
-                time = new DispatcherTimer
-                {
-                    Interval = TimeSpan.FromSeconds(1)
-                };
-                time.Tick += Time_Tick;
-                time.Start();
-                Init = true;
-            }
-
-            // Update the UI
-            await UIUpdate();
+            viewModel.Start();
         }
 
-        private async Task UIUpdate()
+        private static void SetWord(StackPanel target, string word, bool useLetters)
         {
-
-        }
-
-
-        /*
-         * Time Digit Legend:
-         * H1 = [0]0:00:00
-         * H2 = 0[0]:00:00
-         * M1 = 00:[0]0:00
-         * M2 = 00:0[0]:00
-         */
-
-        // Current char of the clock
-        private string ActualH1 = "1";
-        private string ActualH2 = "7";
-        private string ActualM1 = "2";
-        private string ActualM2 = "0";
-        private string ActualDName = "MON";
-        private string ActualDDay = "7";
-        private string ActualDMonth = "AUG";
-
-        // Animation variables
-        // - Slide speed
-        private double txtslidespeed = 1;
-        // - Delay between slides
-        private int txtdelay = 1000;
-
-        // Tick event
-        private async void Time_Tick(object sender, EventArgs e)
-        {
-            // Update the clock
-            DateTime now = DateTime.Now;
-            UpdateH1(now.Hour.ToString("00")[0].ToString()); // First digit of the hour
-            UpdateH2(now.Hour.ToString("00")[1].ToString()); // Second digit of the hour
-            UpdateM1(now.Minute.ToString("00")[0].ToString()); // First digit of the minute
-            UpdateM2(now.Minute.ToString("00")[1].ToString()); // Second digit of the minute
-            UpdateDName(now.DayOfWeek.ToString().Substring(0, 3).ToUpper());   // Day of the week
-            UpdateDDay(now.Day.ToString());  // Day of the month
-            UpdateMonth(now.ToString("MMM").ToUpper());  // Month
-
-        }
-
-        // Update the clock with animation
-        private async Task UpdateH1(string text)
-        {
-            if (ActualH1 != text)
+            target.Children.Clear();
+            foreach (char c in word)
             {
-                H1Img.Source = await FbxStyle.GetFbxNumberBitmapImage(int.Parse(ActualH1));
-                ActualH1 = text;
+                target.Children.Add(new Image
                 {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = -180,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed)
-                    };
-                    Storyboard.SetTarget(translateAnimation, H1Img);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-                await Task.Delay(txtdelay);
-                H1Img.Source = await FbxStyle.GetFbxNumberBitmapImage(int.Parse(text));
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = -180,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed)
-                    };
-                    var resetx = new DoubleAnimation
-                    {
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(0)
-                    };
-                    Storyboard.SetTarget(translateAnimation, H1Img);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    Storyboard.SetTarget(resetx, H1Img);
-                    Storyboard.SetTargetProperty(resetx, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Children.Add(resetx);
-                    storyboard.Begin();
-                }
-            }
-        }
-        private async Task UpdateH2(string text)
-        {
-            if (ActualH2 != text)
-            {
-                H2Img.Source = await FbxStyle.GetFbxNumberBitmapImage(int.Parse(ActualH2));
-                ActualH2 = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 180,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed)
-                    };
-                    Storyboard.SetTarget(translateAnimation, H2Img);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-                await Task.Delay(txtdelay);
-                H2Img.Source = await FbxStyle.GetFbxNumberBitmapImage(int.Parse(text));
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = -180,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed)
-                    };
-                    var resetx = new DoubleAnimation
-                    {
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(0)
-                    };
-                    Storyboard.SetTarget(translateAnimation, H2Img);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    Storyboard.SetTarget(resetx, H2Img);
-                    Storyboard.SetTargetProperty(resetx, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Children.Add(resetx);
-                    storyboard.Begin();
-                }
-            }
-        }
-        private async Task UpdateM1(string text)
-        {
-            if (ActualM1 != text)
-            {
-                M1Img.Source = await FbxStyle.GetFbxNumberBitmapImage(int.Parse(ActualM1));
-                ActualM1 = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = -180,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed)
-                    };
-                    Storyboard.SetTarget(translateAnimation, M1Img);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-                await Task.Delay(txtdelay);
-                M1Img.Source = await FbxStyle.GetFbxNumberBitmapImage(int.Parse(text));
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 180,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed)
-                    };
-                    var resetx = new DoubleAnimation
-                    {
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(0)
-                    };
-                    Storyboard.SetTarget(translateAnimation, M1Img);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    Storyboard.SetTarget(resetx, M1Img);
-                    Storyboard.SetTargetProperty(resetx, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Children.Add(resetx);
-                    storyboard.Begin();
-                }
-            }
-        }
-        private async Task UpdateM2(string text)
-        {
-            if (ActualM2 != text)
-            {
-                M2Img.Source = await FbxStyle.GetFbxNumberBitmapImage(int.Parse(ActualM2));
-                ActualM2 = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 180,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed)
-                    };
-                    Storyboard.SetTarget(translateAnimation, M2Img);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-                await Task.Delay(txtdelay);
-                M2Img.Source = await FbxStyle.GetFbxNumberBitmapImage(int.Parse(text));
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 180,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed)
-                    };
-                    var resetx = new DoubleAnimation
-                    {
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(0)
-                    };
-                    Storyboard.SetTarget(translateAnimation, M2Img);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    Storyboard.SetTarget(resetx, M2Img);
-                    Storyboard.SetTargetProperty(resetx, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Children.Add(resetx);
-                    storyboard.Begin();
-                }
+                    Source = useLetters ? FbxStyle.GetFbxLetterBitmapImage(c.ToString()) : FbxStyle.GetFbxNumberBitmapImage(int.Parse(c.ToString())),
+                    Margin = new Thickness(5),
+                    Height = 30,
+                    Width = 30
+                });
             }
         }
 
-        private async Task UpdateDName(string text)
+        /// <summary>
+        /// Faithful port of the original's per-field slide (UpdateH1/H2/M1/M2/UpdateDName/UpdateDDay/
+        /// UpdateDMonth): translate OUT along outAxis to outTo (1s), swap the content, then translate
+        /// IN along inAxis from inFrom back to 0 (1s). The original isn't a simple back-and-forth
+        /// slide along one axis: every field but the day-of-month goes out sideways (X) and comes
+        /// back in vertically (Y), so when the in-phase uses a different axis than the out-phase, that
+        /// out-axis is snapped back to 0 instantly the moment the in-phase starts (the original's
+        /// zero-duration "resetx" animation) - otherwise the image would stay sideways-displaced while
+        /// sliding in vertically.
+        /// </summary>
+        private static async void SlideReplace(FrameworkElement target, SlideAxis outAxis, double outTo, SlideAxis inAxis, double inFrom, Action applyChange)
         {
-            if (ActualDName != text)
+            var transform = (TranslateTransform)target.RenderTransform;
+
+            Animate(transform, outAxis, null, outTo, SlideSeconds);
+            await Task.Delay(SlideDelayMs);
+
+            applyChange();
+
+            Animate(transform, inAxis, inFrom, 0, SlideSeconds);
+            if (inAxis != outAxis)
             {
-                ActualDName = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = -55*3,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                    };
-                    Storyboard.SetTarget(translateAnimation, DNameStack);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-                await Task.Delay(txtdelay);
-                DNameStack.Children.Clear();
-                foreach (char c in text)
-                {
-                    string letter = c.ToString().ToUpper();
-                    Image img = new Image();
-                    img.Source = await FbxStyle.GetFbxLetterBitmapImage(letter);
-                    img.Margin = new Thickness(5);
-                    img.Height = 30;
-                    img.Width = 30;
-                    DNameStack.Children.Add(img);
-                }
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 55,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                    };
-                    var resetx = new DoubleAnimation
-                    {
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(0)
-                    };
-                    Storyboard.SetTarget(translateAnimation, DNameStack);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    Storyboard.SetTarget(resetx, DNameStack);
-                    Storyboard.SetTargetProperty(resetx, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Children.Add(resetx);
-                    storyboard.Begin();
-                }
+                Animate(transform, outAxis, outTo, 0, 0);
             }
         }
 
-        private async Task UpdateDDay(string text)
+        private static void Animate(TranslateTransform transform, SlideAxis axis, double? from, double to, double seconds)
         {
-            if (ActualDDay != text)
+            var animation = new DoubleAnimation { To = to, Duration = TimeSpan.FromSeconds(seconds) };
+            if (from.HasValue)
             {
-                ActualDDay = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = -55,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                    };
-                    Storyboard.SetTarget(translateAnimation, DDayStack);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-                await Task.Delay(txtdelay);
-                DDayStack.Children.Clear();
-                foreach (char c in text)
-                {
-                    string letter = c.ToString();
-                    Image img = new Image();
-                    img.Source = await FbxStyle.GetFbxNumberBitmapImage(int.Parse(letter));
-                    img.Margin = new Thickness(5);
-                    img.Height = 30;
-                    img.Width = 30;
-                    DDayStack.Children.Add(img);
-                }
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 55,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                    };
-                    Storyboard.SetTarget(translateAnimation, DDayStack);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
+                animation.From = from.Value;
             }
-        }
-
-        private async Task UpdateMonth(string text)
-        {
-            if (ActualDMonth != text)
-            {
-                ActualDMonth = text;
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 0,
-                        To = 55*3,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                    };
-                    Storyboard.SetTarget(translateAnimation, DMonthStack);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Begin();
-                }
-                await Task.Delay(txtdelay);
-                DMonthStack.Children.Clear();
-                foreach (char c in text)
-                {
-                    string letter = c.ToString().ToUpper();
-                    Image img = new Image();
-                    img.Source = await FbxStyle.GetFbxLetterBitmapImage(letter);
-                    img.Margin = new Thickness(5);
-                    img.Height = 30;
-                    img.Width = 30;
-                    DMonthStack.Children.Add(img);
-                }
-                {
-                    var translateAnimation = new DoubleAnimation
-                    {
-                        From = 55,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(txtslidespeed),
-                    };
-                    var resetx = new DoubleAnimation
-                    {
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(0)
-                    };
-                    Storyboard.SetTarget(translateAnimation, DMonthStack);
-                    Storyboard.SetTargetProperty(translateAnimation, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.Y)"));
-                    Storyboard.SetTarget(resetx, DMonthStack);
-                    Storyboard.SetTargetProperty(resetx, new PropertyPath("(UIElement.RenderTransform).(TranslateTransform.X)"));
-                    var storyboard = new Storyboard();
-                    storyboard.Children.Add(translateAnimation);
-                    storyboard.Children.Add(resetx);
-                    storyboard.Begin();
-                }
-
-            }
+            transform.BeginAnimation(axis == SlideAxis.X ? TranslateTransform.XProperty : TranslateTransform.YProperty, animation);
         }
     }
 }

@@ -13,6 +13,13 @@
         "exit": "Exit",
         "exiting": "Exiting..."
       },
+      "mirror": {
+        "titlename": "Mirror",
+        "back": "Back",
+        "mirrormode": "Mirror mode",
+        "camera": "Camera",
+        "nocamera": "No camera detected"
+      },
       "settings": {
         "titlename": "Settings",
         "save": "Save",
@@ -24,6 +31,25 @@
           },
           "volume": {
             "name": "Volume"
+          },
+          "blur": {
+            "name": "Blur effect"
+          },
+          "screenonoff": {
+            "name": "Screen on/off animation",
+            "type": {
+              "none": "None",
+              "fade": "Fade",
+              "crt": "CRT TV"
+            }
+          },
+          "screenwakeup": {
+            "name": "Screen auto wake-up"
+          },
+          "menuautoclose": {
+            "name": "Menu auto-close after inactivity",
+            "never": "Never",
+            "secs": "%0 seconds"
           },
           "clock": {
             "titlename": "Clock",
@@ -69,7 +95,6 @@
             "carouseldelay": {
               "name": "Carousel delay",
               "desc": "Delay between each plugin change (only when 2 or more plugins are pinned)",
-              "sec": "%0 second",
               "secs": "%0 seconds"
             }
           }
@@ -174,7 +199,7 @@
         "name": "Name",
         "defsounds": "Default sounds",
         "custsounds": "Custom sounds",
-        "add": "Add alarm",
+        "add": "Add",
         "noalarm": "No alarms here",
         "delete": "Delete",
         "cancel": "Cancel",
@@ -228,6 +253,13 @@
         "exit": "Fermer",
         "exiting": "Fermeture..."
       },
+      "mirror": {
+        "titlename": "Miroir",
+        "back": "Retour",
+        "mirrormode": "Mode miroir",
+        "camera": "Caméra",
+        "nocamera": "Aucune caméra détectée"
+      },
       "settings": {
         "titlename": "Paramètres",
         "save": "Enregistrer",
@@ -239,6 +271,25 @@
           },
           "volume": {
             "name": "Volume"
+          },
+          "blur": {
+            "name": "Effet de flou"
+          },
+          "screenonoff": {
+            "name": "Animation d'allumage/extinction de l'écran",
+            "type": {
+              "none": "Aucun",
+              "fade": "Fondu",
+              "crt": "Télé CRT"
+            }
+          },
+          "screenwakeup": {
+            "name": "Réveil automatique de l'écran"
+          },
+          "menuautoclose": {
+            "name": "Fermeture automatique des menus après inactivité",
+            "never": "Jamais",
+            "secs": "%0 secondes"
           },
           "clock": {
             "titlename": "Horloge",
@@ -284,7 +335,6 @@
             "carouseldelay": {
               "name": "Délai du carrousel",
               "desc": "Délai entre chaque changement d'extention (seulement quand 2 ou plus d'extentions sont épinglées)",
-              "sec": "%0 seconde",
               "secs": "%0 secondes"
             }
           }
@@ -360,10 +410,10 @@
             "march": "Mar",
             "april": "Avr",
             "may": "Mai",
-            "june": "Juin",
-            "july": "Juil",
-            "august": "Août",
-            "september": "Sept",
+            "june": "Jui",
+            "july": "Jui",
+            "august": "Aoû",
+            "september": "Sep",
             "october": "Oct",
             "november": "Nov",
             "december": "Déc"
@@ -389,7 +439,7 @@
         "name": "Nom",
         "defsounds": "Sons par défaut",
         "custsounds": "Sons personnalisés",
-        "add": "Ajouter un réveil",
+        "add": "Ajouter",
         "noalarm": "Pas de réveil ici",
         "delete": "Supprimer",
         "cancel": "Annuler",
@@ -426,6 +476,246 @@
       "plugin": {
         "noload": "Pas d'extention chargée",
         "nopin": "Pas d'extention épinglée"
+      }
+    }
+  },
+  "tr-tr": {
+    "id": "tr-tr",
+    "name": "Türkçe (Türkiye)",
+    "content": {
+      "mainmenu": {
+        "titlename": "Ana menü",
+        "back": "Geri",
+        "screenoff": "Ekranı kapat",
+        "fullscreen": "Tam ekran",
+        "kiosk": "Kiosk modu",
+        "settings": "Ayarlar",
+        "exit": "Çıkış",
+        "exiting": "Çıkılıyor..."
+      },
+      "mirror": {
+        "titlename": "Aynalama",
+        "back": "Geri",
+        "mirrormode": "Aynalama modu",
+        "camera": "Kamera",
+        "nocamera": "Kamera algılanamadı"
+      },
+      "settings": {
+        "titlename": "Ayarlar",
+        "save": "Kaydet",
+        "cancel": "İptal",
+        "general": {
+          "titlename": "Genel",
+          "lang": {
+            "name": "Dil"
+          },
+          "volume": {
+            "name": "Ses"
+          },
+          "blur": {
+            "name": "Bulanıklık efekti"
+          },
+          "screenonoff": {
+            "name": "Ekranı açma/kapatma animasyonu",
+            "type": {
+              "none": "Yok",
+              "fade": "Solma",
+              "crt": "CRT TV"
+            }
+          },
+          "screenwakeup": {
+            "name": "Ekranı otomatik uyandırma"
+          },
+          "menuautoclose": {
+            "name": "Menülerin inaktiflik sonrası otomatik kapanması",
+            "never": "Asla",
+            "secs": "%0 saniye"
+          },
+          "clock": {
+            "titlename": "Saat",
+            "showsec": {
+              "name": "Saniyeleri göster",
+              "desc": "Saate saniyeleri (ve yılı) ekle"
+            },
+            "fbxstyle": {
+              "name": "Freebox tarzı",
+              "desc": "Efsanevi Freebox Revolution saat stilini kullan (saniyeleri gizler)"
+            }
+          },
+          "alarm": {
+            "titlename": "Alarm",
+            "defaultsound": {
+              "name": "Varsayılan alarm sesi",
+              "desc": "Alarm için varsayılan sesi seç (şu anki: %0)",
+              "choose": "Bir dosya seç"
+            },
+            "timeout": {
+              "name": "Alarm zaman aşımı",
+              "desc": "Alarmın durması için bekleme süresi",
+              "never": "Asla",
+              "min": "%0 dakika",
+              "mins": "%0 dakika"
+            }
+          },
+          "timer": {
+            "titlename": "Zamanlayıcı",
+            "defaultsound": {
+              "name": "Zamanlayıcı sesi",
+              "desc": "Zamanlayıcı sesi seç (şu anki: %0)",
+              "choose": "Bir dosya seç"
+            }
+          },
+          "plugin": {
+            "titlename": "Eklenti",
+            "pinned": {
+              "name": "Sabitlenmiş eklentiler",
+              "desc": "Ana ekranda görmek istediğiniz eklentileri seçin (karusel)",
+              "noplugin": "Yüklü eklenti yok"
+            },
+            "carouseldelay": {
+              "name": "Karusel gecikmesi",
+              "desc": "Her eklenti değişimi arasındaki süre (2 veya daha fazla eklenti varsa)",
+              "secs": "%0 saniye"
+            }
+          }
+        },
+        "pluginmanager": {
+          "titlename": "Eklenti yöneticisi",
+          "enabled": "Etkin",
+          "disabled": "Devre dışı",
+          "update": "Güncelle",
+          "updating": "Güncelleniyor...",
+          "updated": "Güncellendi",
+          "settings": "Ayarlar",
+          "delete": "Sil",
+          "website": "Web sitesi",
+          "source": "Kaynak",
+          "noplugin": "Yüklü eklenti yok",
+          "save": "Kaydet",
+          "cancel": "İptal"
+        },
+        "about": {
+          "titlename": "Hakkında"
+        }
+      },
+      "clock": {
+        "titlename": "Saat",
+        "days": {
+          "long": {
+            "monday": "Pazartesi",
+            "tuesday": "Salı",
+            "wednesday": "Çarşamba",
+            "thursday": "Perşembe",
+            "friday": "Cuma",
+            "saturday": "Cumartesi",
+            "sunday": "Pazar"
+          },
+          "short": {
+            "monday": "Pzt",
+            "tuesday": "Sal",
+            "wednesday": "Çar",
+            "thursday": "Per",
+            "friday": "Cum",
+            "saturday": "Cmt",
+            "sunday": "Paz"
+          },
+          "abbr": {
+            "monday": "P",
+            "tuesday": "S",
+            "wednesday": "Ç",
+            "thursday": "P",
+            "friday": "C",
+            "saturday": "C",
+            "sunday": "P"
+          }
+        },
+        "months": {
+          "long": {
+            "january": "Ocak",
+            "february": "Şubat",
+            "march": "Mart",
+            "april": "Nisan",
+            "may": "Mayıs",
+            "june": "Haziran",
+            "july": "Temmuz",
+            "august": "Ağustos",
+            "september": "Eylül",
+            "october": "Ekim",
+            "november": "Kasım",
+            "december": "Aralık"
+          },
+          "short": {
+            "january": "Oca",
+            "february": "Şub",
+            "march": "Mar",
+            "april": "Nis",
+            "may": "May",
+            "june": "Haz",
+            "july": "Tem",
+            "august": "Ağu",
+            "september": "Eyl",
+            "october": "Eki",
+            "november": "Kas",
+            "december": "Ara"
+          },
+          "abbr": {
+            "january": "O",
+            "february": "Ş",
+            "march": "M",
+            "april": "N",
+            "may": "M",
+            "june": "H",
+            "july": "T",
+            "august": "A",
+            "september": "E",
+            "october": "E",
+            "november": "K",
+            "december": "A"
+          }
+        }
+      },
+      "alarm": {
+        "titlename": "Alarm",
+        "name": "Ad",
+        "defsounds": "Varsayılan sesler",
+        "custsounds": "Özel sesler",
+        "add": "Ekle",
+        "noalarm": "Alarm yok",
+        "delete": "Sil",
+        "cancel": "İptal",
+        "save": "Kaydet",
+        "stop": "Durdur",
+        "repeat": {
+          "once": "Bir kez",
+          "everyday": "Her gün",
+          "workdays": "Hafta içi",
+          "weekend": "Hafta sonu"
+        },
+        "remaining": {
+          "inhour": "%0 s ve %1 dk içinde",
+          "inmin": "%0 dk içinde",
+          "inday": "%0 gün içinde",
+          "indays": "%0 gün içinde"
+        }
+      },
+      "stopwatch": {
+        "titlename": "Kronometre",
+        "start": "Başlat",
+        "pause": "Duraklat",
+        "reset": "Sıfırla",
+        "lap": "Tur"
+      },
+      "timer": {
+        "titlename": "Zamanlayıcı",
+        "start": "Başlat",
+        "pause": "Duraklat",
+        "stop": "Durdur",
+        "reset": "Sıfırla",
+        "timeup": "Süre doldu"
+      },
+      "plugin": {
+        "noload": "Yüklü eklenti yok",
+        "nopin": "Sabitlenmiş eklenti yok"
       }
     }
   }

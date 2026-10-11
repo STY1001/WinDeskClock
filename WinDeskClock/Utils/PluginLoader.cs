@@ -16,6 +16,7 @@ namespace WinDeskClock.Utils
 
         public static string PluginPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "plugins");
         public static string PluginDataPath = Path.Combine(PluginPath, "plugins_data");
+        public static string PluginLogPath = Path.Combine(PluginPath, "plugins_log");
 
         public static Dictionary<string, IPluginInfo> PluginInfos = new Dictionary<string, IPluginInfo>();
         public static Dictionary<string, IPluginModule> PluginModules = new Dictionary<string, IPluginModule>();
@@ -62,55 +63,80 @@ namespace WinDeskClock.Utils
 
         public static async Task<bool> UpdateValidate(string id)
         {
+            _ = Log.Info($"Validating update information for plugin {id}...");
             try
             {
                 HttpClient client = new HttpClient();
+                _ = Log.Info($"Fetching update information from {PluginInfos[id].UpdateURL}...");
                 string json = await client.GetStringAsync(PluginInfos[id].UpdateURL);
                 dynamic data = JsonConvert.DeserializeObject(json);
                 if (data["version"] != null && data["versioncode"] != null && data["downloadlink"] != null)
                 {
+                    _ = Log.Info($"Update information for plugin {id} is valid.");
                     return true;
+                }
+                if (data["version"] == null)
+                {
+                    _ = Log.Warning($"Update information for plugin {id} is invalid: 'version' is missing");
+                }
+                if (data["versioncode"] == null)
+                {
+                    _ = Log.Warning($"Update information for plugin {id} is invalid: 'versioncode' is missing");
+                }
+                if (data["downloadlink"] == null)
+                {
+                    _ = Log.Warning($"Update information for plugin {id} is invalid: 'downloadlink' is missing");
                 }
                 return false;
             }
-            catch
+            catch (Exception ex)
             {
+                _ = Log.Warning($"Failed to validate update information for plugin {id}. Exception: {ex.Message}");
                 return false;
             }
         }
 
         public static async Task<bool> UpdateCheck(string id)
         {
+            _ = Log.Info($"Checking for updates for plugin {id}...");
             try
             {
                 HttpClient client = new HttpClient();
+                _ = Log.Info($"Fetching update information from {PluginInfos[id].UpdateURL}...");
                 string json = await client.GetStringAsync(PluginInfos[id].UpdateURL);
                 dynamic data = JsonConvert.DeserializeObject(json);
                 if (data["versioncode"] > PluginInfos[id].VersionCode)
                 {
+                    _ = Log.Info($"Update available for plugin {id}. Current version: {PluginInfos[id].VersionCode}, New version: {data["versioncode"]}");
                     return true;
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                _ = Log.Warning($"Failed to check for updates for plugin {id}. Exception: {ex.Message}");
                 return false;
             }
+            _ = Log.Info($"No updates available for plugin {id}");
             return false;
         }
 
         public static async Task<bool> UpdatePlugin(string id)
         {
+            _ = Log.Info($"Updating plugin {id}...");
             try
             {
                 HttpClient client = new HttpClient();
+                _ = Log.Info($"Fetching update information from {PluginInfos[id].UpdateURL}...");
                 string json = await client.GetStringAsync(PluginInfos[id].UpdateURL);
                 dynamic data = JsonConvert.DeserializeObject(json);
                 string downloadURL = data["downloadlink"];
                 string downloadPath = Path.Combine(PluginPath, id + ".dll");
                 if (File.Exists(downloadPath))
                 {
+                    _ = Log.Info($"Deleting old plugin file {downloadPath}...");
                     File.Delete(downloadPath);
                 }
+                _ = Log.Info($"Downloading new plugin file from {downloadURL} to {downloadPath}...");
                 using (var downloadStream = await client.GetStreamAsync(downloadURL))
                 {
                     using (var fileStream = new FileStream(downloadPath, FileMode.Create, FileAccess.Write, FileShare.None))
@@ -118,10 +144,12 @@ namespace WinDeskClock.Utils
                         await downloadStream.CopyToAsync(fileStream);
                     }
                 }
+                _ = Log.Info($"Plugin {id} updated successfully");
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                _ = Log.Error($"Failed to update plugin {id}. Exception: {ex.Message}");
                 return false;
             }
         }
@@ -132,34 +160,52 @@ namespace WinDeskClock.Utils
 
             if (!Directory.Exists(PluginPath))
             {
+                _ = Log.Warning("Plugin folder does not exist, creating it...");
                 Directory.CreateDirectory(PluginPath);
             }
             if (!Directory.Exists(PluginDataPath))
             {
+                _ = Log.Warning("Plugin data folder does not exist, creating it...");
                 Directory.CreateDirectory(PluginDataPath);
+            }
+            if (!Directory.Exists(PluginLogPath))
+            {
+                _ = Log.Warning("Plugin log folder does not exist, creating it...");
+                Directory.CreateDirectory(PluginLogPath);
             }
 
             var dllFiles = Directory.GetFiles(PluginPath, "*.dll");
             foreach (var file in dllFiles)
             {
+                _ = Log.Info($"Loading plugin from {Path.GetFileName(file)}");
                 if (!Path.GetFileName(file).StartsWith("WDC."))
                 {
+                    _ = Log.Warning($"Skipping {Path.GetFileName(file)}, file name does not start with 'WDC.'");
                     continue;
                 }
 
+                _ = Log.Info($"Loading plugin assembly from {Path.GetFileName(file)}");
                 var context = new AssemblyLoadContext(Path.GetFileNameWithoutExtension(file), isCollectible: true);
                 using var stream = new FileStream(file, FileMode.Open, FileAccess.Read);
                 var assembly = context.LoadFromStream(stream);
-
                 var productAttribute = assembly.GetCustomAttribute<AssemblyProductAttribute>();
                 if (productAttribute?.Product != "WinDeskClock" || !assembly.GetName().Name.StartsWith("WDC."))
                 {
+                    if (productAttribute?.Product != "WinDeskClock")
+                    {
+                        _ = Log.Warning($"Skipping {Path.GetFileName(file)}, product attribute does not match 'WinDeskClock'");
+                    }
+                    if (!assembly.GetName().Name.StartsWith("WDC."))
+                    {
+                        _ = Log.Warning($"Skipping {Path.GetFileName(file)}, assembly name does not start with 'WDC.'");
+                    }
                     context.Unload();
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
                     continue;
                 }
 
+                _ = Log.Info($"Assembly loaded successfully, getting types from {Path.GetFileName(file)}");
                 Type[] types;
                 try
                 {
@@ -167,12 +213,13 @@ namespace WinDeskClock.Utils
                 }
                 catch (ReflectionTypeLoadException ex)
                 {
+                    _ = Log.Warning($"Failed to load types from {Path.GetFileName(file)}, skipping..., exception: {ex.Message}");
                     types = ex.Types.Where(t => t != null).ToArray();
                 }
 
+                _ = Log.Info($"Searching for plugin info and module in {Path.GetFileName(file)}");
                 var pluginInfoType = types
                     .FirstOrDefault(t => typeof(IPluginInfo).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
-
                 IPluginInfo pluginInfo = null;
                 try
                 {
@@ -181,24 +228,38 @@ namespace WinDeskClock.Utils
                         pluginInfo = Activator.CreateInstance(pluginInfoType) as IPluginInfo;
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    _ = Log.Warning($"Failed to create instance of plugin info for {Path.GetFileName(file)}, exception: {ex.Message}");
                 }
 
                 if (pluginInfo == null || !pluginInfo.ID.StartsWith("WDC.") || Path.GetFileNameWithoutExtension(file) != pluginInfo.ID)
                 {
+                    if (pluginInfo == null)
+                    {
+                        _ = Log.Warning($"Skipping {Path.GetFileName(file)}, plugin info is null");
+                    }
+                    if (!pluginInfo.ID.StartsWith("WDC."))
+                    {
+                        _ = Log.Warning($"Skipping {Path.GetFileName(file)}, plugin ID does not start with 'WDC.'");
+                    }
+                    if (Path.GetFileNameWithoutExtension(file) != pluginInfo.ID)
+                    {
+                        _ = Log.Warning($"Skipping {Path.GetFileName(file)}, plugin ID does not match file name");
+                    }
                     context.Unload();
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
                     continue;
                 }
 
+                _ = Log.Info($"Plugin found: {pluginInfo.Name} ({pluginInfo.ID}) by {pluginInfo.Author}");
                 PluginInfos.Add(pluginInfo.ID, pluginInfo);
 
                 var pluginDataDir = Path.Combine(PluginDataPath, pluginInfo.ID);
                 if (!Directory.Exists(pluginDataDir))
                 {
+                    _ = Log.Warning($"Plugin data directory for {pluginInfo.ID} does not exist, creating it...");
                     Directory.CreateDirectory(pluginDataDir);
                 }
 
@@ -213,13 +274,29 @@ namespace WinDeskClock.Utils
                         {
                             if (!await CheckDisabledPlugin(pluginInfo.ID))
                             {
+                                _ = Log.Info($"Plugin {pluginInfo.ID} loaded successfully.");
                                 PluginModules.Add(pluginInfo.ID, pluginModule);
                             }
+                            else
+                            {
+                                _ = Log.Warning($"Plugin {pluginInfo.ID} is disabled, skipping...");
+                            }
+                        }
+                        else
+                        {
+                            _ = Log.Warning($"Failed to create instance of plugin module for {pluginInfo.ID}, adding to incompatible plugins list.");
+                            IncompatiblePlugin.Add(pluginInfo.ID);
                         }
                     }
+                    else
+                    {
+                        _ = Log.Warning($"No valid plugin module found for {pluginInfo.ID}, adding to incompatible plugins list.");
+                        IncompatiblePlugin.Add(pluginInfo.ID);
+                    }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _ = Log.Warning($"Failed to create instance of plugin module for {pluginInfo.ID}, adding to incompatible plugins list., exception: {ex.Message}");
                     IncompatiblePlugin.Add(pluginInfo.ID);
                 }
 

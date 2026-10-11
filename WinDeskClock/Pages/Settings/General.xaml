@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:WinDeskClock.Pages.Settings"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d"
-      d:DesignHeight="900"
+      d:DesignHeight="1500"
       d:DesignWidth="800"
       Title="General">
 
@@ -24,43 +24,180 @@
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                Grid.Column="0"
                                Margin="0,0,10,0"
-                               x:Name="GeneralText"/>
+                               x:Name="GeneralText" />
                     <Separator HorizontalAlignment="Stretch"
                                VerticalAlignment="Center"
                                Grid.Column="1" />
                 </Grid>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Language"
-                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                       FontFamily="Segoe UI SemiBold"
-                                       x:Name="LangTitle" />
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/language.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Language"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="LangTitle" />
+                            </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
-                    <ComboBox x:Name="LangComboBox" />
+                    <ComboBox x:Name="LangComboBox"
+                              ItemsSource="{Binding AvailableLanguages}"
+                              DisplayMemberPath="Value"
+                              SelectedValuePath="Key"
+                              SelectedValue="{Binding DraftLanguage, Mode=TwoWay}" />
                 </ui:CardControl>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Volume"
-                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                       FontFamily="Segoe UI SemiBold"
-                                       x:Name="VolumeTitle"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/volume.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Volume"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="VolumeTitle" />
+                            </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="x %"
+                        <TextBlock Text="{Binding VolumePercent, StringFormat='{}{0} %'}"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    FontSize="12"
                                    HorizontalAlignment="Right"
                                    Margin="0,0,10,0"
-                                   x:Name="VolumeText"/>
+                                   x:Name="VolumeText" />
                         <Slider x:Name="VolumeSlider"
                                 Minimum="0"
                                 Maximum="100"
                                 TickFrequency="1"
-                                IsSnapToTickEnabled="True"/>
+                                Value="{Binding VolumePercent, Mode=TwoWay}"
+                                IsSnapToTickEnabled="True" />
+                    </StackPanel>
+                </ui:CardControl>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/effect.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Blur effect"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="BlurEffectTitle" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <ui:ToggleSwitch x:Name="BlurEffectSwitch"
+                                      IsChecked="{Binding DraftBlurEffectEnabled, Mode=TwoWay}" />
+                </ui:CardControl>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/screenoff.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Screen On/Off animation"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="ScreenOnOffTitle" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <ComboBox x:Name="ScreenOnOffComboBox"
+                              SelectedValuePath="Tag"
+                              SelectedValue="{Binding DraftScreenOnOffEffect, Mode=TwoWay}">
+                        <ComboBoxItem Content="None"
+                                      Tag="none"
+                                      x:Name="ScreenOnOffNone"/>
+                        <ComboBoxItem Content="Fade"
+                                      Tag="fade"
+                                      x:Name="ScreenOnOffFade"/>
+                        <ComboBoxItem Content="CRT"
+                                      Tag="crt"
+                                      x:Name="ScreenOnOffCRT"/>
+                    </ComboBox>
+                </ui:CardControl>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/wakeup.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Screen auto wake up"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="ScreenWakeUpTitle" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:NumberBox x:Name="ScreenWakeUpDelayHourNumberBox"
+                                      Minimum="0"
+                                      Maximum="23"
+                                      Value="{Binding DraftScreenAutoWakeUpHour, Mode=TwoWay}"
+                                      ClearButtonEnabled="False" />
+                        <TextBlock Text=":"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   FontSize="12"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Margin="5,0,5,0" />
+                        <ui:NumberBox x:Name="ScreenWakeUpDelayMinuteNumberBox"
+                                      Minimum="0"
+                                      Maximum="59"
+                                      Value="{Binding DraftScreenAutoWakeUpMinute, Mode=TwoWay}"
+                                      ClearButtonEnabled="False"/>
+                        <ui:ToggleSwitch x:Name="ScreenWakeUpToggleSwitch"
+                                         IsChecked="{Binding DraftScreenAutoWakeUp, Mode=TwoWay}"
+                                         Margin="15,0,0,0" />
+                    </StackPanel>
+                </ui:CardControl>
+                <ui:CardControl Margin="15,0,15,10">
+                    <ui:CardControl.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/dashboardtimeout.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Menu auto-close after inactivity"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="MenuAutoCloseTitle" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding MenuAutoCloseLabel}"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   FontSize="12"
+                                   HorizontalAlignment="Right"
+                                   Margin="0,0,10,0"
+                                   x:Name="MenuAutoCloseText" />
+                        <Slider x:Name="MenuAutoCloseSlider"
+                                Minimum="0"
+                                Maximum="60"
+                                TickFrequency="10"
+                                Value="{Binding DraftMenuCloseDelaySeconds, Mode=TwoWay}"
+                                IsSnapToTickEnabled="True" />
                     </StackPanel>
                 </ui:CardControl>
                 <Grid HorizontalAlignment="Stretch"
@@ -74,40 +211,57 @@
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                Grid.Column="0"
                                Margin="0,0,10,0"
-                               x:Name="ClockText"/>
+                               x:Name="ClockText" />
                     <Separator HorizontalAlignment="Stretch"
                                VerticalAlignment="Center"
                                Grid.Column="1" />
                 </Grid>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Show seconds"
-                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                       FontFamily="Segoe UI SemiBold"
-                                       x:Name="ShowSecondsTitle"/>
-                            <TextBlock Text="Show seconds on the clock (also show year)"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       FontSize="12"
-                                       x:Name="ShowSecondsDesc"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/clocksec.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Show seconds"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="ShowSecondsTitle" />
+                                <TextBlock Text="Show seconds on the clock (also show year)"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                           FontSize="12"
+                                           x:Name="ShowSecondsDesc" />
+                            </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
-                    <ui:ToggleSwitch x:Name="ShowSecondsToggleSwitch" />
+                    <ui:ToggleSwitch x:Name="ShowSecondsToggleSwitch"
+                                      IsChecked="{Binding DraftClockShowSeconds, Mode=TwoWay}"
+                                      IsEnabled="{Binding IsShowSecondsEditable}" />
                 </ui:CardControl>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Freebox style"
-                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                       FontFamily="Segoe UI SemiBold"
-                                       x:Name="FbxStyleTitle"/>
-                            <TextBlock Text="Apply the Freebox Revolution clock style"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       FontSize="12"
-                                       x:Name="FbxStyleDesc"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/clockstyle.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Freebox style"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="FbxStyleTitle" />
+                                <TextBlock Text="Apply the Freebox Revolution clock style"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                           FontSize="12"
+                                           x:Name="FbxStyleDesc" />
+                            </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
-                    <ui:ToggleSwitch x:Name="FbxStyleToggleSwitch" />
+                    <ui:ToggleSwitch x:Name="FbxStyleToggleSwitch"
+                                      IsChecked="{Binding DraftClockFbxStyle, Mode=TwoWay}" />
                 </ui:CardControl>
                 <Grid HorizontalAlignment="Stretch"
                       Margin="20,0,20,5">
@@ -120,52 +274,68 @@
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                Grid.Column="0"
                                Margin="0,0,10,0"
-                               x:Name="AlarmText"/>
+                               x:Name="AlarmText" />
                     <Separator HorizontalAlignment="Stretch"
                                VerticalAlignment="Center"
                                Grid.Column="1" />
                 </Grid>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Default alarm sound"
-                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                       FontFamily="Segoe UI SemiBold"
-                                       x:Name="DefaultAlarmSoundTitle"/>
-                            <TextBlock Text="Select the default sound of the alarm (Current: audio.wav)"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       FontSize="12"
-                                       x:Name="DefaultAlarmSoundDesc"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/alarmsound.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Default alarm sound"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="DefaultAlarmSoundTitle" />
+                                <TextBlock Text="{Binding DefaultAlarmSoundLabel}"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                           FontSize="12"
+                                           x:Name="DefaultAlarmSoundDesc" />
+                            </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
                     <Button Content="Choose a file"
-                            x:Name="DefaultAlarmSoundBtn"/>
+                            Click="DefaultAlarmSoundBtn_Click"
+                            x:Name="DefaultAlarmSoundBtn" />
                 </ui:CardControl>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Alarm timeout delay"
-                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                       FontFamily="Segoe UI SemiBold"
-                                       x:Name="AlarmTimeoutTitle"/>
-                            <TextBlock Text="Delay before the alarm stops ringing"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       FontSize="12"
-                                       x:Name="AlarmTimeoutDesc"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/alarmtimeout.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Alarm timeout delay"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="AlarmTimeoutTitle" />
+                                <TextBlock Text="Delay before the alarm stops ringing"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                           FontSize="12"
+                                           x:Name="AlarmTimeoutDesc" />
+                            </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="x minutes"
+                        <TextBlock Text="{Binding AlarmTimeoutLabel}"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    FontSize="12"
                                    HorizontalAlignment="Right"
                                    Margin="0,0,10,0"
-                                   x:Name="AlarmTimeoutText"/>
+                                   x:Name="AlarmTimeoutText" />
                         <Slider x:Name="AlarmTimeoutSlider"
                                 Minimum="0"
                                 Maximum="60"
                                 TickFrequency="1"
-                                IsSnapToTickEnabled="True"/>
+                                Value="{Binding DraftAlarmTimeoutDelayMinutes, Mode=TwoWay}"
+                                IsSnapToTickEnabled="True" />
                     </StackPanel>
                 </ui:CardControl>
                 <Grid HorizontalAlignment="Stretch"
@@ -179,26 +349,34 @@
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                Grid.Column="0"
                                Margin="0,0,10,0"
-                               x:Name="TimerText"/>
+                               x:Name="TimerText" />
                     <Separator HorizontalAlignment="Stretch"
                                VerticalAlignment="Center"
                                Grid.Column="1" />
                 </Grid>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Timer sound"
-                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                       FontFamily="Segoe UI SemiBold"
-                                       x:Name="TimerSoundText"/>
-                            <TextBlock Text="Select the sound of the timer (Current: audio.wav)"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       FontSize="12"
-                                       x:Name="TimerSoundDesc"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/timersound.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Timer sound"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="TimerSoundText" />
+                                <TextBlock Text="{Binding TimerSoundLabel}"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                           FontSize="12"
+                                           x:Name="TimerSoundDesc" />
+                            </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
                     <Button Content="Choose a file"
-                            x:Name="TimerSoundBtn"/>
+                            Click="TimerSoundBtn_Click"
+                            x:Name="TimerSoundBtn" />
                 </ui:CardControl>
                 <Grid HorizontalAlignment="Stretch"
                       Margin="20,0,20,5">
@@ -211,51 +389,71 @@
                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                Grid.Column="0"
                                Margin="0,0,10,0"
-                               x:Name="PluginText"/>
+                               x:Name="PluginText" />
                     <Separator HorizontalAlignment="Stretch"
                                VerticalAlignment="Center"
                                Grid.Column="1" />
                 </Grid>
                 <Expander Margin="15,0,15,10">
                     <Expander.Header>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Pinned plugins"
-                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                       FontFamily="Segoe UI SemiBold"
-                                       x:Name="CarouselSelectTitle"/>
-                            <TextBlock Text="Select what plugins you want to see in the main screen carousel"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       FontSize="12"
-                                       x:Name="CarouselSelectDesc"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/carouselpin.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Pinned plugins"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="CarouselSelectTitle" />
+                                <TextBlock Text="Select what plugins you want to see in the main screen carousel"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                           FontSize="12"
+                                           x:Name="CarouselSelectDesc" />
+                            </StackPanel>
                         </StackPanel>
                     </Expander.Header>
-                    <StackPanel Orientation="Vertical"
-                                x:Name="CarouselSelectStack" />
+                    <ItemsControl x:Name="CarouselSelectStack" ItemsSource="{Binding PinnablePlugins}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsPinned, Mode=TwoWay}" Margin="0,4" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Expander>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="Carousel delay"
-                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                       FontFamily="Segoe UI SemiBold"
-                                       x:Name="CarouselDelayTitle"/>
-                            <TextBlock Text="Delay between changes"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       FontSize="12" 
-                                       x:Name="CarouselDelayDesc"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Resources/icons/carouseldelay.png"
+                                   Width="32"
+                                   Height="32" />
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0,0,0">
+                                <TextBlock Text="Carousel delay"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           FontFamily="Segoe UI SemiBold"
+                                           x:Name="CarouselDelayTitle" />
+                                <TextBlock Text="Delay between changes"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                           FontSize="12"
+                                           x:Name="CarouselDelayDesc" />
+                            </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="x seconds"
+                        <TextBlock Text="{Binding CarouselDelayLabel}"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    FontSize="12"
                                    HorizontalAlignment="Right"
                                    Margin="0,0,10,0"
-                                   x:Name="CarouselDelayText"/>
+                                   x:Name="CarouselDelayText" />
                         <Slider x:Name="CarouselDelaySlider"
                                 Minimum="5"
                                 Maximum="60"
                                 TickFrequency="5"
+                                Value="{Binding DraftCarouselDelaySeconds, Mode=TwoWay}"
                                 IsSnapToTickEnabled="True" />
                     </StackPanel>
                 </ui:CardControl>

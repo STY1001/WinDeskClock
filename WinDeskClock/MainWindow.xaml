@@ -16,7 +16,8 @@
                  WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid x:Name="AppGrid"
-              RenderTransformOrigin="0.5,0.5">
+              RenderTransformOrigin="0.5,0.5"
+              ClipToBounds="True">
             <Grid.RenderTransform>
                 <ScaleTransform ScaleX="1"
                                 ScaleY="1" />
@@ -37,7 +38,13 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
                 <Grid Grid.Column="0"
+                      Grid.RowSpan="3"
                       x:Name="LeftGrid">
                     <Grid x:Name="ClockGrid"
                           RenderTransformOrigin="0,0">
@@ -55,15 +62,14 @@
                                VerticalAlignment="Stretch"
                                Background="Transparent"
                                Margin="10" />
-                        <Button Grid.Row="1"
-                                x:Name="EnterDownMenuClockBtn"
-                                Click="EnterDownMenuClockBtn_Click"
-                                Content="▼"
-                                FontFamily="Segoe UI Variable Display Regular"
-                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Bottom"
-                                Margin="0,5,0,10" />
+                        <ui:Button Grid.Row="1"
+                                   Padding="10"
+                                   x:Name="EnterDownMenuClockBtn"
+                                   Click="EnterDownMenuClockBtn_Click"
+                                   Icon="{ui:ImageIcon '/Resources/icons/down.png'}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Bottom"
+                                   Margin="0,5,0,10" />
                     </Grid>
                     <Grid x:Name="DownMenuClockGrid"
                           Visibility="Hidden">
@@ -119,15 +125,14 @@
                                     </TextBlock>
                                 </Grid>
                             </Border>
-                            <Button Grid.Row="1"
-                                    x:Name="ExitDownMenuClockBtn"
-                                    Click="ExitDownMenuClockBtn_Click"
-                                    Content="▲"
-                                    FontFamily="Segoe UI Variable Display Regular"
-                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Visibility="Hidden" />
+                            <ui:Button Grid.Row="1"
+                                       Padding="10"
+                                       x:Name="ExitDownMenuClockBtn"
+                                       Click="ExitDownMenuClockBtn_Click"
+                                       Icon="{ui:ImageIcon '/Resources/icons/up.png'}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Visibility="Hidden" />
                         </Grid>
                         <Grid x:Name="MenuClockGrid"
                               Grid.Row="1"
@@ -151,27 +156,43 @@
                                     </Grid.RowDefinitions>
                                     <Grid>
                                         <ScrollViewer x:Name="AlarmScroll"
-                                                      Margin="10,0,10,0">
+                                                      Margin="10,0,10,0"
+                                                      PanningMode="VerticalOnly">
                                             <StackPanel x:Name="AlarmStack"
                                                         Orientation="Vertical">
                                             </StackPanel>
                                         </ScrollViewer>
-                                        <TextBlock x:Name="NoAlarmText"
-                                                   Text="No alarms"
-                                                   FontSize="24"
-                                                   FontFamily="Segoe UI Variable Display Regular"
-                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   Visibility="Visible" />
+                                        <Grid HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Visibility="Visible"
+                                              x:Name="NoAlarmGrid">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="10" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Image x:Name="NoAlarmImage"
+                                                   Source="/Resources/icons/alarm.png"
+                                                   Width="72"
+                                                   Height="72"
+                                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                                   Grid.Row="0" />
+                                            <TextBlock x:Name="NoAlarmText"
+                                                       Text="No alarms"
+                                                       FontSize="20"
+                                                       FontFamily="Segoe UI Variable Display Regular"
+                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                       Grid.Row="2" />
+                                        </Grid>
                                     </Grid>
                                     <ui:Button x:Name="AddAlarmBtn"
                                                Content="Add alarm"
-                                               FontFamily="Segoe UI Variable Display Bold"
+                                               FontFamily="Segoe UI Variable Display Regular"
                                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                Grid.Row="1"
                                                Width="200"
                                                Appearance="Primary"
+                                               Icon="{ui:ImageIcon '/Resources/icons/add.png'}"
                                                HorizontalAlignment="Center"
                                                Click="AddAlarmBtn_Click" />
                                 </Grid>
@@ -402,10 +423,73 @@
                                             </Grid>
                                         </Border>
                                         <ScrollViewer Grid.Row="1"
-                                                      x:Name="StopwatchLapScrollView">
-                                            <StackPanel Orientation="Vertical"
-                                                        x:Name="LapStopwatchStack">
-                                            </StackPanel>
+                                                      x:Name="StopwatchLapScrollView"
+                                                      PanningMode="VerticalOnly">
+                                            <!-- Lap cards: same look as the original's code-built Card (Margin 20,0,20,10, 18pt texts, plain lap number).
+                                                 The "slide" is the original's: the card's slot grows 0 -> 58 (Quintic ease-out, 0.3s) while it is still
+                                                 invisible - which pushes the older laps down smoothly - and only then does it fade in (0.15s).
+                                                 Height starts at 0 in the template itself so the first frame can't flash a full-height card. -->
+                                            <ItemsControl x:Name="LapStopwatchItems"
+                                                          ItemsSource="{Binding Stopwatch.Laps}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Vertical" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <ui:Card Margin="20,0,20,10"
+                                                                 Height="0"
+                                                                 Opacity="0">
+                                                            <ui:Card.Triggers>
+                                                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                                    <BeginStoryboard>
+                                                                        <Storyboard>
+                                                                            <DoubleAnimation Storyboard.TargetProperty="Height"
+                                                                                             From="0"
+                                                                                             To="58"
+                                                                                             Duration="0:0:0.3">
+                                                                                <DoubleAnimation.EasingFunction>
+                                                                                    <QuinticEase EasingMode="EaseOut" />
+                                                                                </DoubleAnimation.EasingFunction>
+                                                                            </DoubleAnimation>
+                                                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                                             From="0"
+                                                                                             To="1"
+                                                                                             BeginTime="0:0:0.3"
+                                                                                             Duration="0:0:0.15">
+                                                                                <DoubleAnimation.EasingFunction>
+                                                                                    <QuadraticEase EasingMode="EaseOut" />
+                                                                                </DoubleAnimation.EasingFunction>
+                                                                            </DoubleAnimation>
+                                                                        </Storyboard>
+                                                                    </BeginStoryboard>
+                                                                </EventTrigger>
+                                                            </ui:Card.Triggers>
+                                                            <Grid>
+                                                                <TextBlock Text="{Binding Index}"
+                                                                           FontSize="18"
+                                                                           FontFamily="Segoe UI Variable Display SemiBold"
+                                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                           HorizontalAlignment="Left"
+                                                                           VerticalAlignment="Center" />
+                                                                <TextBlock Text="{Binding GapDisplay}"
+                                                                           FontSize="18"
+                                                                           FontFamily="Segoe UI Variable Display Regular"
+                                                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                                           HorizontalAlignment="Center"
+                                                                           VerticalAlignment="Center" />
+                                                                <TextBlock Text="{Binding TotalDisplay}"
+                                                                           FontSize="18"
+                                                                           FontFamily="Segoe UI Variable Display Regular"
+                                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                           HorizontalAlignment="Right"
+                                                                           VerticalAlignment="Center" />
+                                                            </Grid>
+                                                        </ui:Card>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
                                         </ScrollViewer>
                                     </Grid>
                                     <Grid Grid.Row="1"
@@ -426,6 +510,7 @@
                                                    Grid.Column="2"
                                                    Width="200"
                                                    HorizontalAlignment="Stretch"
+                                                   Icon="{ui:ImageIcon '/Resources/icons/play.png'}"
                                                    Appearance="Primary" />
                                         <ui:Button x:Name="PauseStopwatchBtn"
                                                    Click="PauseStopwatchBtn_Click"
@@ -436,6 +521,7 @@
                                                    Width="200"
                                                    HorizontalAlignment="Stretch"
                                                    Visibility="Hidden"
+                                                   Icon="{ui:ImageIcon '/Resources/icons/pause.png'}"
                                                    Appearance="Primary" />
                                         <ui:Button x:Name="ResetStopwatchBtn"
                                                    Click="ResetStopwatchBtn_Click"
@@ -445,6 +531,7 @@
                                                    Grid.Column="0"
                                                    Width="0"
                                                    HorizontalAlignment="Stretch"
+                                                   Icon="{ui:ImageIcon '/Resources/icons/reset.png'}"
                                                    Visibility="Hidden" />
                                         <ui:Button x:Name="LapStopwatchBtn"
                                                    Click="LapStopwatchBtn_Click"
@@ -454,6 +541,7 @@
                                                    Grid.Column="0"
                                                    Width="0"
                                                    HorizontalAlignment="Stretch"
+                                                   Icon="{ui:ImageIcon '/Resources/icons/lap.png'}"
                                                    Visibility="Hidden" />
                                     </Grid>
                                 </Grid>
@@ -472,7 +560,7 @@
                                             CornerRadius="8"
                                             Background="#0affffff"
                                             Padding="10">
-                                        <Grid x:Name="TimerwBtnGrid">
+                                        <Grid x:Name="TimerBtnGrid">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="20" />
@@ -485,16 +573,14 @@
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
-                                            <Button x:Name="TimerHourUpBtn"
-                                                    Click="TimerHourUpBtn_Click"
-                                                    Content="▲"
-                                                    FontFamily="Segoe UI Variable Display Regular"
-                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                    Grid.Column="0"
-                                                    Grid.Row="0"
-                                                    HorizontalAlignment="Stretch"
-                                                    VerticalAlignment="Center"
-                                                    Height="31" />
+                                            <ui:Button x:Name="TimerHourUpBtn"
+                                                       Click="TimerHourUpBtn_Click"
+                                                       Icon="{ui:ImageIcon '/Resources/icons/up.png'}"
+                                                       Grid.Column="0"
+                                                       Grid.Row="0"
+                                                       HorizontalAlignment="Stretch"
+                                                       VerticalAlignment="Center"
+                                                       Height="31" />
                                             <Grid Grid.Column="0"
                                                   Grid.Row="1"
                                                   ClipToBounds="True">
@@ -533,16 +619,14 @@
                                                     </TextBlock.RenderTransform>
                                                 </TextBlock>
                                             </Grid>
-                                            <Button x:Name="TimerHourDownBtn"
-                                                    Click="TimerHourDownBtn_Click"
-                                                    Content="▼"
-                                                    FontFamily="Segoe UI Variable Display Regular"
-                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                    Grid.Column="0"
-                                                    Grid.Row="2"
-                                                    HorizontalAlignment="Stretch"
-                                                    VerticalAlignment="Center"
-                                                    Height="31" />
+                                            <ui:Button x:Name="TimerHourDownBtn"
+                                                       Click="TimerHourDownBtn_Click"
+                                                       Icon="{ui:ImageIcon '/Resources/icons/down.png'}"
+                                                       Grid.Column="0"
+                                                       Grid.Row="2"
+                                                       HorizontalAlignment="Stretch"
+                                                       VerticalAlignment="Center"
+                                                       Height="31" />
                                             <TextBlock Text=":"
                                                        Grid.Column="1"
                                                        Grid.Row="1"
@@ -553,16 +637,14 @@
                                                        VerticalAlignment="Center"
                                                        LineHeight="75"
                                                        LineStackingStrategy="BlockLineHeight" />
-                                            <Button x:Name="TimerMinuteUpBtn"
-                                                    Click="TimerMinuteUpBtn_Click"
-                                                    Content="▲"
-                                                    FontFamily="Segoe UI Variable Display Regular"
-                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                    Grid.Column="2"
-                                                    Grid.Row="0"
-                                                    HorizontalAlignment="Stretch"
-                                                    VerticalAlignment="Center"
-                                                    Height="31" />
+                                            <ui:Button x:Name="TimerMinuteUpBtn"
+                                                       Click="TimerMinuteUpBtn_Click"
+                                                       Icon="{ui:ImageIcon '/Resources/icons/up.png'}"
+                                                       Grid.Column="2"
+                                                       Grid.Row="0"
+                                                       HorizontalAlignment="Stretch"
+                                                       VerticalAlignment="Center"
+                                                       Height="31" />
                                             <Grid Grid.Column="2"
                                                   Grid.Row="1"
                                                   ClipToBounds="True">
@@ -599,16 +681,14 @@
                                                     </TextBlock.RenderTransform>
                                                 </TextBlock>
                                             </Grid>
-                                            <Button x:Name="TimerMinuteDownBtn"
-                                                    Click="TimerMinuteDownBtn_Click"
-                                                    Content="▼"
-                                                    FontFamily="Segoe UI Variable Display Regular"
-                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                    Grid.Column="2"
-                                                    Grid.Row="2"
-                                                    HorizontalAlignment="Stretch"
-                                                    VerticalAlignment="Center"
-                                                    Height="31" />
+                                            <ui:Button x:Name="TimerMinuteDownBtn"
+                                                       Click="TimerMinuteDownBtn_Click"
+                                                       Icon="{ui:ImageIcon '/Resources/icons/down.png'}"
+                                                       Grid.Column="2"
+                                                       Grid.Row="2"
+                                                       HorizontalAlignment="Stretch"
+                                                       VerticalAlignment="Center"
+                                                       Height="31" />
                                             <TextBlock Text=":"
                                                        Grid.Column="3"
                                                        Grid.Row="1"
@@ -619,16 +699,14 @@
                                                        VerticalAlignment="Center"
                                                        LineHeight="75"
                                                        LineStackingStrategy="BlockLineHeight" />
-                                            <Button x:Name="TimerSecondUpBtn"
-                                                    Click="TimerSecondUpBtn_Click"
-                                                    Content="▲"
-                                                    FontFamily="Segoe UI Variable Display Regular"
-                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                    Grid.Column="4"
-                                                    Grid.Row="0"
-                                                    HorizontalAlignment="Stretch"
-                                                    VerticalAlignment="Center"
-                                                    Height="31" />
+                                            <ui:Button x:Name="TimerSecondUpBtn"
+                                                       Click="TimerSecondUpBtn_Click"
+                                                       Icon="{ui:ImageIcon '/Resources/icons/up.png'}"
+                                                       Grid.Column="4"
+                                                       Grid.Row="0"
+                                                       HorizontalAlignment="Stretch"
+                                                       VerticalAlignment="Center"
+                                                       Height="31" />
                                             <Grid Grid.Column="4"
                                                   Grid.Row="1"
                                                   ClipToBounds="True">
@@ -665,16 +743,14 @@
                                                     </TextBlock.RenderTransform>
                                                 </TextBlock>
                                             </Grid>
-                                            <Button x:Name="TimerSecondDownBtn"
-                                                    Click="TimerSecondDownBtn_Click"
-                                                    Content="▼"
-                                                    FontFamily="Segoe UI Variable Display Regular"
-                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                    Grid.Column="4"
-                                                    Grid.Row="2"
-                                                    HorizontalAlignment="Stretch"
-                                                    VerticalAlignment="Center"
-                                                    Height="31" />
+                                            <ui:Button x:Name="TimerSecondDownBtn"
+                                                       Click="TimerSecondDownBtn_Click"
+                                                       Icon="{ui:ImageIcon '/Resources/icons/down.png'}"
+                                                       Grid.Column="4"
+                                                       Grid.Row="2"
+                                                       HorizontalAlignment="Stretch"
+                                                       VerticalAlignment="Center"
+                                                       Height="31" />
                                         </Grid>
                                     </Border>
                                     <ui:ProgressRing VerticalAlignment="Center"
@@ -700,8 +776,7 @@
                                         </Grid.ColumnDefinitions>
                                         <ui:Button x:Name="StartTimerBtn"
                                                    Click="StartTimerBtn_Click"
-                                                   Content="Start"
-                                                   FontFamily="Segoe UI Variable Display Regular"
+                                                   Icon="{ui:ImageIcon '/Resources/icons/play.png'}"
                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                    Grid.Column="2"
                                                    Width="200"
@@ -709,8 +784,7 @@
                                                    Appearance="Primary" />
                                         <ui:Button x:Name="PauseTimerBtn"
                                                    Click="PauseTimerBtn_Click"
-                                                   Content="Pause"
-                                                   FontFamily="Segoe UI Variable Display Regular"
+                                                   Icon="{ui:ImageIcon '/Resources/icons/pause.png'}"
                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                    Grid.Column="2"
                                                    Width="200"
@@ -719,8 +793,8 @@
                                                    Appearance="Primary" />
                                         <ui:Button x:Name="ResetTimerBtn"
                                                    Click="ResetTimerBtn_Click"
-                                                   Content="Reset"
-                                                   FontFamily="Segoe UI Variable Display Regular"
+                                                   Icon="{ui:ImageIcon '/Resources/icons/reset.png'}"
+                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                    Grid.Column="0"
                                                    Width="0"
                                                    HorizontalAlignment="Stretch"
@@ -731,44 +805,45 @@
                                 </Grid>
                             </Grid>
                             <Grid Grid.Row="1">
-                                <Button x:Name="LeftMenuClockBtn"
-                                        Click="LeftMenuClockBtn_Click"
-                                        Content="◄"
-                                        FontFamily="Segoe UI Variable Display Regular"
-                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Center"
-                                        Margin="10,0,0,0"
-                                        IsEnabled="False" />
-                                <Button x:Name="RightMenuClockBtn"
-                                        Click="RightMenuClockBtn_Click"
-                                        Content="►"
-                                        FontFamily="Segoe UI Variable Display Regular"
-                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Center"
-                                        Margin="0,0,10,0" />
+                                <ui:Button x:Name="LeftMenuClockBtn"
+                                           Padding="10"
+                                           Click="LeftMenuClockBtn_Click"
+                                           Icon="{ui:ImageIcon '/Resources/icons/left.png'}"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           Margin="10,0,0,0"
+                                           IsEnabled="False" />
+                                <ui:Button x:Name="RightMenuClockBtn"
+                                           Padding="10"
+                                           Click="RightMenuClockBtn_Click"
+                                           Icon="{ui:ImageIcon '/Resources/icons/right.png'}"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,0" />
                             </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
                 <Separator Grid.Column="1"
-                           Margin="10" />
-                <Button x:Name="GlobalMenuBtn"
-                        Click="GlobalMenuBtn_Click"
-                        Content="☰"
-                        FontFamily="Segoe UI Variable Display Regular"
-                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Grid.Column="1"
-                        RenderTransformOrigin="0.5,0.5">
-                    <Button.RenderTransform>
+                           Grid.RowSpan="3"
+                           Margin="10"
+                           x:Name="GlobalMenuSep"/>
+                <ui:Button x:Name="GlobalMenuBtn"
+                           Padding="10"
+                           PreviewMouseDown="GlobalMenuBtn_MouseDown"
+                           Icon="{ui:ImageIcon '/Resources/icons/menu.png'}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Grid.Column="1"
+                           RenderTransformOrigin="0.5,0.5"
+                           Grid.RowSpan="3">
+                    <ui:Button.RenderTransform>
                         <ScaleTransform ScaleX="1"
                                         ScaleY="1" />
-                    </Button.RenderTransform>
-                </Button>
+                    </ui:Button.RenderTransform>
+                </ui:Button>
                 <Grid Grid.Column="2"
+                      Grid.RowSpan="3"
                       x:Name="RightGrid">
                     <Grid x:Name="PluginGrid"
                           RenderTransformOrigin="0,0">
@@ -798,16 +873,15 @@
                               PreviewMouseUp="CarouselFrameClickGrid_PreviewMouseUp"
                               VerticalAlignment="Stretch"
                               HorizontalAlignment="Stretch"
-                              Background="#00000000"/>
-                        <Button Grid.Row="1"
-                                x:Name="EnterDownMenuPluginBtn"
-                                Click="EnterDownMenuPluginBtn_Click"
-                                Content="▼"
-                                FontFamily="Segoe UI Variable Display Regular"
-                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Bottom"
-                                Margin="0,5,0,10" />
+                              Background="#00000000" />
+                        <ui:Button Grid.Row="1"
+                                   Padding="10"
+                                   x:Name="EnterDownMenuPluginBtn"
+                                   Click="EnterDownMenuPluginBtn_Click"
+                                   Icon="{ui:ImageIcon '/Resources/icons/down.png'}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Bottom"
+                                   Margin="0,5,0,10" />
                     </Grid>
                     <Grid x:Name="DownMenuPluginGrid"
                           Visibility="Hidden">
@@ -829,156 +903,38 @@
                                    Background="Transparent"
                                    Margin="10"
                                    RenderTransformOrigin="0.5,0.5">
-                                <Frame.LayoutTransform>
+                                <Frame.RenderTransform>
                                     <TranslateTransform X="0" />
-                                </Frame.LayoutTransform>
+                                </Frame.RenderTransform>
                             </Frame>
                             <Grid Grid.Row="1">
-                                <Button x:Name="LeftMenuPluginBtn"
-                                        Click="LeftMenuPluginBtn_Click"
-                                        Content="◄"
-                                        FontFamily="Segoe UI Variable Display Regular"
-                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Center"
-                                        Margin="10,0,0,0"
-                                        IsEnabled="False" />
-                                <Button x:Name="ExitDownMenuPluginBtn"
-                                        Click="ExitDownMenuPluginBtn_Click"
-                                        Content="▲"
-                                        FontFamily="Segoe UI Variable Display Regular"
-                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Margin="0,0,0,0" />
-                                <Button x:Name="RightMenuPluginBtn"
-                                        Click="RightMenuPluginBtn_Click"
-                                        Content="►"
-                                        FontFamily="Segoe UI Variable Display Regular"
-                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Center"
-                                        Margin="0,0,10,0" />
+                                <ui:Button x:Name="LeftMenuPluginBtn"
+                                           Padding="10"
+                                           Click="LeftMenuPluginBtn_Click"
+                                           Icon="{ui:ImageIcon '/Resources/icons/left.png'}"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           Margin="10,0,0,0"
+                                           IsEnabled="False" />
+                                <ui:Button x:Name="ExitDownMenuPluginBtn"
+                                           Padding="10"
+                                           Click="ExitDownMenuPluginBtn_Click"
+                                           Icon="{ui:ImageIcon '/Resources/icons/up.png'}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,0,0" />
+                                <ui:Button x:Name="RightMenuPluginBtn"
+                                           Padding="10"
+                                           Click="RightMenuPluginBtn_Click"
+                                           Icon="{ui:ImageIcon '/Resources/icons/right.png'}"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,0" />
 
                             </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
-            </Grid>
-            <Grid x:Name="SettingsGrid"
-                  Visibility="Hidden"
-                  Grid.RowSpan="2"
-                  Background="#a0000000">
-                <Border x:Name="SettingsBorder"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch"
-                        CornerRadius="8"
-                        Background="#0affffff"
-                        Padding="20"
-                        Margin="30,70,30,30"
-                        RenderTransformOrigin="0.5,0.5"
-                        ClipToBounds="True">
-                    <Border.RenderTransform>
-                        <ScaleTransform ScaleX="1"
-                                        ScaleY="1" />
-                    </Border.RenderTransform>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <ui:Button x:Name="SettingsBackBtn"
-                                   Click="SettingsBackBtn_Click"
-                                   Content="◄"
-                                   FontFamily="Segoe UI Variable Display Regular"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Top"
-                                   Margin="0,0,0,10" />
-                        <TextBlock Text="Settings"
-                                   x:Name="SettingsTitleText"
-                                   FontSize="22"
-                                   FontFamily="Segoe UI Variable Display Regular"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
-                        <ui:Button x:Name="SettingsSaveBtn"
-                                   Click="SettingsSaveBtn_Click"
-                                   Content="Save"
-                                   FontFamily="Segoe UI Variable Display Regular"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   HorizontalAlignment="Right"
-                                   VerticalAlignment="Top"
-                                   Appearance="Primary"
-                                   Margin="0,0,0,10" />
-                        <TabControl x:Name="SettingsTabControl"
-                                    Grid.Row="1">
-                            <TabItem x:Name="GeneralTabItem">
-                                <TabItem.Header>
-                                    <TextBlock Text="General"
-                                               x:Name="GeneralTabItemHeader" />
-                                </TabItem.Header>
-                                <Border ClipToBounds="True"
-                                        Background="#282828"
-                                        CornerRadius="0,8,8,8">
-                                    <Frame x:Name="GeneralFrame"
-                                           NavigationUIVisibility="Hidden"
-                                           HorizontalAlignment="Stretch"
-                                           VerticalAlignment="Stretch"
-                                           Loaded="GeneralFrame_Loaded"
-                                           RenderTransformOrigin="0.5,0.5">
-                                        <Frame.RenderTransform>
-                                            <ScaleTransform ScaleX="1"
-                                                            ScaleY="1" />
-                                        </Frame.RenderTransform>
-                                    </Frame>
-                                </Border>
-                            </TabItem>
-                            <TabItem x:Name="PMTabItem">
-                                <TabItem.Header>
-                                    <TextBlock Text="Plugin Manager"
-                                               x:Name="PMTabItemHeader" />
-                                </TabItem.Header>
-                                <Border ClipToBounds="True"
-                                        Background="#282828"
-                                        CornerRadius="8,8,8,8">
-                                    <Frame x:Name="PluginManagerFrame"
-                                           NavigationUIVisibility="Hidden"
-                                           HorizontalAlignment="Stretch"
-                                           VerticalAlignment="Stretch"
-                                           Loaded="PluginManagerFrame_Loaded"
-                                           RenderTransformOrigin="0.5,0.5">
-                                        <Frame.RenderTransform>
-                                            <ScaleTransform ScaleX="1"
-                                                            ScaleY="1" />
-                                        </Frame.RenderTransform>
-                                    </Frame>
-                                </Border>
-                            </TabItem>
-                            <TabItem x:Name="AboutTabItem">
-                                <TabItem.Header>
-                                    <TextBlock Text="About"
-                                               x:Name="AboutTabItemHeader" />
-                                </TabItem.Header>
-                                <Border ClipToBounds="True"
-                                        Background="#282828"
-                                        CornerRadius="8,8,8,8">
-                                    <Frame x:Name="AboutFrame"
-                                           NavigationUIVisibility="Hidden"
-                                           HorizontalAlignment="Stretch"
-                                           VerticalAlignment="Stretch"
-                                           Loaded="AboutFrame_Loaded"
-                                           RenderTransformOrigin="0.5,0.5">
-                                        <Frame.RenderTransform>
-                                            <ScaleTransform ScaleX="1"
-                                                            ScaleY="1" />
-                                        </Frame.RenderTransform>
-                                    </Frame>
-                                </Border>
-                            </TabItem>
-                        </TabControl>
-                    </Grid>
-                </Border>
             </Grid>
             <Grid x:Name="TimeUpGrid"
                   Visibility="Hidden"
@@ -993,11 +949,26 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="100" />
                 </Grid.RowDefinitions>
+                <Rectangle VerticalAlignment="Stretch"
+                           HorizontalAlignment="Stretch"
+                           Grid.RowSpan="2"
+                           x:Name="TimeUpBlur">
+                    <Rectangle.Effect>
+                        <BlurEffect Radius="10" />
+                    </Rectangle.Effect>
+                    <Rectangle.Fill>
+                        <VisualBrush Visual="{Binding ElementName=AppGrid}"
+                                     Stretch="None" />
+                    </Rectangle.Fill>
+                    <Rectangle.CacheMode>
+                        <BitmapCache />
+                    </Rectangle.CacheMode>
+                </Rectangle>
                 <Border x:Name="TimeUpBorder"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         CornerRadius="8"
-                        Background="#0affffff"
+                        Background="#161515"
                         Padding="20">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -1044,11 +1015,26 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="100" />
                 </Grid.RowDefinitions>
+                <Rectangle VerticalAlignment="Stretch"
+                           HorizontalAlignment="Stretch"
+                           Grid.RowSpan="2"
+                           x:Name="AlarmAlertBlur">
+                    <Rectangle.Effect>
+                        <BlurEffect Radius="10" />
+                    </Rectangle.Effect>
+                    <Rectangle.Fill>
+                        <VisualBrush Visual="{Binding ElementName=AppGrid}"
+                                     Stretch="None" />
+                    </Rectangle.Fill>
+                    <Rectangle.CacheMode>
+                        <BitmapCache />
+                    </Rectangle.CacheMode>
+                </Rectangle>
                 <Border x:Name="AlarmAlertBorder"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         CornerRadius="8"
-                        Background="#0affffff"
+                        Background="#161515"
                         Padding="20">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -1056,14 +1042,14 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <TextBlock x:Name="AlarmAlertText"
-                                   Text="Alarm"
+                                   Text="{Binding Alarms.AlertName}"
                                    FontSize="50"
                                    FontFamily="Segoe UI Variable Display Regular"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center" />
                         <TextBlock x:Name="AlarmAlertTime"
-                                   Text="00:00"
+                                   Text="{Binding Alarms.AlertTime}"
                                    FontSize="100"
                                    FontFamily="Segoe UI Variable Display Regular"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -1088,12 +1074,225 @@
                                Grid.Column="2" />
                 </Grid>
             </Grid>
+            <Grid x:Name="SettingsGrid"
+                  Visibility="Hidden"
+                  Grid.RowSpan="2"
+                  Background="#a0000000">
+                <Rectangle VerticalAlignment="Stretch"
+                           HorizontalAlignment="Stretch"
+                           x:Name="SettingsBlur">
+                    <Rectangle.Effect>
+                        <BlurEffect Radius="10" />
+                    </Rectangle.Effect>
+                    <Rectangle.Fill>
+                        <VisualBrush Visual="{Binding ElementName=AppGrid}"
+                                     Stretch="None" />
+                    </Rectangle.Fill>
+                    <Rectangle.CacheMode>
+                        <BitmapCache />
+                    </Rectangle.CacheMode>
+                </Rectangle>
+                <Border x:Name="SettingsBorder"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        CornerRadius="8"
+                        Background="#161515"
+                        Padding="20"
+                        Margin="30,70,30,30"
+                        RenderTransformOrigin="0.5,0.5"
+                        ClipToBounds="True">
+                    <Border.RenderTransform>
+                        <ScaleTransform ScaleX="1"
+                                        ScaleY="1" />
+                    </Border.RenderTransform>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <ui:Button x:Name="SettingsBackBtn"
+                                   Click="SettingsBackBtn_Click"
+                                   Content="Back"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Icon="{ui:ImageIcon '/Resources/icons/left.png'}"
+                                   IsEnabled="{Binding Settings.IsPluginSettingsOpen, Converter={StaticResource InverseBooleanConverter}}"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Top"
+                                   Margin="0,0,0,10" />
+                        <TextBlock Text="Settings"
+                                   x:Name="SettingsTitleText"
+                                   FontSize="22"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                        <ui:Button x:Name="SettingsSaveBtn"
+                                   Click="SettingsSaveBtn_Click"
+                                   Content="Save"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Icon="{ui:ImageIcon '/Resources/icons/checkmark.png'}"
+                                   IsEnabled="{Binding Settings.IsPluginSettingsOpen, Converter={StaticResource InverseBooleanConverter}}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Top"
+                                   Appearance="Primary"
+                                   Margin="0,0,0,10" />
+                        <TabControl x:Name="SettingsTabControl"
+                                    IsEnabled="{Binding Settings.IsPluginSettingsOpen, Converter={StaticResource InverseBooleanConverter}}"
+                                    Grid.Row="1">
+                            <TabItem x:Name="GeneralTabItem">
+                                <TabItem.Header>
+                                    <TextBlock Text="General"
+                                               x:Name="GeneralTabItemHeader" />
+                                </TabItem.Header>
+                                <Border ClipToBounds="True"
+                                        Background="#282828"
+                                        CornerRadius="0,8,8,8">
+                                    <Frame x:Name="GeneralFrame"
+                                           NavigationUIVisibility="Hidden"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           Loaded="SettingsTabFrame_Loaded"
+                                           RenderTransformOrigin="0.5,0.5">
+                                        <Frame.RenderTransform>
+                                            <ScaleTransform ScaleX="1"
+                                                            ScaleY="1" />
+                                        </Frame.RenderTransform>
+                                    </Frame>
+                                </Border>
+                            </TabItem>
+                            <TabItem x:Name="PMTabItem">
+                                <TabItem.Header>
+                                    <TextBlock Text="Plugin Manager"
+                                               x:Name="PMTabItemHeader" />
+                                </TabItem.Header>
+                                <Border ClipToBounds="True"
+                                        Background="#282828"
+                                        CornerRadius="8,8,8,8">
+                                    <Frame x:Name="PluginManagerFrame"
+                                           NavigationUIVisibility="Hidden"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           Loaded="SettingsTabFrame_Loaded"
+                                           RenderTransformOrigin="0.5,0.5">
+                                        <Frame.RenderTransform>
+                                            <ScaleTransform ScaleX="1"
+                                                            ScaleY="1" />
+                                        </Frame.RenderTransform>
+                                    </Frame>
+                                </Border>
+                            </TabItem>
+                            <TabItem x:Name="AboutTabItem">
+                                <TabItem.Header>
+                                    <TextBlock Text="About"
+                                               x:Name="AboutTabItemHeader" />
+                                </TabItem.Header>
+                                <Border ClipToBounds="True"
+                                        Background="#282828"
+                                        CornerRadius="8,8,8,8">
+                                    <Frame x:Name="AboutFrame"
+                                           NavigationUIVisibility="Hidden"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           Loaded="SettingsTabFrame_Loaded"
+                                           RenderTransformOrigin="0.5,0.5">
+                                        <Frame.RenderTransform>
+                                            <ScaleTransform ScaleX="1"
+                                                            ScaleY="1" />
+                                        </Frame.RenderTransform>
+                                    </Frame>
+                                </Border>
+                            </TabItem>
+                        </TabControl>
+                    </Grid>
+                </Border>
+            </Grid>
+            <Grid x:Name="MirrorGrid"
+                  Visibility="Hidden"
+                  Grid.RowSpan="2"
+                  RenderTransformOrigin="0.5,0.5"
+                  Background="#a0000000">
+                <Grid.RenderTransform>
+                    <ScaleTransform ScaleX="1"
+                                    ScaleY="1" />
+                </Grid.RenderTransform>
+                <Rectangle VerticalAlignment="Stretch"
+                           HorizontalAlignment="Stretch"
+                           x:Name="MirrorBlur">
+                    <Rectangle.Effect>
+                        <BlurEffect Radius="10" />
+                    </Rectangle.Effect>
+                    <Rectangle.Fill>
+                        <VisualBrush Visual="{Binding ElementName=AppGrid}"
+                                     Stretch="None" />
+                    </Rectangle.Fill>
+                    <Rectangle.CacheMode>
+                        <BitmapCache />
+                    </Rectangle.CacheMode>
+                </Rectangle>
+                <Border x:Name="MirrorBorder"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        CornerRadius="8"
+                        Background="#161515"
+                        Padding="20"
+                        Margin="30,70,30,30"
+                        RenderTransformOrigin="0.5,0.5"
+                        ClipToBounds="True">
+                    <Border.RenderTransform>
+                        <ScaleTransform ScaleX="1"
+                                        ScaleY="1" />
+                    </Border.RenderTransform>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <ui:Button x:Name="MirrorBackBtn"
+                                   Click="MirrorBackBtn_Click"
+                                   Content="Back"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Icon="{ui:ImageIcon '/Resources/icons/left.png'}"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Top"
+                                   Margin="0,0,0,10" />
+                        <TextBlock Text="Mirror"
+                                   x:Name="MirrorTitleText"
+                                   FontSize="22"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                        <Frame x:Name="MirrorFrame"
+                                    Grid.Row="1">
+                        </Frame>
+                    </Grid>
+                </Border>
+            </Grid>
             <Grid x:Name="GlobalMenuGrid"
                   Grid.RowSpan="2"
+                  Visibility="Hidden"
                   Background="#a0000000"
-                  Visibility="Hidden">
+                  IsHitTestVisible="True"
+                  PreviewMouseUp="GlobalMenuGrid_MouseUp">
+                <Rectangle VerticalAlignment="Stretch"
+                           HorizontalAlignment="Stretch"
+                           x:Name="GlobalMenuBlur">
+                    <Rectangle.Effect>
+                        <BlurEffect Radius="10" />
+                    </Rectangle.Effect>
+                    <Rectangle.Fill>
+                        <VisualBrush Visual="{Binding ElementName=AppGrid}"
+                                     Stretch="None" />
+                    </Rectangle.Fill>
+                    <Rectangle.CacheMode>
+                        <BitmapCache />
+                    </Rectangle.CacheMode>
+                </Rectangle>
                 <Border x:Name="GlobalMenuBorder"
-                        Background="#0affffff"
+                        Background="#161515"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         CornerRadius="8"
@@ -1116,63 +1315,125 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="10" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="10" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <Button x:Name="BackBtn"
-                                Content="Back"
-                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                FontFamily="Segoe UI Variable Display Regular"
-                                Click="BackBtn_Click"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Width="200"
-                                Grid.Row="0" />
+                        <ui:Button x:Name="BackBtn"
+                                   Padding="10"
+                                   Content="Back"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   PreviewMouseUp="BackBtn_MouseUp"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Icon="{ui:ImageIcon '/Resources/icons/left.png'}"
+                                   Width="200"
+                                   Grid.Row="0" />
                         <Separator Grid.Row="1"
                                    VerticalAlignment="Center" />
-                        <Button x:Name="ScreenOffBtn"
-                                Content="Turn screen off"
-                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                FontFamily="Segoe UI Variable Display Regular"
-                                Click="ScreenOffBtn_Click"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Width="200"
-                                Grid.Row="2" />
+                        <ui:Button x:Name="ScreenOffBtn"
+                                   Padding="10"
+                                   Content="Turn screen off"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   PreviewMouseUp="ScreenOffBtn_MouseUp"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Icon="{ui:ImageIcon '/Resources/icons/screenoff.png'}"
+                                   Width="200"
+                                   Grid.Row="2" />
+                        <ui:Button x:Name="MirrorBtn"
+                                   Padding="10"
+                                   Content="Mirror"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   PreviewMouseUp="MirrorBtn_MouseUp"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Icon="{ui:ImageIcon '/Resources/icons/camera.png'}"
+                                   Width="200"
+                                   Grid.Row="4" />
                         <ToggleButton x:Name="FullScreenBtn"
-                                      Content="Full screen"
-                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                      FontFamily="Segoe UI Variable Display Regular"
-                                      Click="FullScreenBtn_Click"
+                                      Padding="10"
+                                      PreviewMouseUp="FullScreenBtn_MouseUp"
+                                      IsChecked="{Binding IsFullScreenIndicatorChecked, Mode=OneWay}"
+                                      IsEnabled="{Binding IsKioskMode, Converter={StaticResource InverseBooleanConverter}}"
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
                                       Width="200"
-                                      Grid.Row="4" />
+                                      Grid.Row="6">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Image Source="/Resources/icons/fullscreen.png"
+                                       Height="16"
+                                       Width="16"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="0" />
+                                <TextBlock Text="Full screen"
+                                           x:Name="FullScreenBtnText"
+                                           FontSize="14"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Grid.Column="2" />
+                            </Grid>
+                        </ToggleButton>
                         <ToggleButton x:Name="KioskModeBtn"
-                                      Content="Kiosk mode"
-                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                      FontFamily="Segoe UI Variable Display Regular"
-                                      Click="KioskModeBtn_Click"
+                                      Padding="10"
+                                      PreviewMouseUp="KioskModeBtn_MouseUp"
+                                      IsChecked="{Binding IsKioskMode, Mode=OneWay}"
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
                                       Width="200"
-                                      Grid.Row="6" />
-                        <Button x:Name="SettingsBtn"
-                                Content="Settings"
-                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                FontFamily="Segoe UI Variable Display Regular"
-                                Click="SettingsBtn_Click"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Width="200"
-                                Grid.Row="8" />
-                        <Button x:Name="ExitAppBtn"
-                                Content="Exit"
-                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                FontFamily="Segoe UI Variable Display Regular"
-                                Click="ExitAppBtn_Click"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Width="200"
-                                Grid.Row="10" />
+                                      Grid.Row="8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Image Source="/Resources/icons/kiosk.png"
+                                       Height="16"
+                                       Width="16"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="0" />
+                                <TextBlock Text="Kiosk mode"
+                                           x:Name="KioskModeBtnText"
+                                           FontSize="14"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Grid.Column="2" />
+                            </Grid>
+                        </ToggleButton>
+                        <ui:Button x:Name="SettingsBtn"
+                                   Padding="10"
+                                   Content="Settings"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   PreviewMouseUp="SettingsBtn_MouseUp"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Icon="{ui:ImageIcon '/Resources/icons/settings.png'}"
+                                   Width="200"
+                                   Grid.Row="10" />
+                        <ui:Button x:Name="ExitAppBtn"
+                                   Padding="10"
+                                   Content="Exit"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   FontFamily="Segoe UI Variable Display Regular"
+                                   PreviewMouseUp="ExitAppBtn_MouseUp"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Icon="{ui:ImageIcon '/Resources/icons/exit.png'}"
+                                   Width="200"
+                                   Grid.Row="12" />
 
                     </Grid>
                 </Border>
@@ -1259,9 +1520,26 @@
                     <TranslateTransform Y="0" />
                 </ui:TitleBar.RenderTransform>
             </ui:TitleBar>
+            <TextBlock x:Name="AppTitleText"
+                       Visibility="Hidden"
+                       Grid.Row="0"
+                       Text="WinDeskClock"
+                       FontSize="12"
+                       FontFamily="Segoe UI SemiBold"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       Margin="32,0,0,0" />
         </Grid>
         <Grid x:Name="OverlayGrid"
               Visibility="Hidden">
+            <Grid x:Name="NoneGrid">
+                <Rectangle x:Name="NoneRect"
+                           Fill="#000000"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           Visibility="Hidden" />
+            </Grid>
             <Grid x:Name="CRTGrid">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -1296,6 +1574,13 @@
                         <ScaleTransform ScaleX="1" />
                     </Rectangle.RenderTransform>
                 </Rectangle>
+            </Grid>
+            <Grid x:Name="FadeGrid">
+                <Rectangle x:Name="FadeRect"
+                           Fill="#000000"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           Visibility="Hidden"/>
             </Grid>
         </Grid>
     </Grid>
