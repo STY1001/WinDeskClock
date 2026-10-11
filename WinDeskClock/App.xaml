@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:local="clr-namespace:WinDeskClock"
-             xmlns:converters="clr-namespace:WinDeskClock.Converters"
              Startup="OnStartup"
              DispatcherUnhandledException="Application_DispatcherUnhandledException">
     <Application.Resources>
@@ -12,10 +11,6 @@
                 <ui:ThemesDictionary Theme="Dark" />
                 <ui:ControlsDictionary />
             </ResourceDictionary.MergedDictionaries>
-            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-            <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
-            <converters:BoolToAppearanceConverter x:Key="BoolToAppearanceConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

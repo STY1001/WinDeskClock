@@ -32,7 +32,7 @@
                            HorizontalAlignment="Center"
                            VerticalAlignment="Top"
                            RenderOptions.BitmapScalingMode="HighQuality" />
-                    <TextBlock Text="{Binding VersionText}"
+                    <TextBlock Text="Version -.-.-"
                                x:Name="VersionTextBlock"
                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                Grid.Row="1"

@@ -23,7 +23,7 @@ namespace WinDeskClock.Utils
 
             foreach (var lang in LangData)
             {
-                _ = Log.Info($"Adding language: {lang.Value["id"]} - {lang.Value["name"]}");
+                Log.Info($"Adding language: {lang.Value["id"]} - {lang.Value["name"]}");
                 LangList.Add(lang.Value["id"].ToString(), lang.Value["name"].ToString());
             }
         }

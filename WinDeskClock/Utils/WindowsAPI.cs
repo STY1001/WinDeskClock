@@ -19,12 +19,6 @@ namespace WinDeskClock.Utils
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
         [DllImport("user32.dll")]
         private static extern int SendMessage(int hWnd, int hMsg, int wParam, int lParam);
-        // SendMessage blocks the calling thread until every window in the broadcast has processed
-        // the message - on some Windows builds that can apparently stall long enough (or indefinitely)
-        // to look like the whole app froze. PostMessage queues the same message and returns immediately;
-        // for SC_MONITORPOWER we never read a result back anyway, so there's nothing lost by not waiting.
-        [DllImport("user32.dll")]
-        private static extern bool PostMessage(int hWnd, int hMsg, int wParam, int lParam);
         [DllImport("user32.dll")]
         private static extern IntPtr RegisterPowerSettingNotification(IntPtr hRecipient, ref Guid PowerSettingGuid, uint Flags);
         [DllImport("user32.dll")]
@@ -85,10 +79,6 @@ namespace WinDeskClock.Utils
             public static int SendMessage(int hWnd, int hMsg, int wParam, int lParam)
             {
                 return WindowsAPI.SendMessage(hWnd, hMsg, wParam, lParam);
-            }
-            public static bool PostMessage(int hWnd, int hMsg, int wParam, int lParam)
-            {
-                return WindowsAPI.PostMessage(hWnd, hMsg, wParam, lParam);
             }
             public static IntPtr RegisterPowerSettingNotification(IntPtr hRecipient, ref Guid PowerSettingGuid, uint Flags)
             {

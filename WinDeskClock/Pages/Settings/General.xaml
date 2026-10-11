@@ -45,11 +45,7 @@
                             </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
-                    <ComboBox x:Name="LangComboBox"
-                              ItemsSource="{Binding AvailableLanguages}"
-                              DisplayMemberPath="Value"
-                              SelectedValuePath="Key"
-                              SelectedValue="{Binding DraftLanguage, Mode=TwoWay}" />
+                    <ComboBox x:Name="LangComboBox" />
                 </ui:CardControl>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
@@ -68,7 +64,7 @@
                         </StackPanel>
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding VolumePercent, StringFormat='{}{0} %'}"
+                        <TextBlock Text="x %"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    FontSize="12"
                                    HorizontalAlignment="Right"
@@ -78,7 +74,6 @@
                                 Minimum="0"
                                 Maximum="100"
                                 TickFrequency="1"
-                                Value="{Binding VolumePercent, Mode=TwoWay}"
                                 IsSnapToTickEnabled="True" />
                     </StackPanel>
                 </ui:CardControl>
@@ -98,8 +93,7 @@
                             </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
-                    <ui:ToggleSwitch x:Name="BlurEffectSwitch"
-                                      IsChecked="{Binding DraftBlurEffectEnabled, Mode=TwoWay}" />
+                    <ui:ToggleSwitch x:Name="BlurEffectSwitch" />
                 </ui:CardControl>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
@@ -117,17 +111,12 @@
                             </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
-                    <ComboBox x:Name="ScreenOnOffComboBox"
-                              SelectedValuePath="Tag"
-                              SelectedValue="{Binding DraftScreenOnOffEffect, Mode=TwoWay}">
+                    <ComboBox x:Name="ScreenOnOffComboBox">
                         <ComboBoxItem Content="None"
-                                      Tag="none"
                                       x:Name="ScreenOnOffNone"/>
                         <ComboBoxItem Content="Fade"
-                                      Tag="fade"
                                       x:Name="ScreenOnOffFade"/>
                         <ComboBoxItem Content="CRT"
-                                      Tag="crt"
                                       x:Name="ScreenOnOffCRT"/>
                     </ComboBox>
                 </ui:CardControl>
@@ -151,7 +140,6 @@
                         <ui:NumberBox x:Name="ScreenWakeUpDelayHourNumberBox"
                                       Minimum="0"
                                       Maximum="23"
-                                      Value="{Binding DraftScreenAutoWakeUpHour, Mode=TwoWay}"
                                       ClearButtonEnabled="False" />
                         <TextBlock Text=":"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
@@ -162,10 +150,8 @@
                         <ui:NumberBox x:Name="ScreenWakeUpDelayMinuteNumberBox"
                                       Minimum="0"
                                       Maximum="59"
-                                      Value="{Binding DraftScreenAutoWakeUpMinute, Mode=TwoWay}"
                                       ClearButtonEnabled="False"/>
                         <ui:ToggleSwitch x:Name="ScreenWakeUpToggleSwitch"
-                                         IsChecked="{Binding DraftScreenAutoWakeUp, Mode=TwoWay}"
                                          Margin="15,0,0,0" />
                     </StackPanel>
                 </ui:CardControl>
@@ -186,7 +172,7 @@
                         </StackPanel>
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding MenuAutoCloseLabel}"
+                        <TextBlock Text="x seconds"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    FontSize="12"
                                    HorizontalAlignment="Right"
@@ -196,7 +182,6 @@
                                 Minimum="0"
                                 Maximum="60"
                                 TickFrequency="10"
-                                Value="{Binding DraftMenuCloseDelaySeconds, Mode=TwoWay}"
                                 IsSnapToTickEnabled="True" />
                     </StackPanel>
                 </ui:CardControl>
@@ -236,9 +221,7 @@
                             </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
-                    <ui:ToggleSwitch x:Name="ShowSecondsToggleSwitch"
-                                      IsChecked="{Binding DraftClockShowSeconds, Mode=TwoWay}"
-                                      IsEnabled="{Binding IsShowSecondsEditable}" />
+                    <ui:ToggleSwitch x:Name="ShowSecondsToggleSwitch" />
                 </ui:CardControl>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
@@ -260,8 +243,7 @@
                             </StackPanel>
                         </StackPanel>
                     </ui:CardControl.Header>
-                    <ui:ToggleSwitch x:Name="FbxStyleToggleSwitch"
-                                      IsChecked="{Binding DraftClockFbxStyle, Mode=TwoWay}" />
+                    <ui:ToggleSwitch x:Name="FbxStyleToggleSwitch" />
                 </ui:CardControl>
                 <Grid HorizontalAlignment="Stretch"
                       Margin="20,0,20,5">
@@ -292,7 +274,7 @@
                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                            FontFamily="Segoe UI SemiBold"
                                            x:Name="DefaultAlarmSoundTitle" />
-                                <TextBlock Text="{Binding DefaultAlarmSoundLabel}"
+                                <TextBlock Text="Select the default sound of the alarm (Current: audio.wav)"
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                            FontSize="12"
                                            x:Name="DefaultAlarmSoundDesc" />
@@ -300,7 +282,6 @@
                         </StackPanel>
                     </ui:CardControl.Header>
                     <Button Content="Choose a file"
-                            Click="DefaultAlarmSoundBtn_Click"
                             x:Name="DefaultAlarmSoundBtn" />
                 </ui:CardControl>
                 <ui:CardControl Margin="15,0,15,10">
@@ -324,7 +305,7 @@
                         </StackPanel>
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding AlarmTimeoutLabel}"
+                        <TextBlock Text="x minutes"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    FontSize="12"
                                    HorizontalAlignment="Right"
@@ -334,7 +315,6 @@
                                 Minimum="0"
                                 Maximum="60"
                                 TickFrequency="1"
-                                Value="{Binding DraftAlarmTimeoutDelayMinutes, Mode=TwoWay}"
                                 IsSnapToTickEnabled="True" />
                     </StackPanel>
                 </ui:CardControl>
@@ -367,7 +347,7 @@
                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                            FontFamily="Segoe UI SemiBold"
                                            x:Name="TimerSoundText" />
-                                <TextBlock Text="{Binding TimerSoundLabel}"
+                                <TextBlock Text="Select the sound of the timer (Current: audio.wav)"
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                            FontSize="12"
                                            x:Name="TimerSoundDesc" />
@@ -375,7 +355,6 @@
                         </StackPanel>
                     </ui:CardControl.Header>
                     <Button Content="Choose a file"
-                            Click="TimerSoundBtn_Click"
                             x:Name="TimerSoundBtn" />
                 </ui:CardControl>
                 <Grid HorizontalAlignment="Stretch"
@@ -414,13 +393,8 @@
                             </StackPanel>
                         </StackPanel>
                     </Expander.Header>
-                    <ItemsControl x:Name="CarouselSelectStack" ItemsSource="{Binding PinnablePlugins}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <CheckBox Content="{Binding DisplayName}" IsChecked="{Binding IsPinned, Mode=TwoWay}" Margin="0,4" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <StackPanel Orientation="Vertical"
+                                x:Name="CarouselSelectStack" />
                 </Expander>
                 <ui:CardControl Margin="15,0,15,10">
                     <ui:CardControl.Header>
@@ -443,7 +417,7 @@
                         </StackPanel>
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding CarouselDelayLabel}"
+                        <TextBlock Text="x seconds"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    FontSize="12"
                                    HorizontalAlignment="Right"
@@ -453,7 +427,6 @@
                                 Minimum="5"
                                 Maximum="60"
                                 TickFrequency="5"
-                                Value="{Binding DraftCarouselDelaySeconds, Mode=TwoWay}"
                                 IsSnapToTickEnabled="True" />
                     </StackPanel>
                 </ui:CardControl>

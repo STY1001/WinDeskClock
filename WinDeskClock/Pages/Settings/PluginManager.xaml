@@ -4,7 +4,6 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:WinDeskClock.Pages.Settings"
-      xmlns:controls="clr-namespace:WinDeskClock.Controls"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d"
       d:DesignHeight="485"
@@ -14,13 +13,8 @@
     <Grid>
         <ScrollViewer Padding="5"
                       PanningMode="VerticalOnly">
-            <ItemsControl x:Name="PluginCardStack" ItemsSource="{Binding Plugins}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <controls:PluginCardView />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <StackPanel x:Name="PluginCardStack">
+            </StackPanel>
         </ScrollViewer>
         <Grid Visibility="Hidden"
               x:Name="PluginSettingsGrid">

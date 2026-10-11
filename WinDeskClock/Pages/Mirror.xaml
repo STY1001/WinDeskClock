@@ -25,22 +25,16 @@
                 <ComboBox x:Name="CameraComboBox"
                           Width="300"
                           Margin="5 0"
-                          ItemsSource="{Binding Cameras}"
-                          DisplayMemberPath="Name"
-                          IsEnabled="{Binding HasNoCamera, Converter={StaticResource InverseBooleanConverter}}"
                           SelectionChanged="CameraComboBox_SelectionChanged" />
                 <CheckBox x:Name="MirrorCheckBox"
                           Content="Mirror mode"
                           VerticalAlignment="Center"
-                          IsChecked="{Binding IsMirrored, Mode=TwoWay}"
-                          IsEnabled="{Binding HasNoCamera, Converter={StaticResource InverseBooleanConverter}}"
                           Margin="10 0" />
             </StackPanel>
 
             <Border Grid.Row="1"
                     BorderThickness="1">
                 <Image x:Name="CameraImage"
-                       Source="{Binding CurrentFrame}"
                        Stretch="Uniform" />
             </Border>
             <ui:ProgressRing VerticalAlignment="Center"

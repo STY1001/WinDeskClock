@@ -425,71 +425,9 @@
                                         <ScrollViewer Grid.Row="1"
                                                       x:Name="StopwatchLapScrollView"
                                                       PanningMode="VerticalOnly">
-                                            <!-- Lap cards: same look as the original's code-built Card (Margin 20,0,20,10, 18pt texts, plain lap number).
-                                                 The "slide" is the original's: the card's slot grows 0 -> 58 (Quintic ease-out, 0.3s) while it is still
-                                                 invisible - which pushes the older laps down smoothly - and only then does it fade in (0.15s).
-                                                 Height starts at 0 in the template itself so the first frame can't flash a full-height card. -->
-                                            <ItemsControl x:Name="LapStopwatchItems"
-                                                          ItemsSource="{Binding Stopwatch.Laps}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <StackPanel Orientation="Vertical" />
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <ui:Card Margin="20,0,20,10"
-                                                                 Height="0"
-                                                                 Opacity="0">
-                                                            <ui:Card.Triggers>
-                                                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                                                    <BeginStoryboard>
-                                                                        <Storyboard>
-                                                                            <DoubleAnimation Storyboard.TargetProperty="Height"
-                                                                                             From="0"
-                                                                                             To="58"
-                                                                                             Duration="0:0:0.3">
-                                                                                <DoubleAnimation.EasingFunction>
-                                                                                    <QuinticEase EasingMode="EaseOut" />
-                                                                                </DoubleAnimation.EasingFunction>
-                                                                            </DoubleAnimation>
-                                                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                                                             From="0"
-                                                                                             To="1"
-                                                                                             BeginTime="0:0:0.3"
-                                                                                             Duration="0:0:0.15">
-                                                                                <DoubleAnimation.EasingFunction>
-                                                                                    <QuadraticEase EasingMode="EaseOut" />
-                                                                                </DoubleAnimation.EasingFunction>
-                                                                            </DoubleAnimation>
-                                                                        </Storyboard>
-                                                                    </BeginStoryboard>
-                                                                </EventTrigger>
-                                                            </ui:Card.Triggers>
-                                                            <Grid>
-                                                                <TextBlock Text="{Binding Index}"
-                                                                           FontSize="18"
-                                                                           FontFamily="Segoe UI Variable Display SemiBold"
-                                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                                           HorizontalAlignment="Left"
-                                                                           VerticalAlignment="Center" />
-                                                                <TextBlock Text="{Binding GapDisplay}"
-                                                                           FontSize="18"
-                                                                           FontFamily="Segoe UI Variable Display Regular"
-                                                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center" />
-                                                                <TextBlock Text="{Binding TotalDisplay}"
-                                                                           FontSize="18"
-                                                                           FontFamily="Segoe UI Variable Display Regular"
-                                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                                           HorizontalAlignment="Right"
-                                                                           VerticalAlignment="Center" />
-                                                            </Grid>
-                                                        </ui:Card>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
+                                            <StackPanel Orientation="Vertical"
+                                                        x:Name="LapStopwatchStack">
+                                            </StackPanel>
                                         </ScrollViewer>
                                     </Grid>
                                     <Grid Grid.Row="1"
@@ -903,9 +841,9 @@
                                    Background="Transparent"
                                    Margin="10"
                                    RenderTransformOrigin="0.5,0.5">
-                                <Frame.RenderTransform>
+                                <Frame.LayoutTransform>
                                     <TranslateTransform X="0" />
-                                </Frame.RenderTransform>
+                                </Frame.LayoutTransform>
                             </Frame>
                             <Grid Grid.Row="1">
                                 <ui:Button x:Name="LeftMenuPluginBtn"
@@ -1042,14 +980,14 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <TextBlock x:Name="AlarmAlertText"
-                                   Text="{Binding Alarms.AlertName}"
+                                   Text="Alarm"
                                    FontSize="50"
                                    FontFamily="Segoe UI Variable Display Regular"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center" />
                         <TextBlock x:Name="AlarmAlertTime"
-                                   Text="{Binding Alarms.AlertTime}"
+                                   Text="00:00"
                                    FontSize="100"
                                    FontFamily="Segoe UI Variable Display Regular"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -1116,7 +1054,6 @@
                                    FontFamily="Segoe UI Variable Display Regular"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                    Icon="{ui:ImageIcon '/Resources/icons/left.png'}"
-                                   IsEnabled="{Binding Settings.IsPluginSettingsOpen, Converter={StaticResource InverseBooleanConverter}}"
                                    HorizontalAlignment="Left"
                                    VerticalAlignment="Top"
                                    Margin="0,0,0,10" />
@@ -1133,13 +1070,11 @@
                                    FontFamily="Segoe UI Variable Display Regular"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                    Icon="{ui:ImageIcon '/Resources/icons/checkmark.png'}"
-                                   IsEnabled="{Binding Settings.IsPluginSettingsOpen, Converter={StaticResource InverseBooleanConverter}}"
                                    HorizontalAlignment="Right"
                                    VerticalAlignment="Top"
                                    Appearance="Primary"
                                    Margin="0,0,0,10" />
                         <TabControl x:Name="SettingsTabControl"
-                                    IsEnabled="{Binding Settings.IsPluginSettingsOpen, Converter={StaticResource InverseBooleanConverter}}"
                                     Grid.Row="1">
                             <TabItem x:Name="GeneralTabItem">
                                 <TabItem.Header>
@@ -1153,7 +1088,7 @@
                                            NavigationUIVisibility="Hidden"
                                            HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
-                                           Loaded="SettingsTabFrame_Loaded"
+                                           Loaded="GeneralFrame_Loaded"
                                            RenderTransformOrigin="0.5,0.5">
                                         <Frame.RenderTransform>
                                             <ScaleTransform ScaleX="1"
@@ -1174,7 +1109,7 @@
                                            NavigationUIVisibility="Hidden"
                                            HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
-                                           Loaded="SettingsTabFrame_Loaded"
+                                           Loaded="PluginManagerFrame_Loaded"
                                            RenderTransformOrigin="0.5,0.5">
                                         <Frame.RenderTransform>
                                             <ScaleTransform ScaleX="1"
@@ -1195,7 +1130,7 @@
                                            NavigationUIVisibility="Hidden"
                                            HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
-                                           Loaded="SettingsTabFrame_Loaded"
+                                           Loaded="AboutFrame_Loaded"
                                            RenderTransformOrigin="0.5,0.5">
                                         <Frame.RenderTransform>
                                             <ScaleTransform ScaleX="1"
@@ -1211,12 +1146,7 @@
             <Grid x:Name="MirrorGrid"
                   Visibility="Hidden"
                   Grid.RowSpan="2"
-                  RenderTransformOrigin="0.5,0.5"
                   Background="#a0000000">
-                <Grid.RenderTransform>
-                    <ScaleTransform ScaleX="1"
-                                    ScaleY="1" />
-                </Grid.RenderTransform>
                 <Rectangle VerticalAlignment="Stretch"
                            HorizontalAlignment="Stretch"
                            x:Name="MirrorBlur">
@@ -1356,8 +1286,6 @@
                         <ToggleButton x:Name="FullScreenBtn"
                                       Padding="10"
                                       PreviewMouseUp="FullScreenBtn_MouseUp"
-                                      IsChecked="{Binding IsFullScreenIndicatorChecked, Mode=OneWay}"
-                                      IsEnabled="{Binding IsKioskMode, Converter={StaticResource InverseBooleanConverter}}"
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
                                       Width="200"
@@ -1386,7 +1314,6 @@
                         <ToggleButton x:Name="KioskModeBtn"
                                       Padding="10"
                                       PreviewMouseUp="KioskModeBtn_MouseUp"
-                                      IsChecked="{Binding IsKioskMode, Mode=OneWay}"
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
                                       Width="200"
