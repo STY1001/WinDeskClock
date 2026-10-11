@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<AssemblyName>WDC.WinDeskClock.Plugin</AssemblyName>
+		<Company>STY Inc. (STY1001)</Company>
+		<Product>WinDeskClock</Product>
+		<Description>A plugin for WinDeskClock</Description>
+		<Copyright>STY1001</Copyright>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="Resources\icon.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="WPF-UI" Version="4.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\WinDeskClock\WinDeskClock.csproj">
+		  <Private>False</Private>
+		</ProjectReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\icon.png" />
+	</ItemGroup>
+</Project>
